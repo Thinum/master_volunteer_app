@@ -1,32 +1,8 @@
-
-
-![SpringBoot-Angular-TrainingCenter-Management](https://socialify.git.ci/walidbosso/SpringBoot-Angular-TrainingCenter-Management/image?description=1&font=Source%20Code%20Pro&forks=1&issues=1&language=1&name=1&pattern=Formal%20Invitation&pulls=1&stargazers=1&theme=Auto)
-
-
-<p align="center">
-<a href="https://github.com/walidbosso/SpringBoot-Angular-TrainingCenter-Management">
-<img src="https://raw.githubusercontent.com/khoa083/khoa/main/Khoa_ne/img/Rainbow.gif" width="60%"/> </a>
-</p>
-<div align="center">
-  
-  [![GitHub WidgetBox](https://github-widgetbox.vercel.app/api/profile?username=walidbosso&data=followers,repositories,stars,commits&theme=nautilus)](https://github.com/walidbosso/SpringBoot-Angular-TrainingCenter-Management)
-
-  <p align="center">
-<a href="https://github.com/walidbosso/SpringBoot-Angular-TrainingCenter-Management">
-<img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fwalidbosso%2FSpringBoot-Angular-TrainingCenter-Management&label=Project%20views&countColor=%23263759&style=flat-square&labelStyle=none" /></a>
-</p>
-
-<a href="https://github.com/walidbosso/SpringBoot-Angular-TrainingCenter-Management">
-  <img src="https://raw.githubusercontent.com/khoa083/khoa/main/Khoa_ne/img/Rainbow.gif" width="60%"/>
-  <a/>
-</a>
-
-
 <br/>
   
 # Training Center Management with Spring Boot, Angular, and MySQL
   
-  </div>
+</div>
 
 
 
