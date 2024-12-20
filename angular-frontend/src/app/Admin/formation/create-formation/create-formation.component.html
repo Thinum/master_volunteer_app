@@ -1,0 +1,209 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header card-header-danger">
+            <h4 class="card-title">Ajouter une formation</h4>
+            <div class="card-category">
+              <!-- if we know the link we type normally, if like delete a list we use [] -->
+              <a
+                class="btn btn-outline-warning float-right"
+                routerLink="/admin/dashboard"
+                >Toutes les formations</a
+              >
+            </div>
+          </div>
+
+          <div class="card-body">
+            <form action="" (submit)="addFormationWithImage()">
+              <!-- IMAGE -->
+              
+              <div class="form-group">
+                
+              
+                <div *ngIf="selectedImage" class="text-center mt-3">
+                  <img width="200" height="150" [src]="getImageUrl()" alt="Selected Image" class="img-fluid rounded" />
+                </div>
+                <div *ngIf="selectedImage" class=" mb-2">
+                  <p class="font-weight-bold">Selected File: {{ selectedImage.name }}</p>
+                  
+                  <div class="progress">
+                    <div
+                      class="progress-bar"
+                      role="progressbar"
+                      [style.width]="progress + '%'"
+                      [attr.aria-valuenow]="progress"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    >
+                      {{ progress }}%
+                    </div>
+                  </div>
+                </div>
+                <!-- File input with styling -->
+                <div class="form-group mt-3">
+                  <label for="imageFile" class="font-weight-bold">Select Image:</label>
+                  <div class="custom-file">
+                    <input
+                      type="file"
+                      class="custom-file-input"
+                      id="imageFile"
+                      name="imageFile"
+                      (change)="onImageSelected($event)"
+                      accept="image/*"
+                    />
+                    <label class="custom-file-label" for="imageFile"><small class="form-text text-muted">
+                    Select a valid and less than 500KB size image file (png, jpeg, gif etc..)
+                  </small></label>
+                  </div>
+                  
+                </div>
+                 
+                  
+                
+                
+                 
+                   
+          
+                
+                <!-- fin image -->
+                
+             
+
+
+                <!-- NOM -->
+                <label for="nom">Nom de Formation</label>
+                <!-- ngModel same name in ts -->
+                <input
+                  [(ngModel)]="formation.nom"
+                  class="form-control"
+                  type="text"
+                  name="nom"
+                  id="nom"
+                  required
+                />
+
+                <!-- Categorie -->
+                <label for="categorie">Categorie</label>
+
+                <textarea
+                  rows="4"
+                  [(ngModel)]="formation.categorie"
+                  class="form-control"
+                  type="text"
+                  name="categorie"
+                  id="categorie"
+                ></textarea>
+
+                <!-- Objectif -->
+
+                <label for="objectif">Objectif</label>
+                <input
+                  [(ngModel)]="formation.objectif"
+                  class="form-control"
+                  type="text"
+                  name="objectif"
+                  id="objectif"
+                />
+
+                <!-- Duree -->
+                <label for="duree">Duree</label>
+                <input
+                  [(ngModel)]="formation.duree"
+                  class="form-control"
+                  type="number"
+                  name="duree"
+                  id="duree"
+                />
+
+                <!-- Description -->
+                <label for="description">Description</label>
+                <input
+                  [(ngModel)]="formation.description"
+                  class="form-control"
+                  type="text"
+                  name="description"
+                  id="description"
+                />
+
+                <!-- Cout -->
+                <label for="cout">Cout</label>
+                <input
+                  [(ngModel)]="formation.cout"
+                  class="form-control"
+                  type="number"
+                  name="cout"
+                  id="cout"
+                  required
+                />
+
+                <label for="dateDebut">Date de debut de formation:</label>
+                <input
+                  [(ngModel)]="formation.dateDebut"
+                  class="form-control"
+                  type="date"
+                  name="dateDebut"
+                  id="dateDebut"
+                  required
+                />
+
+                <label for="dateFin">Date de fin de formation:</label>
+                <input
+                  [(ngModel)]="formation.dateFin"
+                  class="form-control"
+                  type="date"
+                  name="dateFin"
+                  id="dateFin"
+                  required
+                />
+
+                <label for="formateur">Select nom de formateur:</label>
+                <select
+                  class="form-control btn btn-outline-primary mt-3"
+                  id="formateur"
+                  (change)="onFormateurSelected($event.target.value)"
+                >
+                  <option [value]="0">
+                    - No Formateur : Select to change -
+                  </option>
+                  <option
+                    *ngFor="let formateur of formateurs"
+                    [value]="formateur.id"
+                  >
+                    {{ formateur.name }}
+                  </option>
+                </select>
+
+                <label for="entreprise">Select Nom de Entreprise:</label>
+                <select
+                  class="form-control btn btn-outline-primary mt-3"
+                  id="entreprise"
+                  (change)="onEntrepriseSelected($event.target.value)"
+                >
+                  <option [value]="0">
+                    - No Entreprise : Select to change -
+                  </option>
+                  <option
+                    *ngFor="let entreprise of entreprises"
+                    [value]="entreprise.id"
+                  >
+                    {{ entreprise.nom }}
+                  </option>
+                </select>
+
+                <button
+                  [disabled]="isSubmitting"
+                  type="submit"
+                  class="form-control btn btn-outline-info mt-3"
+                >
+                  Ajouter la Formation
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

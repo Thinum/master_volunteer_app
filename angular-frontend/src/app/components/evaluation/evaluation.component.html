@@ -1,0 +1,188 @@
+<div class="container mt-5">
+  <div class="card p-4 mt-5">
+    <div class="text-center my-4">
+      <h2 class="form-title text-primary fw-bold mb-3">Feel free to share your feedback</h2>
+    </div>
+    <div class="alert alert-info alert-dismissible fade show fs-5" role="alert">
+      Please <strong class="fs-3 fw-bolder">note</strong> that once feedbacks are submitted, they cannot be edited or
+      re-added. This policy ensures the integrity of the feedback process and
+      maintains fairness for all participants.
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <form
+      [formGroup]="evaluationForm"
+      (ngSubmit)="evaluate()"
+      class="evaluation-form"
+    >
+      <div class="form-group row align-items-center">
+        <label for="code" class="col-md-4 form-label"
+          >Enter your unique code:</label
+        >
+        <div class="col-md-8">
+          <input
+            class="form-control bg-transparent"
+            formControlName="code"
+            type="text"
+            placeholder="Enter your 10-character code here..."
+            id="code"
+            required
+          />
+          <div *ngIf="code.invalid && (code.dirty || code.touched)">
+            <label *ngIf="code.errors?.['required']" style="color: red">
+              Please enter your unique code
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row align-items-center">
+        <label for="quality" class="col-md-4 form-label"
+          > Rate the educational quality of the trainer:</label
+        >
+        <div class="col-md-8">
+          <input
+            class="form-control bg-transparent"
+            formControlName="quality"
+            type="number"
+            placeholder="Number (1-5)..."
+            id="quality"
+            required
+          />
+          <div *ngIf="quality.invalid && (quality.dirty || quality.touched)">
+            <label *ngIf="quality.errors?.['required']" style="color: red">
+              Please rate the educational quality
+            </label>
+            <label
+              *ngIf="
+                numberInputControl.errors.min || numberInputControl.errors.max
+              "
+              style="color: red"
+            >
+              Number must be between 1 and 5.
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row align-items-center">
+        <label for="pace" class="col-md-4 form-label">Rate the pace of the trainer:</label>
+        <div class="col-md-8">
+          <input
+            class="form-control bg-transparent"
+            formControlName="pace"
+            type="number"
+            placeholder="Number (1-5)..."
+            id="pace"
+            required
+          />
+          <div *ngIf="pace.invalid && (pace.dirty || pace.touched)">
+            <label *ngIf="pace.errors?.['required']" style="color: red">
+              Please rate the pace
+            </label>
+            <label
+              *ngIf="
+                numberInputControl.errors.min || numberInputControl.errors.max
+              "
+              style="color: red"
+            >
+              Number must be between 1 and 5.
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row align-items-center">
+        <label for="course" class="col-md-4 form-label">Rate the course support:</label>
+        <div class="col-md-8">
+          <input
+            class="form-control bg-transparent"
+            formControlName="course"
+            type="number"
+            placeholder="Number (1-5)..."
+            id="course"
+            required
+          />
+          <div *ngIf="course.invalid && (course.dirty || course.touched)">
+            <label *ngIf="course.errors?.['required']" style="color: red">
+              Please rate the course support
+            </label>
+            <label
+              *ngIf="
+                numberInputControl.errors.min || numberInputControl.errors.max
+              "
+              style="color: red"
+            >
+              Number must be between 1 and 5.
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row align-items-center">
+        <label for="tp" class="col-md-4 form-label">"Rate the TP support:</label>
+        <div class="col-md-8">
+          <input
+            class="form-control bg-transparent"
+            formControlName="tp"
+            type="number"
+            placeholder="Number (1-5)..."
+            id="tp"
+            required
+          />
+          <div *ngIf="tp.invalid && (tp.dirty || tp.touched)">
+            <label *ngIf="tp.errors?.['required']" style="color: red">
+              Please rate TP support
+            </label>
+            <label
+              *ngIf="
+                numberInputControl.errors.min || numberInputControl.errors.max
+              "
+              style="color: red"
+            >
+              Number must be between 1 and 5.
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row align-items-center">
+        <label for="mastery" class="col-md-4 form-label"
+          >Rate the trainer's mastery of the subject:</label
+        >
+        <div class="col-md-8">
+          <input
+            class="form-control bg-transparent"
+            formControlName="mastery"
+            type="number"
+            placeholder="Number (1-5)..."
+            id="mastery"
+            required
+          />
+          <div *ngIf="mastery.invalid && (mastery.dirty || mastery.touched)">
+            <label *ngIf="mastery.errors?.['required']" style="color: red">
+              Please rate mastery of the subject
+            </label>
+            <label
+              *ngIf="
+                numberInputControl.errors.min || numberInputControl.errors.max
+              "
+              style="color: red"
+            >
+              Number must be between 1 and 5
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group text-center mt-4">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="!evaluationForm.valid"
+        >
+          Submit Feedback
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

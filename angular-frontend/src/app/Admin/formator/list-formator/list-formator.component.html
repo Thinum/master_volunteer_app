@@ -1,0 +1,52 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card" style="height: 460px;">
+          <div class="card-header card-header-danger sticky-top fixed">
+            <h4 class="card-title">List Des Formateurs</h4>
+            <p class="card-category">
+            <a *ngIf="permission" class="btn btn-outline-primary float-right" routerLink="/admin/formateur/add">
+              Ajouter Formateur
+            </a>
+            </p>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+              <table class="table">
+                <thead class="text-primary text-center fixed">
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Competances</th>
+                  <th>Remarques</th>
+                  <th>Actions</th>
+                </thead>
+                <tbody class="text-center">
+                  <tr *ngFor="let formator of formators">
+                    <td>{{formator.id}}</td>
+                    <td>{{formator.name}}</td>
+                    <td>{{formator.email}}</td>
+                    <td>{{formator.competences}}</td>
+                    <td>{{formator.remarques}}</td>
+                    <td class="text-center">
+                      <a [routerLink]="['/admin/formateur',formator.id,'update']"
+                        class="btn btn-outline-success mx-1">Edit</a>
+                      <button 
+                        class="btn btn-outline-danger mx-1" 
+                        (click)="deleteFormator(formator.id)"
+                        *ngIf="permission">
+                         Delete
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
