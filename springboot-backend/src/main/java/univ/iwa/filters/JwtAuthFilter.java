@@ -17,13 +17,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException; 
 
+
 // This class helps us to validate the generated jwt token 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter { 
 	@Autowired JwtService jwtService; 
 	@Autowired UserInfoService userDetailsService; 
+
+
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException { 
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+		/*
 		String authHeader = request.getHeader("Authorization"); 
 		String token = null; 
 		String username = null; 
@@ -38,7 +42,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request)); 
 				SecurityContextHolder.getContext().setAuthentication(authToken); 
 			} 
-		} 
-		filterChain.doFilter(request, response); 
-	} 
-} 
+		}
+		*/
+		filterChain.doFilter(request, response);
+	}
+}
