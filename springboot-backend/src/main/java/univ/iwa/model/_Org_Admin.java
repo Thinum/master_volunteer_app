@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "org_admin")
 public class _Org_Admin extends _Member{
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
 }

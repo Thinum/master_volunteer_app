@@ -4,12 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import univ.iwa.model._User;
-import univ.iwa.repository._Member_Repository;
-import univ.iwa.repository._Org_Admin_Repository;
+import univ.iwa.repository._MemberRepository;
+import univ.iwa.repository._Org_AdminRepository;
 import univ.iwa.repository._UserRepository;
 
 @Service
-public class _User_Service {
+public class _UserService {
     @Autowired
     PasswordEncoder encoder;
     //region User
@@ -25,12 +25,12 @@ public class _User_Service {
 
     //region Member
     @Autowired
-    private _Member_Repository memberRepository;
+    private _MemberRepository memberRepository;
     //endregion
 
     //region Org_Admin
     @Autowired
-    private _Org_Admin_Repository orgAdminRepository;
+    private _Org_AdminRepository orgAdminRepository;
     //endregion
 
 }
