@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { VolunteerListComponent } from './volunteer-list.component';
+import { UserSettingsComponent } from './user-settings.component';
 
-describe('VolunteerListComponent', () => {
-  let component: VolunteerListComponent;
-  let fixture: ComponentFixture<VolunteerListComponent>;
+describe('UserSettingsComponent', () => {
+  let component: UserSettingsComponent;
+  let fixture: ComponentFixture<UserSettingsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [VolunteerListComponent]
+      imports: [UserSettingsComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(VolunteerListComponent);
+    fixture = TestBed.createComponent(UserSettingsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
