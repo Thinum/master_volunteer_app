@@ -1,0 +1,21 @@
+.profile-card {
+  max-width: 80%;
+  position: relative;
+  z-index:1;
+  margin: 100px auto 20px;
+}
+
+.profile-image {
+  background-size: cover;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+
+mat-card-header {
+  margin-bottom: 20px;
+}
+
+mat-card-content {
+  padding: 16px;
+}

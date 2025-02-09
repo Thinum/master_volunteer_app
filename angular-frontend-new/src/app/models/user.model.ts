@@ -18,11 +18,6 @@ export interface User {
     email: string;
 
     /**
-     * Hashed password for authentication.
-     */
-    password: string;
-
-    /**
      * Base64-encoded string of the user's profile picture.
      */
     profilePicture?: string;
@@ -30,5 +25,5 @@ export interface User {
     /**
      * Timestamp when the user joined.
      */
-    joinedAt: string;
+    joinedAt: Date;
 }
