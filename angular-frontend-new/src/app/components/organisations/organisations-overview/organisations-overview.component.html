@@ -1,0 +1,36 @@
+<!-- Search Bar -->
+<div class="search-container">
+  <mat-form-field appearance="outline" class="search-bar">
+    <mat-label>Search</mat-label>
+    <input matInput type="text">
+    <button mat-button matSuffix><mat-icon>search</mat-icon></button>
+  </mat-form-field>
+  <button mat-mini-fab color="primary"><mat-icon>add</mat-icon></button>
+</div>
+
+<!-- Joined Organisations -->
+<div class="section">
+  <h3 class="section-title">Joined</h3>
+  <mat-list>
+    <mat-list-item *ngFor="let org of joinedOrganisations">
+      <mat-icon class="avatar">groups</mat-icon>
+      <span>{{ org.name }}</span>
+      <span class="spacer"></span>
+      <mat-icon color="primary">check</mat-icon>
+    </mat-list-item>
+  </mat-list>
+</div>
+
+<!-- Recommended Organisations -->
+<div class="section">
+  <h3 class="section-title">Recommended</h3>
+  <mat-list>
+    <mat-list-item *ngFor="let org of recommendedOrganisations">
+      <mat-icon class="avatar">groups</mat-icon>
+      <span>{{ org.name }}</span>
+      <span class="spacer"></span>
+      <mat-icon color="accent">thumb_up</mat-icon>
+      <mat-icon color="accent">emoji_emotions</mat-icon>
+    </mat-list-item>
+  </mat-list>
+</div>
