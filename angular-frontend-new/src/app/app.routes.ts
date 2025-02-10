@@ -10,6 +10,6 @@ import {
 export const routes: Routes = [
   {path: '', component: UserProfileComponent, data: {title: 'Profil'}},
   {path: 'organisations', component: OrganisationsOverviewComponent, data: {title: 'Organisation Overview'}},
-  {path: 'organisation', component: OrganisationDetailComponent, data: {title: 'Organisation'}}
+  {path: 'organisations/:id', component: OrganisationDetailComponent, data: {title: 'Organisation'}}
   /**TODO change organisations to single organisation just for testing purposes for now */
 ]

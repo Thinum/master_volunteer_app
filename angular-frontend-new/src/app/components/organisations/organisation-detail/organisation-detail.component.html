@@ -1,35 +1,37 @@
-<div class="container">
-  <div class="top-section">
-    <div class="left">
-      <div class="icon-circle">
-        <mat-icon>groups</mat-icon>
+<div *ngIf="detailedOrganisation">
+  <div class="container">
+    <div class="top-section">
+      <div class="left">
+        <div class="icon-circle">
+          <mat-icon>groups</mat-icon>
+        </div>
+        <h3>{{detailedOrganisation.orgName}}</h3>
+        <p>{{detailedOrganisation.body}}</p>
       </div>
-      <h3>Title</h3>
-      <p>Some details about the title...</p>
+      <div class="right">
+        <h3>Goals</h3>
+        <mat-progress-bar mode="determinate" value="70"></mat-progress-bar>
+        <mat-progress-bar mode="determinate" value="50"></mat-progress-bar>
+      </div>
     </div>
-    <div class="right">
-      <h3>Goals</h3>
-      <mat-progress-bar mode="determinate" value="70"></mat-progress-bar>
-      <mat-progress-bar mode="determinate" value="50"></mat-progress-bar>
-    </div>
-  </div>
 
-  <div class="middle-section">
-    <div class="projects">
-      <h3>Projects</h3>
-      <ul>
-        <li>Project 1</li>
-        <li>Project 2</li>
-        <li>Project 3</li>
-      </ul>
-    </div>
-    <div class="activities">
-      <h3>Activities</h3>
-      <ul>
-        <li>Activity 1</li>
-        <li>Activity 2</li>
-        <li>Activity 3</li>
-      </ul>
+    <div class="middle-section">
+      <div class="projects">
+        <h3>Projects</h3>
+        <ul>
+          <li>Project 1</li>
+          <li>Project 2</li>
+          <li>Project 3</li>
+        </ul>
+      </div>
+      <div class="activities">
+        <h3>Activities</h3>
+        <ul>
+          <li>Activity 1</li>
+          <li>Activity 2</li>
+          <li>Activity 3</li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>
