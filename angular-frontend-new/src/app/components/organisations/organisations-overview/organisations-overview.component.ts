@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MatToolbar} from '@angular/material/toolbar';
 import {MatIcon} from '@angular/material/icon';
 import {MatButton, MatFabAnchor, MatIconButton, MatMiniFabButton} from '@angular/material/button';
@@ -31,7 +31,7 @@ import {RouterLink, RouterLinkActive} from '@angular/router';
   templateUrl: './organisations-overview.component.html',
   styleUrl: './organisations-overview.component.css'
 })
-export class OrganisationsOverviewComponent {
+export class OrganisationsOverviewComponent implements OnInit{
   public organisations: Organisation[] = [];
   public organisationsFiltered = this.organisations;
 

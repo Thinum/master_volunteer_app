@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MatIcon} from '@angular/material/icon';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {ActivatedRoute} from '@angular/router';
@@ -15,7 +15,7 @@ import {NgIf} from '@angular/common';
   templateUrl: './organisation-detail.component.html',
   styleUrl: './organisation-detail.component.css'
 })
-export class OrganisationDetailComponent {
+export class OrganisationDetailComponent implements OnInit{
   detailedOrganisation: any;
   private id?: string | null;
   constructor(private route: ActivatedRoute, private organisationService: OrganisationService) {
