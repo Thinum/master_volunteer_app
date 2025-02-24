@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "org_admin")
-public class _Org_Admin extends _Member{
+public class Org_Admin extends Member {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;

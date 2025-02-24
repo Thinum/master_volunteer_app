@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Entity
 @Table(name = "organisation")
-public class _Organisation {
+public class Organisation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;

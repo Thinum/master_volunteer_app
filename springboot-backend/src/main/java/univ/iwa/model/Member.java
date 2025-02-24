@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "member")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class _Member extends _User{
+public class Member extends User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;

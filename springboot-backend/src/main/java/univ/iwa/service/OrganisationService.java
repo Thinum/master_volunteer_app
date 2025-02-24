@@ -1,31 +1,30 @@
 package univ.iwa.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import univ.iwa.model._Organisation;
-import univ.iwa.repository._OrganisationRepository;
+import univ.iwa.model.Organisation;
+import univ.iwa.repository.OrganisationRepository;
 
 import java.util.List;
 
 @Service
-public class _OrganisationService {
+public class OrganisationService {
     @Autowired
-    private _OrganisationRepository organisationRepository;
+    private OrganisationRepository organisationRepository;
 
-    public List<_Organisation> getAllOrganisations(){
+    public List<Organisation> getAllOrganisations(){
         return organisationRepository.findAll();
     }
 
-    public _Organisation getOrganisationById(int id) {
+    public Organisation getOrganisationById(int id) {
         return organisationRepository.findById(id).get();
     }
 
-    public _Organisation addOrganisation(_Organisation organisation) {
+    public Organisation addOrganisation(Organisation organisation) {
         return organisationRepository.save(organisation);
     }
 
-    public _Organisation updateOrganisation(_Organisation organisation) {
+    public Organisation updateOrganisation(Organisation organisation) {
         return organisationRepository.save(organisation);
     }
 
