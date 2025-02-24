@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 
 import univ.iwa.filters.JwtAuthFilter;
+import univ.iwa.service.UserInfoService;
 
 @Configuration
 @EnableWebSecurity
