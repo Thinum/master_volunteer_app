@@ -27,8 +27,8 @@ public class ActivityService {
         return activityRepository.save(activity);
     }
 
-    public Activity getActivityByProjectId(int project_id) {
-        return activityRepository.findById(project_id).get();
+    public Activity getActivityByProjectId(int projectId) {
+        return activityRepository.findByProjectId(projectId).get();
     }
 
     public void deleteActivity(int id) {

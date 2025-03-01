@@ -27,7 +27,7 @@ public class SecurityConfig {
     JwtAuthFilter authFilter;
 
     @Bean
-    public UserService userService() {
+    public UserService userDetailService() {
         return new UserService();
     }
 
@@ -62,7 +62,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userService());
+        authenticationProvider.setUserDetailsService(userDetailService());
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }

@@ -16,6 +16,8 @@ public class Activity {
     private int id;
     private String title;
     private String body;
-    private int project_id;
-    private int org_id;
+    @Column(name = "project_id")
+    private int projectId;
+    @Column(name = "org_id")
+    private int orgId;
 }
