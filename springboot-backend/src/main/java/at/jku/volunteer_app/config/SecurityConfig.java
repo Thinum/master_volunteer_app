@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -41,13 +42,13 @@ public class SecurityConfig {
                         .requestMatchers("/formation/**").permitAll()
                         .requestMatchers("/demande/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
-                        .requestMatchers("/organisations/**").permitAll()
+                        .requestMatchers("/organisations/**").authenticated()
                         .requestMatchers("/auth/assistant/**").permitAll() // .authenticated()
                         .requestMatchers("/auth/admin/**").permitAll()     // .authenticated()
                         .requestMatchers("/auth/formateur/**").permitAll()     // .authenticated()
                         .requestMatchers("/formateur/**").permitAll() // .authenticated()
                         .requestMatchers("/individu/**").authenticated() // Done
-                ).csrf(csrf -> csrf.disable())
+                ).csrf(AbstractHttpConfigurer::disable)
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

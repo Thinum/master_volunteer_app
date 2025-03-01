@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {MatToolbar} from '@angular/material/toolbar';
 import {MatIcon} from '@angular/material/icon';
-import {MatButton, MatFabAnchor, MatIconButton, MatMiniFabButton} from '@angular/material/button';
+import {MatButton, MatMiniFabButton} from '@angular/material/button';
 import {MatList, MatListItem} from '@angular/material/list';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
@@ -13,9 +12,7 @@ import {RouterLink, RouterLinkActive} from '@angular/router';
 @Component({
   selector: 'app-organisations-overview',
   imports: [
-    MatToolbar,
     MatIcon,
-    MatIconButton,
     MatListItem,
     MatList,
     MatLabel,
@@ -24,7 +21,6 @@ import {RouterLink, RouterLinkActive} from '@angular/router';
     MatButton,
     MatMiniFabButton,
     NgForOf,
-    MatFabAnchor,
     RouterLink,
     RouterLinkActive
   ],

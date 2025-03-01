@@ -25,5 +25,5 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp createdAt;
 
-
+    private String username;
 }
