@@ -31,8 +31,21 @@ mat-list-item {
 }
 
 .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 8px;
+  object-fit: cover;
+  display: inline-block;
+  vertical-align: middle;
+  background-color: transparent;
+  border: 2px solid transparent;
+}
+
+.avatar-placeholder {
   background-color: #2196f3;
   color: white;
+  display: flex;
   padding: 8px;
   border-radius: 50%;
   margin-right: 8px;

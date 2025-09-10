@@ -17,7 +17,8 @@
   <mat-list>
     <mat-list-item *ngFor="let org of organisationsFiltered">
         <a class="organisation-list-element" routerLink="{{org.id}}" routerLinkActive="active" ariaCurrentWhenActive="page">
-          <mat-icon class="avatar">groups</mat-icon>
+          <!--<mat-icon class="avatar-placeholder">groups</mat-icon>-->
+          <img src="test.png" alt="Groups Icon" class="avatar"/>
           <span class="link-text">{{ org.orgName }}</span>
           <span class="spacer"></span>
           <mat-icon color="primary">check</mat-icon>
