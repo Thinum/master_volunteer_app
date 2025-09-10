@@ -12,44 +12,8 @@
   </button>
 </div>
 
-<div class="section">
-  <h3 class="section-title">All Organisations</h3>
-  <mat-list>
-    <mat-list-item *ngFor="let org of organisationsFiltered">
-        <a class="organisation-list-element" routerLink="{{org.id}}" routerLinkActive="active" ariaCurrentWhenActive="page">
-          <!--<mat-icon class="avatar-placeholder">groups</mat-icon>-->
-          <img src="test.png" alt="Groups Icon" class="avatar"/>
-          <span class="link-text">{{ org.orgName }}</span>
-          <span class="spacer"></span>
-          <mat-icon color="primary">check</mat-icon>
-        </a>
-    </mat-list-item>
-  </mat-list>
-</div>
+<app-organisation-list [organisationsList]="organisationsFiltered" [sectionTitle]="'All Organisations'"/>
 
-<!-- Joined Organisations -->
-<div class="section">
-  <h3 class="section-title">Joined</h3>
-  <mat-list>
-    <mat-list-item *ngFor="let org of joinedOrganisations">
-      <mat-icon class="avatar">groups</mat-icon>
-      <span>{{ org.name }}</span>
-      <span class="spacer"></span>
-      <mat-icon color="primary">check</mat-icon>
-    </mat-list-item>
-  </mat-list>
-</div>
+<app-organisation-list [organisationsList]="joinedOrganisations" [sectionTitle]="'Joined'"/>
 
-<!-- Recommended Organisations -->
-<div class="section">
-  <h3 class="section-title">Recommended</h3>
-  <mat-list>
-    <mat-list-item *ngFor="let org of recommendedOrganisations">
-      <mat-icon class="avatar">groups</mat-icon>
-      <span>{{ org.name }}</span>
-      <span class="spacer"></span>
-      <mat-icon color="accent">thumb_up</mat-icon>
-      <mat-icon color="accent">emoji_emotions</mat-icon>
-    </mat-list-item>
-  </mat-list>
-</div>
+<app-organisation-list [organisationsList]="recommendedOrganisations" [sectionTitle]="'Recommended'"/>

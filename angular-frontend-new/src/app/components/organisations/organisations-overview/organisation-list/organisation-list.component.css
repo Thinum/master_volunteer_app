@@ -1,0 +1,64 @@
+.section {
+  padding: 16px;
+}
+
+.section-title {
+  background-color: #e3f2fd;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+mat-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.organisation-list-element {
+  display: flex;
+  align-items: center;
+  ::ng-deep mat-icon {
+    text-decoration: none;
+  }
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 8px;
+  object-fit: cover;
+  display: inline-block;
+  vertical-align: middle;
+  background-color: transparent;
+  border: 2px solid transparent;
+}
+
+.avatar-placeholder {
+  background-color: #2196f3;
+  color: white;
+  display: flex;
+  padding: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.bottom-toolbar {
+  display: flex;
+  justify-content: space-around;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+a {
+  text-decoration: none;
+}
+
+a .link-text {
+  text-decoration: underline;
+}

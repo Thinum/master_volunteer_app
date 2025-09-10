@@ -1,0 +1,14 @@
+<div class="section">
+  <h3 class="section-title">{{sectionTitle}}</h3>
+  <mat-list>
+    <mat-list-item *ngFor="let org of organisationsList">
+      <a class="organisation-list-element" routerLink="{{org.id}}" routerLinkActive="active" ariaCurrentWhenActive="page">
+        <img src="test.png" alt="Groups Icon" class="avatar"/>
+        <mat-icon class="avatar-placeholder">groups</mat-icon>
+        <span class="link-text">{{ org.orgName }}</span>
+        <span class="spacer"></span>
+        <mat-icon color="primary">check</mat-icon>
+      </a>
+    </mat-list-item>
+  </mat-list>
+</div>

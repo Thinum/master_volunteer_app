@@ -8,21 +8,18 @@ import {NgForOf} from '@angular/common';
 import {OrganisationService} from '../../../services/api/organisation.service';
 import {Organisation} from '../../../models/organisations.model';
 import {RouterLink, RouterLinkActive} from '@angular/router';
+import {OrganisationListComponent} from './organisation-list/organisation-list.component';
 
 @Component({
   selector: 'app-organisations-overview',
   imports: [
     MatIcon,
-    MatListItem,
-    MatList,
     MatLabel,
     MatFormField,
     MatInput,
     MatButton,
     MatMiniFabButton,
-    NgForOf,
-    RouterLink,
-    RouterLinkActive
+    OrganisationListComponent
   ],
   templateUrl: './organisations-overview.component.html',
   styleUrl: './organisations-overview.component.css'
@@ -35,14 +32,54 @@ export class OrganisationsOverviewComponent implements OnInit{
 
   }
 
-  joinedOrganisations = [
-    { name: 'Org 1', joined: true },
-    { name: 'Org 2', joined: true }
+  joinedOrganisations: Organisation[] = [
+    {
+      id: 3,
+      orgName: "Joined Organisation 1",
+      location: {
+        lat: 0,
+        lon: 0
+      },
+      createdAt: "",
+      body: "This is an organisation 1",
+      deactivated: false
+    },
+    {
+      id: 4,
+      orgName: "Joined Organisation 2",
+      location: {
+        lat: 0,
+        lon: 0
+      },
+      createdAt: "",
+      body: "This is an organisation 2",
+      deactivated: false
+    }
   ];
 
-  recommendedOrganisations = [
-    { name: 'Org A', joined: false },
-    { name: 'Org B', joined: false }
+  recommendedOrganisations: Organisation[] = [
+    {
+      id: 5,
+      orgName: "Recommended Organisation 1",
+      location: {
+        lat: 0,
+        lon: 0
+      },
+      createdAt: "",
+      body: "This is an organisation 1",
+      deactivated: false
+    },
+    {
+      id: 6,
+      orgName: "Recommended Organisation 2",
+      location: {
+        lat: 0,
+        lon: 0
+      },
+      createdAt: "",
+      body: "This is an organisation 2",
+      deactivated: false
+    }
   ];
 
   ngOnInit() {
