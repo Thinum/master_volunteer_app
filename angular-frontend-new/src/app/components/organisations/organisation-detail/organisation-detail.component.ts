@@ -17,13 +17,13 @@ import {NgIf} from '@angular/common';
 })
 export class OrganisationDetailComponent implements OnInit{
   detailedOrganisation: any;
-  private id?: string | null;
+  private id?: number | null;
   constructor(private route: ActivatedRoute, private organisationService: OrganisationService) {
 
   }
 
   ngOnInit(){
-    this.id = this.route.snapshot.paramMap.get('id');
+    this.id = parseInt(this.route.snapshot.paramMap.get('id') ?? '-1');
     if(this.id) {
       this.organisationService.getOrganisationById(this.id).subscribe(org => this.detailedOrganisation=org)
     }

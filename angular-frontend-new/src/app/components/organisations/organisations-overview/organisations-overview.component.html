@@ -16,12 +16,12 @@
   <h3 class="section-title">All Organisations</h3>
   <mat-list>
     <mat-list-item *ngFor="let org of organisationsFiltered">
-      <a routerLink="{{org.id}}"  routerLinkActive="active" ariaCurrentWhenActive="page">
-        <mat-icon class="avatar">groups</mat-icon>
-        <span>{{ org.orgName }}</span>
-        <span class="spacer"></span>
-        <mat-icon color="primary">check</mat-icon>
-      </a>
+        <a class="organisation-list-element" routerLink="{{org.id}}" routerLinkActive="active" ariaCurrentWhenActive="page">
+          <mat-icon class="avatar">groups</mat-icon>
+          <span>{{ org.orgName }}</span>
+          <span class="spacer"></span>
+          <mat-icon color="primary">check</mat-icon>
+        </a>
     </mat-list-item>
   </mat-list>
 </div>

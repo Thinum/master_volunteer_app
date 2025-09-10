@@ -22,6 +22,15 @@
 mat-list-item {
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+
+.organisation-list-element {
+  display: flex;
+  align-items: center;
+  ::ng-deep mat-icon {
+    text-decoration: none;
+  }
 }
 
 .avatar {
