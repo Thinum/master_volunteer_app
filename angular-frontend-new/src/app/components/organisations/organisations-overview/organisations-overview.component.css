@@ -28,9 +28,6 @@ mat-list-item {
 .organisation-list-element {
   display: flex;
   align-items: center;
-  ::ng-deep mat-icon {
-    text-decoration: none;
-  }
 }
 
 .avatar {
@@ -51,4 +48,12 @@ mat-list-item {
   position: fixed;
   bottom: 0;
   width: 100%;
+}
+
+a {
+  text-decoration: none;
+}
+
+a .link-text {
+  text-decoration: underline;
 }
