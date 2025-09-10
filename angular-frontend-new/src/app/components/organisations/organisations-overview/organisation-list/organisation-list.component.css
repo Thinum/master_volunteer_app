@@ -31,7 +31,6 @@ mat-list-item {
   display: inline-block;
   vertical-align: middle;
   background-color: transparent;
-  border: 2px solid transparent;
 }
 
 .avatar-placeholder {

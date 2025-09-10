@@ -17,7 +17,8 @@ export class OrganisationService {
       },
       createdAt: "",
       body: "This is an organisation 1",
-      deactivated: false
+      deactivated: false,
+      profilePicture: "test.png",
     },
     {
       id: 2,
