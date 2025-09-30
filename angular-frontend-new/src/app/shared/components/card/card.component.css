@@ -6,7 +6,7 @@
   border-top: solid 1px lightgray;
 }
 
-.card-left{
+.card-left {
   width: 30%;
   background-color: #EEF9FF !important;
   display: flex;
@@ -21,7 +21,7 @@
   align-items: center;
 }
 
-.card-right{
+.card-right {
   width: 5%;
   display: flex;
   justify-content: center;

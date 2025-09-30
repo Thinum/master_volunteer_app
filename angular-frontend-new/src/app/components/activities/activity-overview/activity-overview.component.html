@@ -13,10 +13,10 @@
         <p class="activity-title">{{ activity.title }}</p>
         <p class="activity-description"> {{ activity.description }} </p>
         <div class="friends">
-          <span *ngFor="let friend of activity.friends" class="friend-avatar">
-            <img *ngIf="friend.avatar" [src]="friend.avatar" alt="{{ friend.name }}">
-            <span *ngIf="!friend.avatar">{{ friend.name?.[0] }}</span>
-          </span>
+        <span *ngFor="let friend of activity.friends" class="friend-avatar">
+          <img *ngIf="friend.avatar" [src]="friend.avatar" alt="{{ friend.name }}">
+          <span *ngIf="!friend.avatar">{{ friend.name }}</span>
+        </span>
         </div>
       </div>
     </div>
