@@ -17,12 +17,13 @@ import {CommunityComponent} from './components/community/community.component';
 
 
 export const routes: Routes = [
-  {path: '', component: UserProfileComponent, data: {title: 'Profil'}},
+  {path: '', component: HomeComponent, data: {title: 'Home'}},
   {path: 'organisations', component: OrganisationsOverviewComponent, data: {title: 'Organisation Overview'}},
   {path: 'organisations/:id', component: OrganisationDetailComponent, data: {title: 'Organisation'}},
   {path: 'community', component: CommunityComponent, data: {title: 'Community'}},
   /**TODO change organisations to single organisation just for testing purposes for now */
-  {path: 'home', component: HomeComponent, data: {title: 'Home'}},
+  {path: 'profile', component: UserProfileComponent, data: {title: 'Profil'}},
+  {path: 'profile/:id', component: UserProfileComponent, data: {title: 'Profil'}},
   {path: 'activities', component: ActivityOverviewComponent, data: {title: 'Activities'}},
   { path: 'activities/:id', component: ActivityDetailComponent }
 ]
