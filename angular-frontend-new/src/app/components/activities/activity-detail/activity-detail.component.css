@@ -1,0 +1,29 @@
+.detail-card {
+  margin: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+.friends {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+
+  .friend-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}
