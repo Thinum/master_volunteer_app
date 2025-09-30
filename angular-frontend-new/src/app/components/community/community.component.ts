@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import {MatTab, MatTabGroup} from '@angular/material/tabs';
-import {FriendsComponent} from './friends-chat/friends.component';
+import {FriendsComponent} from './friends/friends.component';
 import {ForumComponent} from './forum/forum.component';
 
 @Component({
