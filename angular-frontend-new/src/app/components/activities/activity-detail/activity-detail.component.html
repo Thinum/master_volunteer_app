@@ -24,7 +24,7 @@
     <div class="friends">
     <span *ngFor="let friend of activity?.friends" class="friend-avatar" matTooltip="{{ friend.name }}">
       <img *ngIf="friend.avatar" [src]="friend.avatar" [alt]="friend.name">
-      <span *ngIf="!friend.avatar" class="initials">{{ friend.name?.[0] }}</span>
+      <span *ngIf="!friend.avatar" class="initials">{{ friend.name }}</span>
     </span>
     </div>
   </div>
