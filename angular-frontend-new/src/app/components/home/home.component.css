@@ -71,16 +71,6 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.hours {
-  min-width: 80px;
-  text-align: center;
-}
-
-.hours .value {
-  font-size: 24px;
-  font-weight: bold;
-}
-
 .request-info {
   flex: 1;
   margin-left: 16px;

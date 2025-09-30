@@ -1,24 +1,24 @@
 <div class="container">
-
-  <mat-card
-    *ngFor="let activity of activities"
-    class="activity-card"
-    routerLink="{{activity.id}}" routerLinkActive="active" ariaCurrentWhenActive="page"
-  >
-      <mat-card-header>
-        <mat-card-title>{{ activity.title }}</mat-card-title>
-        <mat-card-subtitle>{{ activity.organization }}</mat-card-subtitle>
-      </mat-card-header>
-
-      <mat-card-content>
-        <p><strong>Date:</strong> {{ activity.date | date:'mediumDate' }}</p>
+  <app-card *ngFor="let activity of activities" routerLink="{{activity.id}}" routerLinkActive="active" ariaCurrentWhenActive="page">
+    <div card-left>
+      <div class="date">
+        <span class="label">{{ activity.organization}} </span>
+        <span class="value">{{ activity.date | date: 'd' }}</span>
+        <span class="label month">{{ activity.date | date:'MMM' }}</span>
+      </div>
+    </div>
+    <div card-body>
+      <div class="card-content" >
+        <p class="organization">{{ activity.organization }}</p>
+        <p class="activity-title">{{ activity.title }}</p>
+        <p class="activity-description"> {{ activity.description }} </p>
         <div class="friends">
-        <span *ngFor="let friend of activity.friends" class="friend-avatar">
-          <img *ngIf="friend.avatar" [src]="friend.avatar" alt="{{ friend.name }}">
-          <span *ngIf="!friend.avatar">{{ friend.name?.[0] }}</span>
-        </span>
+          <span *ngFor="let friend of activity.friends" class="friend-avatar">
+            <img *ngIf="friend.avatar" [src]="friend.avatar" alt="{{ friend.name }}">
+            <span *ngIf="!friend.avatar">{{ friend.name?.[0] }}</span>
+          </span>
         </div>
-      </mat-card-content>
-  </mat-card>
-
+      </div>
+    </div>
+  </app-card>
 </div>

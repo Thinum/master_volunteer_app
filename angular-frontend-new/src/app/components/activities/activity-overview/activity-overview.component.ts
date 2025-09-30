@@ -4,11 +4,13 @@ import {NgIf} from '@angular/common';
 import { DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import {RouterLink, RouterLinkActive} from "@angular/router";
+import {CardComponent} from '../../../shared/components/card/card.component';
 
 interface Activity {
   id: number;
   title: string;
   date: string;
+  description: string;
   organization: string;
   location: string;
   friends: { name: string; avatar?: string }[];
@@ -16,7 +18,7 @@ interface Activity {
 
 @Component({
   selector: 'app-activity-overview',
-  imports: [NgFor, NgIf, DatePipe, MatCardModule, RouterLink, RouterLinkActive],
+  imports: [NgFor, NgIf, DatePipe, MatCardModule, RouterLink, RouterLinkActive, CardComponent],
   templateUrl: './activity-overview.component.html',
   styleUrl: './activity-overview.component.css'
 })
@@ -28,6 +30,7 @@ export class ActivityOverviewComponent {
       title: 'Hiking Trip',
       date: '2025-10-12',
       organization: 'Outdoor Club',
+      description: 'A fun day hiking with friends.',
       location: 'Mount Fiji' ,
       friends: [
         { name: 'Alice', avatar: 'https://i.pravatar.cc/40?img=1' },
@@ -40,6 +43,7 @@ export class ActivityOverviewComponent {
       title: 'Coding Hackathon',
       date: '2025-11-05',
       organization: 'Tech Society',
+      description: 'A fun day hacking with friends.',
       location: 'JKU',
       friends: [
         { name: 'Diana', avatar: 'https://i.pravatar.cc/40?img=4' },
