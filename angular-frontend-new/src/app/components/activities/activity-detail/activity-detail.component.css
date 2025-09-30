@@ -27,3 +27,43 @@
     }
   }
 }
+
+.initials {
+  text-transform: uppercase;
+}
+
+
+.detail-card {
+  padding: 20px;
+}
+
+.activity-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.info-row mat-icon {
+  margin-right: 8px;
+}
+
+.section {
+  margin-top: 1.5rem;
+}
+
+.contacts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.contact-card {
+  padding: 10px;
+}

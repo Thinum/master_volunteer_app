@@ -1,34 +1,111 @@
 <mat-card class="detail-card">
-  <mat-card-header>
-    <mat-card-title>{{ activity.title }}</mat-card-title>
-    <mat-card-subtitle>{{ activity.organization }}</mat-card-subtitle>
-  </mat-card-header>
 
-  <mat-card-content>
-    <p><strong>Date & Time:</strong> {{ activity.date | date:'fullDate' }} – {{ activity.date | date:'shortTime' }}</p>
-    <p><strong>Location:</strong> {{ activity.location }}</p>
-    <p><strong>Duration:</strong> {{ activity.duration }}</p>
+  <!-- Heading -->
+  <h1 class="activity-title">{{ activity?.title }}</h1>
 
-    <h4>Description</h4>
-    <p>{{ activity.description }}</p>
+  <!-- Location & Time -->
+  <div class="info-row">
+    <mat-icon>place</mat-icon>
+    <span>{{ activity?.location }}</span>
+  </div>
+  <div class="info-row">
+    <mat-icon>schedule</mat-icon>
+    <span>{{ activity?.date | date:'fullDate' }} – {{ activity?.date | date:'shortTime' }}</span>
+  </div>
 
-    <h4>Skills</h4>
-    <mat-chip-listbox>
-      <mat-chip *ngFor="let skill of activity.skills">{{ skill }}</mat-chip>
-    </mat-chip-listbox>
+  <!-- Description -->
+  <div class="section">
+    <h3><mat-icon>description</mat-icon> Description</h3>
+    <p>{{ activity?.description }}</p>
+  </div>
 
-    <h4>Volunteers</h4>
+  <div class="section">
+    <h3><mat-icon>group</mat-icon> Your Friends</h3>
     <div class="friends">
-      <span *ngFor="let friend of activity.friends" class="friend-avatar">
-        <img *ngIf="friend.avatar" [src]="friend.avatar" alt="{{ friend.name }}">
-        <span *ngIf="!friend.avatar">{{ friend.name?.[0] }}</span>
-      </span>
+    <span *ngFor="let friend of activity?.friends" class="friend-avatar" matTooltip="{{ friend.name }}">
+      <img *ngIf="friend.avatar" [src]="friend.avatar" [alt]="friend.name">
+      <span *ngIf="!friend.avatar" class="initials">{{ friend.name?.[0] }}</span>
+    </span>
     </div>
-  </mat-card-content>
+  </div>
 
+  <!-- Expansion Panels -->
+  <div class="section">
+    <h3><mat-icon>info</mat-icon> Activity Details</h3>
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Time & Date</mat-panel-title>
+        </mat-expansion-panel-header>
+        <p>{{ activity?.date | date:'fullDate' }} – {{ activity?.date | date:'shortTime' }}</p>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Duration</mat-panel-title>
+        </mat-expansion-panel-header>
+        <p>{{ activity?.duration }}</p>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Skills</mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-chip-listbox>
+          <mat-chip *ngFor="let skill of activity?.skills">{{ skill }}</mat-chip>
+        </mat-chip-listbox>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Qualifications</mat-panel-title>
+        </mat-expansion-panel-header>
+        <ul>
+          <li *ngFor="let q of activity?.qualifications">{{ q }}</li>
+        </ul>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Prerequisites</mat-panel-title>
+        </mat-expansion-panel-header>
+        <ul>
+          <li *ngFor="let p of activity?.prerequisites">{{ p }}</li>
+        </ul>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Dates</mat-panel-title>
+        </mat-expansion-panel-header>
+        <p><strong>Created:</strong> {{ activity?.createdAt | date:'shortDate' }}</p>
+        <p><strong>Expires:</strong> {{ activity?.expiresAt | date:'shortDate' }}</p>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+
+  <!-- Contact Cards -->
+  <div class="contacts-grid">
+    <mat-card class="contact-card" *ngFor="let c of activity?.contacts">
+      <mat-card-title>{{ c.name }}</mat-card-title>
+      <mat-card-subtitle>{{ c.role }}</mat-card-subtitle>
+      <p><mat-icon>phone</mat-icon> {{ c.phone }}</p>
+      <p><mat-icon>email</mat-icon> {{ c.email }}</p>
+    </mat-card>
+
+    <mat-card class="contact-card" *ngFor="let oc of activity?.orgContacts">
+      <mat-card-title>{{ oc.name }}</mat-card-title>
+      <mat-card-subtitle>{{ oc.role }} ({{ activity?.organization }})</mat-card-subtitle>
+      <p><mat-icon>phone</mat-icon> {{ oc.phone }}</p>
+      <p><mat-icon>email</mat-icon> {{ oc.email }}</p>
+    </mat-card>
+  </div>
+
+  <!-- Actions -->
   <mat-card-actions align="end">
     <button mat-raised-button color="primary" (click)="onShare()">Share</button>
     <button mat-stroked-button color="accent" (click)="onCancel()">Cancel</button>
     <button mat-raised-button color="warn" (click)="onDelete()">Delete</button>
   </mat-card-actions>
+
 </mat-card>
