@@ -88,7 +88,8 @@
 
 .request-info h5 {
   margin: 0;
-  font-size: 1
+  font-size: 1;
+}
 
 /* Avatar Styling */
 .avatar {
@@ -104,6 +105,4 @@
   /* Verhindert, dass andere Styles das Bild größer machen */
   max-width: 40px !important;
   max-height: 40px !important;
-}
-
 }
