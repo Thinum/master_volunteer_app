@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import {CardComponent} from '../../shared/components/card/card.component';
 
 @Component({
   selector: 'app-home',
@@ -11,7 +12,9 @@ import { MatButtonModule } from '@angular/material/button';
     CommonModule,       // for *ngFor, *ngIf
     MatCardModule,      // for <mat-card>
     MatIconModule,      // for <mat-icon>
-    MatButtonModule     // for <button mat-icon-button>
+    MatButtonModule,
+    CardComponent,
+    // for <button mat-icon-button>
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']

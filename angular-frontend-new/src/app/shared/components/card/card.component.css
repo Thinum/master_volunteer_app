@@ -1,0 +1,26 @@
+.app-card {
+  display: flex;
+  background-color: white;
+  padding: 3px;
+  height: 200px;
+  border-top: solid 1px lightgray;
+}
+
+.card-left{
+  width: 30%;
+  background-color: #EEF9FF !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-body{
+  width: 65%;
+}
+
+.card-right{
+  width: 5%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

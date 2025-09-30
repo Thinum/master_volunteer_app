@@ -1,0 +1,11 @@
+.friends-group {
+  display: flex;
+  width: 100%;
+  h1 {
+    text-align: center;
+  }
+}
+
+.friend-area{
+  width: 50%;
+}

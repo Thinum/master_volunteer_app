@@ -32,22 +32,28 @@
   <!-- Requests -->
   <div class="requests">
     <h4>Anfragen Nachweise</h4>
-    <div *ngFor="let req of requests" class="request-card">
-      <div class="hours">
-        <span class="value">{{ req.hours }}</span>
-        <span class="label">Stunden</span>
-      </div>
-      <div class="request-info">
-        <h5>{{ req.organisation }}</h5>
-        <p class="title">{{ req.title }}</p>
-        <div class="request-user">
-          <img [src]="req.user.avatar" alt="{{ req.user.name }}" class="avatar"/>
-          <span>{{ req.user.name }}</span>
+    <app-card *ngFor="let req of requests">
+        <div card-left>
+          <div class="hours">
+            <span class="value">{{ req.hours }}</span>
+            <span class="label"> Stunden</span>
+          </div>
         </div>
+        <div card-body>
+          <div class="request-info">
+            <h5>{{ req.organisation }}</h5>
+            <p class="title">{{ req.title }}</p>
+            <div class="request-user">
+              <img [src]="req.user.avatar" alt="{{ req.user.name }}" class="avatar"/>
+              <span>{{ req.user.name }}</span>
+            </div>
+          </div>
+        </div>
+      <div card-right>
+        <button mat-icon-button>
+          <mat-icon>chat_bubble_outline</mat-icon>
+        </button>
       </div>
-      <button mat-icon-button>
-        <mat-icon>chat_bubble_outline</mat-icon>
-      </button>
-    </div>
+    </app-card>
   </div>
 </div>

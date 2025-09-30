@@ -1,0 +1,6 @@
+::ng-deep .mdc-tab {
+  margin: 24px;
+  ::ng-deep .mdc-tab__text-label {
+    color: blue;
+  }
+}
