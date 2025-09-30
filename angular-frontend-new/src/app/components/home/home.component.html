@@ -1,1 +1,53 @@
-<p>home works!</p>
+<div class="home-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="user-info">
+      <img class="profile-pic" src="https://i.pravatar.cc/40?img=3" alt="Profile Picture">
+      <div>
+        <h3>{{ user.name }}</h3>
+        <p class="role">Rolle: {{ user.role }}</p>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <span class="value">{{ user.badges }}</span>
+        <span class="label">Badges</span>
+      </div>
+      <div class="stat">
+        <span class="value">{{ user.functions }}</span>
+        <span class="label">Funktionen</span>
+      </div>
+      <div class="stat">
+        <span class="value">{{ user.activities }}</span>
+        <span class="label">Aktivitäten</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification">
+    Sie haben <b>{{ requests.length }}</b> neue Nachweisanfragen, bitte geben Sie diese frei.
+  </div>
+
+  <!-- Requests -->
+  <div class="requests">
+    <h4>Anfragen Nachweise</h4>
+    <div *ngFor="let req of requests" class="request-card">
+      <div class="hours">
+        <span class="value">{{ req.hours }}</span>
+        <span class="label">Stunden</span>
+      </div>
+      <div class="request-info">
+        <h5>{{ req.organisation }}</h5>
+        <p class="title">{{ req.title }}</p>
+        <div class="request-user">
+          <img [src]="req.user.avatar" alt="{{ req.user.name }}" class="avatar"/>
+          <span>{{ req.user.name }}</span>
+        </div>
+      </div>
+      <button mat-icon-button>
+        <mat-icon>chat_bubble_outline</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
