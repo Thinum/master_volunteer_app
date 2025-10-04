@@ -5,7 +5,7 @@
     [(ngModel)]="searchTerm"
     class="search-bar"
   />
-  <button (click)="addNew()" class="add-button">+ Add Forum</button>
+
 </div>
 
 <div class="forum-list">
@@ -37,3 +37,6 @@
     </div>
   </app-card>
 </div>
+<button mat-fab class="corner-button" color="primary" (click)="addNew()" >
+  <mat-icon>add</mat-icon>
+</button>

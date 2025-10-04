@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CardComponent } from '../../../shared/components/card/card.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 interface ForumEntry {
   id: string;
@@ -16,7 +18,7 @@ interface ForumEntry {
 @Component({
   selector: 'app-forum',
   standalone: true, // Assuming standalone components; adjust if using NgModule
-  imports: [CommonModule, FormsModule, RouterModule, CardComponent],
+  imports: [CommonModule, FormsModule, RouterModule, CardComponent, MatButtonModule, MatIconModule],
   templateUrl: './forum.component.html',
   styleUrls: ['./forum.component.css']
 })
