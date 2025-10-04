@@ -1,0 +1,54 @@
+<div class="chat-container">
+
+  <div class="chat-header">
+    <input
+      type="text"
+      placeholder="Search forums..."
+      [(ngModel)]="searchTerm"
+      class="search-bar"
+    />
+  </div>
+
+  <!-- Scrollable message area -->
+  <div #chatContainer class="chat-messages">
+    <!-- Typing indicator -->
+    <div *ngIf="isTyping" class="typing-indicator">Someone is typing...</div>
+
+    <!-- Messages as cards -->
+    <app-card
+      *ngFor="let message of filteredMessages"
+      [class.user-message]="message.isCurrentUser"
+      [class.other-message]="!message.isCurrentUser"
+    >
+      <!-- Left: Avatar and timestamp -->
+      <div card-left>
+        <div class="sender-info">
+          <span class="avatar">
+            <img *ngIf="message.avatar" [src]="message.avatar" [alt]="message.sender">
+            <span *ngIf="!message.avatar">{{ message.sender.charAt(0) }}</span>
+          </span>
+          <div class="timestamp">
+            <span class="label">{{ message.timestamp | date: 'MMM d' }}</span>
+            <span class="value">{{ message.timestamp | date: 'HH:mm' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body: Message text -->
+      <div card-body>
+        <div class="message-content">
+          <p class="sender-name">{{ message.sender }}</p>
+          <p class="message-text">{{ shortenText(message.text) }}</p>
+        </div>
+      </div>
+
+      <!-- Right: Actions (e.g., reply icon) -->
+      <div card-right>
+        <span class="action-icon">↩️</span> <!-- Placeholder; use real icons -->
+      </div>
+    </app-card>
+  </div>
+  <button mat-fab class="corner-button" color="primary" >
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

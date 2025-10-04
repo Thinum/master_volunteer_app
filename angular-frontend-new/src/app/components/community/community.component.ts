@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {MatTab, MatTabGroup} from '@angular/material/tabs';
 import {FriendsComponent} from './friends/friends.component';
 import {ForumComponent} from './forum/forum.component';
+import {ChatComponent} from './chat/chat.component';
 
 @Component({
   selector: 'app-community',
@@ -9,7 +10,8 @@ import {ForumComponent} from './forum/forum.component';
     MatTabGroup,
     MatTab,
     FriendsComponent,
-    ForumComponent
+    ForumComponent,
+    ChatComponent
   ],
   templateUrl: './community.component.html',
   styleUrl: './community.component.css'
