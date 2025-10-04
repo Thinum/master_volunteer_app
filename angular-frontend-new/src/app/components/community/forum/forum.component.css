@@ -1,0 +1,53 @@
+.forum-header {
+  display: flex;
+  gap: 10px;
+  padding: 5px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.search-bar {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.add-button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-button:hover {
+  background-color: #0056b3;
+}
+
+.forum-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.topic {
+  font-weight: bold;
+  margin: 0 0 5px 0;
+}
+
+.last-message {
+  margin: 0;
+  color: #666;
+  font-size: 0.9em;
+}
+
+.forum-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Assume your card styles handle .active, .date, etc. */

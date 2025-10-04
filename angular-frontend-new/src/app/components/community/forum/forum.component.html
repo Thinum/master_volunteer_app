@@ -1,1 +1,39 @@
-<p>forum works!</p>
+<div class="forum-header">
+  <input
+    type="text"
+    placeholder="Search forums..."
+    [(ngModel)]="searchTerm"
+    class="search-bar"
+  />
+  <button (click)="addNew()" class="add-button">+ Add Forum</button>
+</div>
+
+<div class="forum-list">
+  <app-card
+    *ngFor="let forum of filteredForums"
+    [routerLink]="forum.id"
+    routerLinkActive="active"
+    ariaCurrentWhenActive="page"
+  >
+    <div card-left>
+      <div class="date">
+        <span class="label">Last Edited</span>
+        <span class="value">{{ forum.lastEdited | date: 'd' }}</span>
+        <span class="label month">{{ forum.lastEdited | date: 'MMM' }}</span>
+        <!-- Alternative: Show new posts if preferred -->
+        <!-- <span class="new-posts" *ngIf="forum.newPosts">New: {{ forum.newPosts }}</span> -->
+      </div>
+    </div>
+    <div card-body>
+      <div class="card-content">
+        <p class="topic">{{ forum.title }}</p>
+        <p class="last-message">
+          {{ (forum.lastMessage.length > 50 ? (forum.lastMessage | slice: 0:50) + '...' : forum.lastMessage) }}
+        </p>
+      </div>
+    </div>
+    <div card-right>
+      <img [src]="forum.icon" [alt]="'Icon for ' + forum.title" class="forum-icon" />
+    </div>
+  </app-card>
+</div>
