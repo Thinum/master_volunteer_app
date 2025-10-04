@@ -31,21 +31,47 @@
 }
 
 .topic {
+  white-space: nowrap; /* Single line */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adds ... for overflow */
+  max-width: 100%;
+  margin: 0 0 0.25rem 0;
   font-weight: bold;
-  margin: 0 0 5px 0;
+  font-size: 1em;
+  min-width: 0;
 }
 
 .last-message {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
   margin: 0;
   color: #666;
   font-size: 0.9em;
+  min-width: 0;
 }
 
 .forum-icon {
-  width: 40px;
-  height: 40px;
+  margin-right: 1rem; /* Adds space between icon and right edge of card/container */
+  width: 32px; /* Or your preferred size, e.g., 40px */
+  height: 32px;
   border-radius: 50%;
   object-fit: cover;
 }
 
-/* Assume your card styles handle .active, .date, etc. */
+app-card [card-body] {
+  overflow: hidden;
+  max-width: calc(100% - 80px); /* Reserves space for left date (~40px) and right icon (~40px); adjust if needed */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0.5rem; /* Adds internal spacing for better readability */
+  min-width: 0; /* Essential for flexbox truncation */
+}
+
+.card-content {
+  width: 100%;
+  overflow: hidden;
+}
