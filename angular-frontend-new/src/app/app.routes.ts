@@ -14,6 +14,7 @@ import {
   ActivityDetailComponent
 } from './components/activities/activity-detail/activity-detail.component';
 import {CommunityComponent} from './components/community/community.component';
+import {ProjectDetailComponent} from './components/project/project-detail/project-detail.component';
 
 
 export const routes: Routes = [
@@ -25,5 +26,6 @@ export const routes: Routes = [
   {path: 'profile', component: UserProfileComponent, data: {title: 'Profil'}},
   {path: 'profile/:id', component: UserProfileComponent, data: {title: 'Profil'}},
   {path: 'activities', component: ActivityOverviewComponent, data: {title: 'Activities'}},
-  { path: 'activities/:id', component: ActivityDetailComponent }
+  { path: 'activities/:id', component: ActivityDetailComponent, data: {title: 'Activities'}},
+  { path: 'projects/:id', component: ProjectDetailComponent, data: {title: 'Projects'} }
 ]

@@ -1,16 +1,19 @@
 import {Component, OnInit} from '@angular/core';
 import {MatIcon} from '@angular/material/icon';
 import {MatProgressBar} from '@angular/material/progress-bar';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, RouterLink, RouterLinkActive} from '@angular/router';
 import {OrganisationService} from '../../../services/api/organisation.service';
 import {NgIf} from '@angular/common';
+import {CardComponent} from '../../../shared/components/card/card.component';
 
 @Component({
   selector: 'app-organisation-detail',
   imports: [
     MatIcon,
     MatProgressBar,
-    NgIf
+    NgIf,
+    RouterLink,
+    RouterLinkActive
   ],
   templateUrl: './organisation-detail.component.html',
   styleUrl: './organisation-detail.component.css'
