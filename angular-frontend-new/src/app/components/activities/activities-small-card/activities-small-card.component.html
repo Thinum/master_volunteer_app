@@ -1,0 +1,10 @@
+<div *ngIf="friends" class="friends">
+  <span *ngFor="let friend of friends" class="friend-avatar">
+      <img *ngIf="friend.profilePicture" [src]="friend.profilePicture" alt="friend.name">
+      <span *ngIf="!friend.profilePicture" class="initials">{{ friend.name }}</span>
+  </span>
+</div>
+<div class="activity-details">
+  <span class="activity-title">{{activity?.title}}</span>
+  <span class="activity-description">{{activity?.body}}</span>
+</div>

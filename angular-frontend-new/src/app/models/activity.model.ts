@@ -4,4 +4,5 @@ export interface Activity {
   body: string;
   project_id: number;
   organisation_id: number;
+  appointment_ids: number[];
 }
