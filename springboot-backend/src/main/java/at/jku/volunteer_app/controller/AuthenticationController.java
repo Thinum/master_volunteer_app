@@ -30,6 +30,7 @@ public class AuthenticationController {
         UserDetails dbUser = userService.loadUserByUsername(authUser.getUsername());
         if(encoder.matches(authUser.getPassword(), dbUser.getPassword())){
             String token = jwtService.generateToken(authUser.getUsername());
+            //TODO: Maybe add expiry date?
             return Map.of("token", token);
         } else {
             throw new LoginException("Password is incorrect");
