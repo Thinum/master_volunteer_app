@@ -1,7 +1,7 @@
 package at.jku.volunteer_app.controller;
 
+import at.jku.volunteer_app.contract.AuthToken;
 import at.jku.volunteer_app.contract.AuthUserDTO;
-import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.service.JwtService;
 import at.jku.volunteer_app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.security.auth.login.LoginException;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -26,12 +25,11 @@ public class AuthenticationController {
     PasswordEncoder encoder;
 
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody AuthUserDTO authUser) throws LoginException {
+    public AuthToken login(@RequestBody AuthUserDTO authUser) throws LoginException {
         UserDetails dbUser = userService.loadUserByUsername(authUser.getUsername());
         if(encoder.matches(authUser.getPassword(), dbUser.getPassword())){
             String token = jwtService.generateToken(authUser.getUsername());
-            //TODO: Maybe add expiry date?
-            return Map.of("token", token);
+            return new AuthToken(token, jwtService.extractExpiration(token));
         } else {
             throw new LoginException("Password is incorrect");
         }
