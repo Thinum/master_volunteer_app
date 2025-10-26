@@ -43,7 +43,7 @@ public class SecurityConfig {
                         .requestMatchers("/demande/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
                         .requestMatchers("/organisations/**").authenticated()
-                        .requestMatchers("/auth/assistant/**").permitAll() // .authenticated()
+                        .requestMatchers("/auth/**").permitAll() // .authenticated()
                         .requestMatchers("/auth/admin/**").permitAll()     // .authenticated()
                         .requestMatchers("/auth/formateur/**").permitAll()     // .authenticated()
                         .requestMatchers("/formateur/**").permitAll() // .authenticated()
