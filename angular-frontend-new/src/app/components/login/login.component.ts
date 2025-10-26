@@ -1,4 +1,4 @@
-import {Component, signal} from '@angular/core';
+import {Component, OnDestroy, signal} from '@angular/core';
 import {LayoutingService} from '../../services/layouting.service';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
@@ -7,6 +7,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {AuthService} from '../../services/authservice/auth.service';
 import {Router} from '@angular/router';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -21,11 +22,13 @@ import {Router} from '@angular/router';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnDestroy{
 
   protected loginForm: FormGroup;
 
   protected hidePw = signal(true);
+
+  private loggedInSubscription: Subscription;
 
 
   constructor(private formbuilder: FormBuilder,
@@ -37,6 +40,16 @@ export class LoginComponent {
       username: ['', [Validators.required]],
       password: ['', [Validators.required]],
     })
+    this.loggedInSubscription = this.authService.loggedInEvent.subscribe(loggedInEvent => {
+      if (loggedInEvent) {
+        this.layoutingService.showBottomNavbar.set(true);
+        this.router.navigate(['home']);
+      }
+    })
+  }
+
+  ngOnDestroy(): void {
+        this.loggedInSubscription.unsubscribe();
   }
 
   clickHidePw(event: MouseEvent) {
@@ -48,10 +61,7 @@ export class LoginComponent {
     const formValue = this.loginForm.value;
 
     if(formValue.username && formValue.password){
-      this.authService.login(formValue.username, formValue.password).subscribe((token) => {
-        this.layoutingService.showBottomNavbar.set(true);
-        this.router.navigate(['home'])
-      } ); //So far as long as we get any response we redirect
+      this.authService.login(formValue.username, formValue.password)
     }
   }
 }
