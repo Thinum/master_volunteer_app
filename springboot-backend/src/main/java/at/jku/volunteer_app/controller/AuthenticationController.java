@@ -1,5 +1,6 @@
 package at.jku.volunteer_app.controller;
 
+import at.jku.volunteer_app.contract.AuthUserDTO;
 import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.service.JwtService;
 import at.jku.volunteer_app.service.UserService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.security.auth.login.LoginException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -23,11 +25,12 @@ public class AuthenticationController {
     @Autowired
     PasswordEncoder encoder;
 
-    @PostMapping
-    public String login(@RequestBody User user) throws LoginException {
-        UserDetails dbUser = userService.loadUserByUsername(user.getUsername());
-        if(encoder.matches(user.getPassword(), dbUser.getPassword())){
-            return jwtService.generateToken(user.getUsername());
+    @PostMapping("/login")
+    public Map<String, String> login(@RequestBody AuthUserDTO authUser) throws LoginException {
+        UserDetails dbUser = userService.loadUserByUsername(authUser.getUsername());
+        if(encoder.matches(authUser.getPassword(), dbUser.getPassword())){
+            String token = jwtService.generateToken(authUser.getUsername());
+            return Map.of("token", token);
         } else {
             throw new LoginException("Password is incorrect");
         }
