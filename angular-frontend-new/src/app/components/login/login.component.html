@@ -1,0 +1,30 @@
+<div class="login-field">
+  <h2 class="login-header">Logging in:</h2>
+  <form [formGroup]="loginForm">
+  <div>
+    <mat-form-field appearance="outline">
+      <mat-label>Username</mat-label>
+      <input matInput placeholder="Username" formControlName="username">
+    </mat-form-field>
+  </div>
+  <div>
+    <mat-form-field appearance="outline">
+      <mat-label>Password</mat-label>
+      <input matInput [type]="hidePw() ? 'password' : 'text'" placeholder="Password" formControlName="password">
+      <button
+        matIconButton
+        matSuffix
+        (click)="clickHidePw($event)"
+        [attr.aria-label]="'Hide password'"
+        [attr.aria-pressed]="hidePw()"
+      >
+        <mat-icon>{{hidePw() ? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+  </form>
+  <div class="button-group">
+    <button mat-button="filled">Register</button>
+    <button mat-button="filled" (click)="clickLogin()">Login</button>
+  </div>
+</div>
