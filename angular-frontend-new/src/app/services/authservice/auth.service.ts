@@ -15,11 +15,14 @@ export class AuthService {
   public loggedInEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   constructor(private http: HttpClient) {
-
+    if (this.isLoggedIn()) {
+      this.loggedInEvent.emit(true);
+    }
   }
 
+
   public isAuthenticated(){
-    return true;
+    return this.isLoggedIn();
   }
 
   public login(userName:string, password:string){
@@ -44,7 +47,8 @@ export class AuthService {
     this.loggedInEvent.emit(true);
   }
 
-  private getExpiration() {
-    return new Date(localStorage.getItem(EXPIRY_DATE_STRING) ?? new Date());
+  private getExpiration(): Date {
+    const expiration = localStorage.getItem(EXPIRY_DATE_STRING);
+    return expiration ? new Date(expiration) : new Date(0); // epoch = expired
   }
 }
