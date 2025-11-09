@@ -5,6 +5,8 @@ import { DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import {RouterLink, RouterLinkActive} from "@angular/router";
 import {CardComponent} from '../../../shared/components/card/card.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 interface Activity {
   id: number;
@@ -18,7 +20,7 @@ interface Activity {
 
 @Component({
   selector: 'app-activity-overview',
-  imports: [NgFor, NgIf, DatePipe, MatCardModule, RouterLink, RouterLinkActive, CardComponent],
+  imports: [NgFor, NgIf, DatePipe, MatCardModule, RouterLink, RouterLinkActive, CardComponent, MatButtonModule, MatIconModule],
   templateUrl: './activity-overview.component.html',
   styleUrl: './activity-overview.component.css'
 })
@@ -51,4 +53,7 @@ export class ActivityOverviewComponent {
       ]
     }
   ];
+
+  addNew(): void {
+  }
 }

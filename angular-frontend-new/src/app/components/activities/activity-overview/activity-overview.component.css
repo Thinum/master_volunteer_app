@@ -31,3 +31,14 @@
     }
   }
 }
+
+.corner-button {
+  position: fixed; /* Fixes the button on the screen */
+  right: 16px;      /* Distance from the left edge */
+  bottom: 100px;    /* Distance from the bottom edge */
+  z-index: 1000;   /* Ensures it stays on top of other elements */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
