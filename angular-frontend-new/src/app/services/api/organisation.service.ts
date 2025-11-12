@@ -1,60 +1,47 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Organisation} from '../../models/organisations.model';
-import {of} from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { of, Observable } from 'rxjs';
+import { Organisation } from '../../models/organisation.model';
+import { MOCK_ORGANISATIONS } from '../../mock/mock-organisations';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class OrganisationService {
-  private organisations: Organisation[] = [
-    {
-      id: 1,
-      orgName: "Test Organisation 1",
-      location: {
-        lat: 0,
-        lon: 0
-      },
-      createdAt: "",
-      body: "This is an organisation 1",
-      deactivated: false,
-      profilePicture: "test.png",
-    },
-    {
-      id: 2,
-      orgName: "Test Organisation 2",
-      location: {
-        lat: 0,
-        lon: 0
-      },
-      createdAt: "",
-      body: "This is an organisation 2",
-      deactivated: false
-    },
-    {
-      id: 3,
-      orgName: "Test Organisation 3",
-      location: {
-        lat: 0,
-        lon: 0
-      },
-      createdAt: "",
-      body: "This is an organisation 3",
-      deactivated: false
-    }
-  ]
+  // Use the shared mock data
+  private organisations: Organisation[] = MOCK_ORGANISATIONS;
 
-  constructor(private http:HttpClient) {
+  constructor(private http: HttpClient) {}
 
-  }
-
-  getAllOrganisations() {
+  /**
+   * Returns all organisations.
+   * Currently uses mock data via RxJS 'of', but can easily switch to an API.
+   */
+  getAllOrganisations(): Observable<Organisation[]> {
+    // Development (mock):
     return of(this.organisations);
-    //return this.http.get<Organisation[]>('http://localhost:8080/organisations');
+
+    // Production (API):
+    // return this.http.get<Organisation[]>('http://localhost:8080/organisations');
   }
 
-  getOrganisationById(id: number) {
-    return of(this.organisations.find(o => o.id === id));
-    //return this.http.get<Organisation>(`http://localhost:8080/organisations/${id}`);
+  /**
+   * Returns a single organisation by ID.
+   */
+  getOrganisationById(id: number): Observable<Organisation | undefined> {
+    // Development (mock):
+    const org = this.organisations.find(o => o.id === id);
+    return of(org);
+
+    // Production (API):
+    // return this.http.get<Organisation>(`http://localhost:8080/organisations/${id}`);
+  }
+
+  /**
+   * Optional helper: adds a new organisation (mock only).
+   */
+  addOrganisation(org: Organisation): Observable<Organisation> {
+    this.organisations.push(org);
+    return of(org);
   }
 }

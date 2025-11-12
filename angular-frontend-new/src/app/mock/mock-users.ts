@@ -1,0 +1,62 @@
+import { User } from '../models/user.model';
+
+export const MOCK_USERS: User[] = [
+  {
+    id: 1,
+    name: 'Alice',
+    profilePicture: 'https://i.pravatar.cc/40?img=1',
+    email: 'alice@mail.com',
+    joinedAt: new Date(2024, 2, 10, 2, 30),
+    isActive: true,
+  },
+  {
+    id: 2,
+    name: 'Bob',
+    profilePicture: 'https://i.pravatar.cc/40?img=2',
+    email: 'bob@mail.com',
+    joinedAt: new Date(2024, 2, 10, 2, 30),
+    isActive: true,
+  },
+  {
+    id: 3,
+    name: 'Charlie',
+    profilePicture: 'https://i.pravatar.cc/40?img=3',
+    email: 'charlie@mail.com',
+    joinedAt: new Date(2024, 2, 10, 2, 30),
+    isActive: true,
+  },
+  {
+    id: 4,
+    name: 'Diana',
+    profilePicture: 'https://i.pravatar.cc/40?img=4',
+    email: 'diana@mail.com',
+    phone: '+43 660 111 2222',
+    joinedAt: new Date(2024, 2, 10, 2, 30),
+    isActive: true,
+  },
+  {
+    id: 5,
+    name: 'Ethan',
+    profilePicture: 'https://i.pravatar.cc/40?img=5',
+    email: 'ethan@mail.com',
+    phone: '+43 660 222 3333',
+    joinedAt: new Date(2024, 2, 10, 2, 30),
+    isActive: true,
+  },
+  {
+    id: 6,
+    name: 'Fiona',
+    profilePicture: 'https://i.pravatar.cc/40?img=6',
+    email: 'fiona@mail.com',
+    joinedAt: new Date(2024, 2, 10, 2, 30),
+    isActive: false,
+  },
+  {
+    id: 7,
+    name: 'George',
+    profilePicture: 'https://i.pravatar.cc/40?img=7',
+    email: 'george@mail.com',
+    joinedAt: new Date(2024, 2, 10, 2, 30),
+    isActive: true,
+  },
+];

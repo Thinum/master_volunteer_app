@@ -6,9 +6,14 @@ import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
 import {NgForOf} from '@angular/common';
 import {OrganisationService} from '../../../services/api/organisation.service';
-import {Organisation} from '../../../models/organisations.model';
+import {Organisation} from '../../../models/organisation.model';
 import {RouterLink, RouterLinkActive} from '@angular/router';
 import {OrganisationListComponent} from './organisation-list/organisation-list.component';
+import {
+  MOCK_JOINED_ORGANISATIONS,
+  MOCK_RECOMMENDED_ORGANISATIONS,
+  MOCK_FEATURED_ORGANISATIONS
+} from '../../../mock/mock-organisations';
 
 @Component({
   selector: 'app-organisations-overview',
@@ -25,79 +30,34 @@ import {OrganisationListComponent} from './organisation-list/organisation-list.c
   styleUrl: './organisations-overview.component.css'
 })
 export class OrganisationsOverviewComponent implements OnInit{
-  public organisations: Organisation[] = [];
-  public organisationsFiltered = this.organisations;
+  organisations: Organisation[] = [];
+  organisationsFiltered: Organisation[] = [];
 
-  constructor(private organisationService: OrganisationService){
+  joinedOrganisations = MOCK_JOINED_ORGANISATIONS;
+  recommendedOrganisations = MOCK_RECOMMENDED_ORGANISATIONS;
+  featuredOrganisations = MOCK_FEATURED_ORGANISATIONS;
 
-  }
-
-  joinedOrganisations: Organisation[] = [
-    {
-      id: 3,
-      orgName: "Joined Organisation 1",
-      location: {
-        lat: 0,
-        lon: 0
-      },
-      createdAt: "",
-      body: "This is an organisation 1",
-      deactivated: false
-    },
-    {
-      id: 4,
-      orgName: "Joined Organisation 2",
-      location: {
-        lat: 0,
-        lon: 0
-      },
-      createdAt: "",
-      body: "This is an organisation 2",
-      deactivated: false
-    }
-  ];
-
-  recommendedOrganisations: Organisation[] = [
-    {
-      id: 5,
-      orgName: "Recommended Organisation 1",
-      location: {
-        lat: 0,
-        lon: 0
-      },
-      createdAt: "",
-      body: "This is an organisation 1",
-      deactivated: false
-    },
-    {
-      id: 6,
-      orgName: "Recommended Organisation 2",
-      location: {
-        lat: 0,
-        lon: 0
-      },
-      createdAt: "",
-      body: "This is an organisation 2",
-      deactivated: false
-    }
-  ];
+  constructor(private organisationService: OrganisationService){}
 
   ngOnInit() {
-    this.getOrganisations()
+    this.loadOrganisations();
   }
 
-  getOrganisations() {
-    this.organisationService.getAllOrganisations().subscribe(organisations => {
-      this.organisations = organisations
-      this.organisationsFiltered = this.organisations
-    })
+  private loadOrganisations() {
+    this.organisationService.getAllOrganisations().subscribe(orgs => {
+      this.organisations = orgs;
+      this.organisationsFiltered = [...orgs];
+    });
   }
 
-  filterBy(searchTerm: string){
-    if(searchTerm){
-      this.organisationsFiltered = this.organisations.filter(org => org.orgName.includes(searchTerm))
+  filterBy(searchTerm: string) {
+    if (searchTerm) {
+      const lower = searchTerm.toLowerCase();
+      this.organisationsFiltered = this.organisations.filter(o =>
+        o.orgName.toLowerCase().includes(lower)
+      );
     } else {
-      this.organisationsFiltered = this.organisations
+      this.organisationsFiltered = [...this.organisations];
     }
   }
 }

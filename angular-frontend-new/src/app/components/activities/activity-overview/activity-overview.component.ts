@@ -8,6 +8,8 @@ import {CardComponent} from '../../../shared/components/card/card.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
+import { User } from '../../../models/user.model';
+
 interface Activity {
   id: number;
   title: string;
@@ -15,7 +17,7 @@ interface Activity {
   description: string;
   organization: string;
   location: string;
-  friends: { name: string; avatar?: string }[];
+  friends: User[];
 }
 
 @Component({
@@ -35,9 +37,9 @@ export class ActivityOverviewComponent {
       description: 'A fun day hiking with friends.',
       location: 'Mount Fiji' ,
       friends: [
-        { name: 'Alice', avatar: 'https://i.pravatar.cc/40?img=1' },
-        { name: 'Bob', avatar: 'https://i.pravatar.cc/40?img=2' },
-        { name: 'Charlie', avatar: 'https://i.pravatar.cc/40?img=3' } // fallback to initials
+        { id:1, name: 'Alice', profilePicture: 'https://i.pravatar.cc/40?img=1', email:'alice@mail.com', joinedAt: new Date(2024, 2, 10, 2, 30) },
+        { id:2, name: 'Bob', profilePicture: 'https://i.pravatar.cc/40?img=2', email:'bob@mail.com', joinedAt: new Date(2024, 2, 10, 2, 30) },
+        { id:3, name: 'Charlie', profilePicture: 'https://i.pravatar.cc/40?img=3', email:'charlie@mail.com', joinedAt: new Date(2024, 2, 10, 2, 30) } // fallback to initials
       ]
     },
     {
@@ -48,8 +50,8 @@ export class ActivityOverviewComponent {
       description: 'A fun day hacking with friends.',
       location: 'JKU',
       friends: [
-        { name: 'Diana', avatar: 'https://i.pravatar.cc/40?img=4' },
-        { name: 'Ethan', avatar: 'https://i.pravatar.cc/40?img=5' }
+        { id:4, name: 'Diana', profilePicture: 'https://i.pravatar.cc/40?img=4', email:'diana@mail.com', joinedAt: new Date(2024, 2, 10, 2, 30)},
+        { id:5, name: 'Ethan', profilePicture: 'https://i.pravatar.cc/40?img=5', email:'ethan@mail.com', joinedAt: new Date(2024, 2, 10, 2, 30)}
       ]
     }
   ];

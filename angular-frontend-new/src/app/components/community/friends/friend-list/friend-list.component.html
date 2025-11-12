@@ -1,10 +1,22 @@
 <div class="section">
-  <h3 class="section-title">{{sectionTitle}}</h3>
+  <h3 class="section-title">{{ sectionTitle }}</h3>
   <mat-list>
     <mat-list-item *ngFor="let friend of friendList">
-      <a class="friend-list-element" routerLink="/../profile/{{friend.id}}" routerLinkActive="active" ariaCurrentWhenActive="page">
-        <img *ngIf="friend.profilePicture" src="test.png" alt="Groups Icon" class="avatar"/>
-        <mat-icon *ngIf="!friend.profilePicture" class="avatar-placeholder">groups</mat-icon>
+      <a
+        class="friend-list-element"
+        [routerLink]="'/../profile/' + friend.id"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+      >
+        <img
+          *ngIf="friend.profilePicture"
+          [src]="friend.profilePicture"
+          [alt]="friend.name + ' avatar'"
+          class="avatar"
+        />
+        <mat-icon *ngIf="!friend.profilePicture" class="avatar-placeholder">
+          groups
+        </mat-icon>
         <span class="friend-name">{{ friend.name }}</span>
       </a>
     </mat-list-item>

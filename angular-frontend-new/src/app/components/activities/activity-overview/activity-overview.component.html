@@ -14,8 +14,8 @@
         <p class="activity-description"> {{ activity.description }} </p>
         <div class="friends">
         <span *ngFor="let friend of activity.friends" class="friend-avatar">
-          <img *ngIf="friend.avatar" [src]="friend.avatar" alt="{{ friend.name }}">
-          <span *ngIf="!friend.avatar">{{ friend.name }}</span>
+          <img *ngIf="friend.profilePicture" [src]="friend.profilePicture" alt="{{ friend.name }}">
+          <span *ngIf="!friend.profilePicture">{{ friend.name }}</span>
         </span>
         </div>
       </div>

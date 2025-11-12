@@ -3,7 +3,7 @@ import {MatIcon} from "@angular/material/icon";
 import {MatList, MatListItem} from "@angular/material/list";
 import {NgForOf, NgIf} from "@angular/common";
 import {RouterLink, RouterLinkActive} from "@angular/router";
-import {Organisation} from '../../../../models/organisations.model';
+import {Organisation} from '../../../../models/organisation.model';
 
 @Component({
   selector: 'app-organisation-list',
