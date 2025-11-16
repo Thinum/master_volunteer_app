@@ -60,3 +60,66 @@ export const MOCK_USERS: User[] = [
     isActive: true,
   },
 ];
+
+export interface UserRelationship {
+  userId: number;
+  friends: {
+    friendId: number;
+    likeScore: number; // 0 = hate, 100 = best friends
+  }[];
+}
+
+export const MOCK_USER_RELATIONSHIPS: UserRelationship[] = [
+  {
+    userId: 1, // Alice
+    friends: [
+      { friendId: 2, likeScore: 85 }, // Bob
+      { friendId: 3, likeScore: 60 }, // Charlie
+      { friendId: 4, likeScore: 92 }, // Diana
+    ],
+  },
+  {
+    userId: 2, // Bob
+    friends: [
+      { friendId: 1, likeScore: 80 },
+      { friendId: 3, likeScore: 70 },
+      { friendId: 5, likeScore: 55 },
+    ],
+  },
+  {
+    userId: 3, // Charlie
+    friends: [
+      { friendId: 1, likeScore: 65 },
+      { friendId: 2, likeScore: 75 },
+      { friendId: 6, likeScore: 40 }, // Fiona (inactive)
+    ],
+  },
+  {
+    userId: 4, // Diana
+    friends: [
+      { friendId: 1, likeScore: 95 },
+      { friendId: 7, likeScore: 50 },
+    ],
+  },
+  {
+    userId: 5, // Ethan
+    friends: [
+      { friendId: 2, likeScore: 60 },
+      { friendId: 7, likeScore: 78 },
+    ],
+  },
+  {
+    userId: 6, // Fiona
+    friends: [
+      { friendId: 3, likeScore: 35 },
+    ],
+  },
+  {
+    userId: 7, // George
+    friends: [
+      { friendId: 4, likeScore: 25 },
+      { friendId: 5, likeScore: 82 },
+    ],
+  },
+];
+

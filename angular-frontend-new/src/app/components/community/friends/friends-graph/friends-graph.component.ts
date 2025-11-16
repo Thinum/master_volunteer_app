@@ -1,46 +1,78 @@
 import { AfterViewInit, Component, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import cytoscape from 'cytoscape';
 
+import { MOCK_USERS, MOCK_USER_RELATIONSHIPS, UserRelationship } from '../../../../mock/mock-users';
+import { User } from '../../../../models/user.model';
+
 @Component({
   selector: 'app-friends-graph',
   template: `<div #cyContainer class="cy-container"></div>`,
   styles: [`
     .cy-container {
       width: 100%;
-      height: 500px; /* required */
+      height: 500px;
       border: 1px solid #ccc;
       border-radius: 8px;
     }
   `]
 })
+
 export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
   @ViewChild('cyContainer', { static: true }) cyContainer!: ElementRef;
   private animationRunning = false;
   private nodeAnimations = new Map<string, boolean>();
 
-  friends = [
-    { name: 'Alice', avatar: 'https://i.pravatar.cc/100?img=1' },
-    { name: 'Bob', avatar: 'https://i.pravatar.cc/100?img=2' },
-    { name: 'Charlie', avatar: 'https://i.pravatar.cc/100?img=3' },
-    { name: 'Heinrich', avatar: 'https://i.pravatar.cc/100?img=4' },
-    { name: 'Gunther', avatar: 'https://i.pravatar.cc/100?img=5' },
-  ];
+  private preloadImage(url: string): Promise<string> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL('image/png'));
+      };
+
+      img.onerror = () => {
+        console.warn('Failed to load image', url);
+        resolve(''); // fallback – no image
+      };
+
+      img.src = url;
+    });
+  }
+
+
 
   ngAfterViewInit(): void {
-    const nodes = this.friends.map((friend, idx) => ({
+
+    //
+    // --- Convert MOCK_USERS -> Cytoscape Nodes ---
+    //
+    const nodes = MOCK_USERS.map(user => ({
       data: {
-        id: `f${idx}`,
-        label: friend.name,
-        avatar: friend.avatar ?? null
+        id: `u${user.id}`,
+        label: user.name,
+        avatar: user.profilePicture
       }
     }));
 
-    const edges = [
-      { data: { source: 'f3', target: 'f0' } },
-      { data: { source: 'f3', target: 'f1' } },
-      { data: { source: 'f3', target: 'f2' } },
-      { data: { source: 'f0', target: 'f4' } },
-    ];
+
+    //
+    // --- Convert MOCK_USER_RELATIONSHIPS -> Cytoscape Edges ---
+    //
+    const edges = MOCK_USER_RELATIONSHIPS.flatMap(rel =>
+      rel.friends.map(friend => ({
+        data: {
+          source: `u${rel.userId}`,
+          target: `u${friend.friendId}`,
+          likeScore: friend.likeScore
+        }
+      }))
+    );
 
     const cy = cytoscape({
       container: this.cyContainer.nativeElement,
@@ -50,6 +82,9 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
         animate: true,
       },
       style: [
+        //
+        // --- NODE STYLE ---
+        //
         {
           selector: 'node',
           style: {
@@ -69,53 +104,55 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
         {
           selector: 'node[avatar]',
           style: {
-            'shape': 'ellipse',
             'background-fit': 'cover',
             'background-clip': 'node',
-            'background-image': './test.png',
-            // 'background-image': 'data(avatar)' // <-- works if you use local assets corse error otherwise with links
+            'background-image': 'data(avatar)'
           }
         },
+
+        //
+        // --- EDGE STYLE WITH WEIGHT BASED ON likeScore ---
+        //
         {
           selector: 'edge',
           style: {
-            'width': 2,
+            'curve-style': 'bezier',
             'line-color': '#bbb',
-            'curve-style': 'bezier'
+
+            // Scale line width 1px → 8px based on likeScore=0–100
+            'width': 'mapData(likeScore, 0, 100, 1, 8)',
+
+            // --- ARROWS ---
+            'target-arrow-shape': 'triangle',
+            'target-arrow-color': '#bbb',
+            'arrow-scale': 1.5
           }
         }
       ]
     });
 
-    // Listen for when user starts dragging - pause animation for that node
+
+    // ----- Your existing animation logic (unchanged) -----
+
     cy.on('grab', 'node', (event: any) => {
       const node = event.target;
       const nodeId = node.id();
-
-      // Stop animation for this specific node
       this.nodeAnimations.set(nodeId, false);
-
-      // Stop any current animation
       node.stop();
     });
 
-    // Listen for drag events to update base positions
     cy.on('dragfree', 'node', (event: any) => {
       const node = event.target;
       const nodeId = node.id();
       const newPosition = node.position();
-
-      // Update the base position when user manually drags a node
       node.data('basePosition', { x: newPosition.x, y: newPosition.y });
 
-      // Resume animation for this node after a short delay
       setTimeout(() => {
         this.nodeAnimations.set(nodeId, true);
         this.startSingleNodeAnimation(node);
       }, 500);
     });
 
-    // Wait for the layout to finish before starting idle animation
     cy.ready(() => {
       setTimeout(() => {
         this.animationRunning = true;
@@ -130,7 +167,6 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
   }
 
   private startIdleAnimation(cy: any): void {
-    // Start animation for each node with staggered timing
     cy.nodes().forEach((node: any, index: number) => {
       const nodeId = node.id();
       this.nodeAnimations.set(nodeId, true);
@@ -147,36 +183,24 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
     const nodeId = node.id();
 
     const loopNodeAnimation = () => {
-      // Check if animation should continue for this specific node
-      if (!this.animationRunning || !this.nodeAnimations.get(nodeId)) {
-        return;
-      }
+      if (!this.animationRunning || !this.nodeAnimations.get(nodeId)) return;
 
       const currentPos = node.position();
       const basePos = node.data('basePosition') || currentPos;
 
-      // Store original position if first time
       if (!node.data('basePosition')) {
         node.data('basePosition', { x: currentPos.x, y: currentPos.y });
       }
 
-      // Generate small random offset (±15 pixels from base position)
       const offsetX = (Math.random() - 0.5) * 30;
       const offsetY = (Math.random() - 0.5) * 30;
 
-      const newPos = {
-        x: basePos.x + offsetX,
-        y: basePos.y + offsetY
-      };
+      const newPos = { x: basePos.x + offsetX, y: basePos.y + offsetY };
 
-      // Create and play animation with promise chaining
-      node.animation({
-        position: newPos
-      }, {
-        duration: 2000 + Math.random() * 2000, // 2-4 seconds
+      node.animation({ position: newPos }, {
+        duration: 2000 + Math.random() * 2000,
         easing: 'ease-in-out'
       }).play().promise('complete').then(() => {
-        // Continue the loop if animation is still running for this node
         if (this.animationRunning && this.nodeAnimations.get(nodeId)) {
           setTimeout(loopNodeAnimation, 500 + Math.random() * 1500);
         }
