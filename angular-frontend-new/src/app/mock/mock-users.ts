@@ -73,10 +73,10 @@ export enum RelationshipType {
 
 export const RELATIONSHIP_COLORS: Record<string, string> = {
   Parent: '#e63946',
-  Child: '#e76f51',
+  Child: '#e63946',
   Sibling: '#2a9d8f',
   Relative: '#457b9d',
-  Partner: '#d00000',
+  Partner: '#e76f51',
   Friend: '#4cc9f0',
   Acquaintant: '#8d99ae'
 };

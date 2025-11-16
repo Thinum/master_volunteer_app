@@ -3,10 +3,23 @@ import cytoscape from 'cytoscape';
 
 import { MOCK_USERS, MOCK_USER_RELATIONSHIPS, UserRelationship, RELATIONSHIP_COLORS } from '../../../../mock/mock-users';
 import { User } from '../../../../models/user.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-friends-graph',
-  template: `<div #cyContainer class="cy-container"></div>`,
+  template: `
+  <div class="legend">
+    <div class="legend-title">Relationship Types</div>
+    <div class="legend-items">
+      <div class="legend-item" *ngFor="let item of relationshipLegend">
+        <span class="legend-color" [style.background]="item.color"></span>
+        <span class="legend-label">{{ item.type }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div #cyContainer class="cy-container"></div>
+  `,
   styles: [`
     .cy-container {
       width: 100%;
@@ -14,13 +27,55 @@ import { User } from '../../../../models/user.model';
       border: 1px solid #ccc;
       border-radius: 8px;
     }
-  `]
+    .legend {
+      padding: 12px;
+      margin-bottom: 12px;
+      background: #fafafa;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-family: Arial, sans-serif;
+      max-width: 300px;
+    }
+
+    .legend-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .legend-items {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      display: inline-block;
+      border: 1px solid #999;
+    }
+
+    .legend-label {
+      color: #333;
+      font-size: 14px;
+    }
+  `],
+  imports: [CommonModule]
 })
 
 export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
   @ViewChild('cyContainer', { static: true }) cyContainer!: ElementRef;
   private animationRunning = false;
   private nodeAnimations = new Map<string, boolean>();
+  public relationshipLegend: { type: string; color: string }[] = [];
 
   private preloadImage(url: string): Promise<string> {
     return new Promise((resolve) => {
@@ -45,9 +100,12 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-
-
   ngAfterViewInit(): void {
+
+    // Initialize legend
+    this.relationshipLegend = Object.entries(RELATIONSHIP_COLORS).map(
+      ([type, color]) => ({ type, color })
+    );
 
     //
     // --- Convert MOCK_USERS -> Cytoscape Nodes ---
