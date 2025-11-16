@@ -106,7 +106,8 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
           style: {
             'background-fit': 'cover',
             'background-clip': 'node',
-            'background-image': 'data(avatar)'
+            'background-image': 'data(avatar)',
+            'background-image-crossorigin': 'null' as any,
           }
         },
 
