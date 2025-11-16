@@ -1,48 +1,75 @@
-<div *ngIf="detailedOrganisation">
-  <div class="container">
-    <div class="top-section">
-      <div class="left">
-        <div class="icon-circle">
-          <mat-icon>groups</mat-icon>
-        </div>
-        <h3>{{detailedOrganisation.orgName}}</h3>
-        <p>{{detailedOrganisation.body}}</p>
+<div *ngIf="detailedOrganisation" class="organisation-container">
+  <mat-card class="header-card">
+    <mat-card-header>
+      <div mat-card-avatar class="avatar">
+        <img [src]="detailedOrganisation.profilePicture" [alt]="detailedOrganisation.orgName + ' profile'">
       </div>
-      <div class="right">
-        <h3>Goals</h3>
-        <mat-progress-bar mode="determinate" value="70"></mat-progress-bar>
-        <mat-progress-bar mode="determinate" value="50"></mat-progress-bar>
-      </div>
-    </div>
+      <mat-card-title>{{ detailedOrganisation.orgName }}</mat-card-title>
+      <mat-card-subtitle>{{ detailedOrganisation.body }}</mat-card-subtitle>
+      <mat-card-subtitle class="additional-info">
+        <mat-icon>location_on</mat-icon> Location: {{ detailedOrganisation.location.lat.toFixed(4) }}, {{ detailedOrganisation.location.lon.toFixed(4) }}
+      </mat-card-subtitle>
+      <mat-card-subtitle class="additional-info">
+        <mat-icon>calendar_today</mat-icon> Created: {{ detailedOrganisation.createdAt | date:'mediumDate' }}
+      </mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
 
-    <div class="middle-section">
-      <div class="projects">
-        <h3>Projects</h3>
-        <ul>
-          <li><a routerLink="../../projects/0" routerLinkActive="active" ariaCurrentWhenActive="page">Project 1</a></li>
-          <li><a routerLink="../../projects/1" routerLinkActive="active" ariaCurrentWhenActive="page">Project 2</a></li>
-          <li><a routerLink="../../projects/2" routerLinkActive="active" ariaCurrentWhenActive="page">Project 3</a></li>
-        </ul>
-      </div>
-      <div class="activities">
-        <h3>Activities</h3>
-        <ul>
-          <li>Activity 1</li>
-          <li>Activity 2</li>
-          <li>Activity 3</li>
-        </ul>
-      </div>
-    </div>
+  <mat-card class="goals-card">
+    <mat-card-header>
+      <mat-card-title>Goals</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-progress-bar mode="determinate" value="70" class="progress-bar"></mat-progress-bar>
+      <mat-progress-bar mode="determinate" value="50" class="progress-bar"></mat-progress-bar>
+    </mat-card-content>
+  </mat-card>
 
-    <div class="top-section">
-      <div class="left">
-        <h3>Friends</h3>
-        <ul>
-        <li>Friend 1</li>
-        <li>Friend 2</li>
-        <li>Friend 3</li>
-        </ul>
-      </div>
-    </div>
+  <div class="middle-row">
+    <mat-card class="list-card">
+      <mat-card-header>
+        <mat-card-title>Projects</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-nav-list role="list">
+          <a mat-list-item routerLink="../../projects/0" routerLinkActive="active" ariaCurrentWhenActive="page">
+            Project 1
+          </a>
+          <a mat-list-item routerLink="../../projects/1" routerLinkActive="active" ariaCurrentWhenActive="page">
+            Project 2
+          </a>
+          <a mat-list-item routerLink="../../projects/2" routerLinkActive="active" ariaCurrentWhenActive="page">
+            Project 3
+          </a>
+        </mat-nav-list>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="list-card">
+      <mat-card-header>
+        <mat-card-title>Activities</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list role="list">
+          <mat-list-item>Activity 1</mat-list-item>
+          <mat-list-item>Activity 2</mat-list-item>
+          <mat-list-item>Activity 3</mat-list-item>
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
   </div>
+
+  <mat-card class="friends-card">
+    <mat-card-header>
+      <mat-card-title>Friends</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-list role="list">
+        <mat-list-item lines="10" *ngFor="let contact of detailedOrganisation.orgContacts">
+          <span matListItemTitle>{{ contact.name || 'Unknown User' }}</span>
+          <span matListItemLine *ngIf="contact.email">{{ contact.email }}</span>
+        </mat-list-item>
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
 </div>

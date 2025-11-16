@@ -1,52 +1,174 @@
-.container {
-  padding: 16px;
-}
-
-.top-section {
+.organisation-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 16px;
+  flex-direction: column;
+  gap: 32px;
 }
 
-.left {
-  width: 45%;
+.header-card {
+  margin-bottom: 0;
 }
 
-.icon-circle {
-  width: 60px;
-  height: 60px;
-  background-color: #2196f3;
-  color: white;
+.header-card .mat-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.header-card .mat-card-header-text {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.header-card .mat-card-title,
+.header-card .mat-card-subtitle {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  line-height: 1.5;
+}
+
+.avatar img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.additional-info {
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  gap: 12px;
+  font-size: 0.875rem;
+  color: rgba(0, 0, 0, 0.6);
+  flex-wrap: wrap;
 }
 
-.right {
-  width: 45%;
+.additional-info mat-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
 }
 
-.middle-section {
+.goals-card {
+  margin-bottom: 0;
+}
+
+.progress-bar {
+  margin-bottom: 16px;
+  height: 8px;
+}
+
+.middle-row {
   display: flex;
-  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
 }
 
-.projects, .activities {
-  width: 45%;
+.list-card {
+  flex: 1;
+  min-width: 280px;
 }
 
-.bottom-toolbar {
+mat-list-item {
+  min-height: 56px;
+  padding: 12px 28px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
   display: flex;
-  justify-content: space-around;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
+  align-items: center;
 }
 
-.mat-mdc-progress-bar {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  --mdc-linear-progress-track-height: 15px;
-  --mdc-linear-progress-active-indicator-height: 15px;
+mat-list-item:last-child {
+  border-bottom: none;
+}
+
+mat-list-item .mat-list-text {
+  flex: 1;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+.friends-card mat-list-item {
+  min-height: 72px;
+}
+
+::ng-deep .mdc-list-item__secondary-text,
+::ng-deep .mat-list-text {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
+}
+
+/* Desktop adjustments */
+@media (min-width: 600px) {
+  .additional-info {
+    gap: 16px;
+  }
+  .additional-info > *:not(mat-icon):first-of-type {
+    margin-left: 12px;
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 599px) {
+  .organisation-container {
+    padding: 16px;
+    gap: 24px;
+  }
+  .middle-row {
+    flex-direction: column;
+    gap: 24px;
+  }
+  .header-card mat-card-title {
+    font-size: 1.5rem;
+  }
+  .additional-info {
+    gap: 8px;
+    font-size: 0.8rem;
+  }
+  .additional-info mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+  .progress-bar {
+    height: 6px;
+    margin-bottom: 12px;
+  }
+  mat-list-item {
+    min-height: 48px;
+    padding: 8px 20px;
+  }
+  .friends-card mat-list-item {
+    min-height: 64px;
+  }
+  ::ng-deep .mdc-list-item__secondary-text {
+    font-size: 0.8rem;
+  }
+  .list-card mat-nav-list,
+  .list-card mat-list,
+  .friends-card mat-list {
+    overflow-y: auto;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 600px) and (max-width: 959px) {
+  .organisation-container {
+    padding: 20px;
+    gap: 28px;
+  }
+  .middle-row {
+    gap: 28px;
+  }
+  mat-list-item {
+    padding: 12px 24px;
+  }
 }
