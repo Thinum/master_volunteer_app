@@ -61,64 +61,86 @@ export const MOCK_USERS: User[] = [
   },
 ];
 
+export enum RelationshipType {
+  Parent = 'Parent',
+  Child = 'Child',
+  Sibling = 'Sibling',
+  Relative = 'Relative',
+  Partner = 'Partner',
+  Friend = 'Friend',
+  Acquaintant = 'Acquaintant',
+}
+
+export const RELATIONSHIP_COLORS: Record<string, string> = {
+  Parent: '#e63946',
+  Child: '#e76f51',
+  Sibling: '#2a9d8f',
+  Relative: '#457b9d',
+  Partner: '#d00000',
+  Friend: '#4cc9f0',
+  Acquaintant: '#8d99ae'
+};
+
 export interface UserRelationship {
   userId: number;
   friends: {
     friendId: number;
     likeScore: number; // 0 = hate, 100 = best friends
+    type: RelationshipType;
   }[];
 }
+
 
 export const MOCK_USER_RELATIONSHIPS: UserRelationship[] = [
   {
     userId: 1, // Alice
     friends: [
-      { friendId: 2, likeScore: 85 }, // Bob
-      { friendId: 3, likeScore: 60 }, // Charlie
-      { friendId: 4, likeScore: 92 }, // Diana
+      { friendId: 2, likeScore: 85, type: RelationshipType.Friend },
+      { friendId: 3, likeScore: 60, type: RelationshipType.Acquaintant },
+      { friendId: 4, likeScore: 92, type: RelationshipType.Relative },
     ],
   },
   {
     userId: 2, // Bob
     friends: [
-      { friendId: 1, likeScore: 80 },
-      { friendId: 3, likeScore: 70 },
-      { friendId: 5, likeScore: 55 },
+      { friendId: 1, likeScore: 80, type: RelationshipType.Friend },
+      { friendId: 3, likeScore: 70, type: RelationshipType.Sibling },
+      { friendId: 5, likeScore: 55, type: RelationshipType.Acquaintant },
     ],
   },
   {
     userId: 3, // Charlie
     friends: [
-      { friendId: 1, likeScore: 65 },
-      { friendId: 2, likeScore: 75 },
-      { friendId: 6, likeScore: 40 }, // Fiona (inactive)
+      { friendId: 1, likeScore: 65, type: RelationshipType.Acquaintant },
+      { friendId: 2, likeScore: 75, type: RelationshipType.Sibling },
+      { friendId: 6, likeScore: 40, type: RelationshipType.Friend },
     ],
   },
   {
     userId: 4, // Diana
     friends: [
-      { friendId: 1, likeScore: 95 },
-      { friendId: 7, likeScore: 50 },
+      { friendId: 1, likeScore: 95, type: RelationshipType.Relative },
+      { friendId: 7, likeScore: 50, type: RelationshipType.Acquaintant },
     ],
   },
   {
     userId: 5, // Ethan
     friends: [
-      { friendId: 2, likeScore: 60 },
-      { friendId: 7, likeScore: 78 },
+      { friendId: 2, likeScore: 60, type: RelationshipType.Friend },
+      { friendId: 7, likeScore: 78, type: RelationshipType.Partner },
     ],
   },
   {
     userId: 6, // Fiona
     friends: [
-      { friendId: 3, likeScore: 35 },
+      { friendId: 3, likeScore: 35, type: RelationshipType.Friend },
     ],
   },
   {
     userId: 7, // George
     friends: [
-      { friendId: 4, likeScore: 25 },
-      { friendId: 5, likeScore: 82 },
+      { friendId: 4, likeScore: 25, type: RelationshipType.Acquaintant },
+      { friendId: 5, likeScore: 82, type: RelationshipType.Partner },
     ],
   },
 ];

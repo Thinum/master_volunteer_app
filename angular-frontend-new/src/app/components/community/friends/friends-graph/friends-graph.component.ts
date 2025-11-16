@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import cytoscape from 'cytoscape';
 
-import { MOCK_USERS, MOCK_USER_RELATIONSHIPS, UserRelationship } from '../../../../mock/mock-users';
+import { MOCK_USERS, MOCK_USER_RELATIONSHIPS, UserRelationship, RELATIONSHIP_COLORS } from '../../../../mock/mock-users';
 import { User } from '../../../../models/user.model';
 
 @Component({
@@ -60,19 +60,45 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
       }
     }));
 
+    // Collect pair scores + relationship types
+    const pairMap = new Map<string, { scores: number[], types: string[] }>();
 
-    //
-    // --- Convert MOCK_USER_RELATIONSHIPS -> Cytoscape Edges ---
-    //
-    const edges = MOCK_USER_RELATIONSHIPS.flatMap(rel =>
-      rel.friends.map(friend => ({
-        data: {
-          source: `u${rel.userId}`,
-          target: `u${friend.friendId}`,
-          likeScore: friend.likeScore
+    for (const rel of MOCK_USER_RELATIONSHIPS) {
+      for (const f of rel.friends) {
+
+        const a = Math.min(rel.userId, f.friendId);
+        const b = Math.max(rel.userId, f.friendId);
+        const key = `${a}-${b}`;
+
+        if (!pairMap.has(key)) {
+          pairMap.set(key, { scores: [], types: [] });
         }
-      }))
-    );
+
+        pairMap.get(key)!.scores.push(f.likeScore);
+        pairMap.get(key)!.types.push(f.type);
+      }
+    }
+
+    const edges = Array.from(pairMap.entries()).map(([key, data]) => {
+      const [a, b] = key.split('-').map(Number);
+
+      // Average score
+      const avgScore = data.scores.reduce((s, v) => s + v, 0) / data.scores.length;
+
+      // Pick the dominant relationship type (max score)
+      const strongestIndex = data.scores.indexOf(Math.max(...data.scores));
+      const dominantType = data.types[strongestIndex];
+
+      return {
+        data: {
+          source: `u${a}`,
+          target: `u${b}`,
+          likeScore: avgScore,
+          type: dominantType,
+          color: RELATIONSHIP_COLORS[dominantType]
+        }
+      };
+    });
 
     const cy = cytoscape({
       container: this.cyContainer.nativeElement,
@@ -118,15 +144,15 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
           selector: 'edge',
           style: {
             'curve-style': 'bezier',
-            'line-color': '#bbb',
+            'line-color': 'data(color)',
 
             // Scale line width 1px → 8px based on likeScore=0–100
             'width': 'mapData(likeScore, 0, 100, 1, 8)',
 
             // --- ARROWS ---
-            'target-arrow-shape': 'triangle',
-            'target-arrow-color': '#bbb',
-            'arrow-scale': 1.5
+            //'target-arrow-shape': 'triangle',
+            //'target-arrow-color': '#bbb',
+            //'arrow-scale': 1.5
           }
         }
       ]
