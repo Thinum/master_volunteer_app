@@ -3,18 +3,21 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import {CardComponent} from '../../shared/components/card/card.component';
+import { CardComponent } from '../../shared/components/card/card.component';
+import { MOCK_USERS } from '../../mock/mock-users';
+import { MOCK_ORGANISATIONS } from '../../mock/mock-organisations';
+import { MOCK_ACTIVITIES } from '../../mock/mock-activities';
+import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
-    CommonModule,       // for *ngFor, *ngIf
-    MatCardModule,      // for <mat-card>
-    MatIconModule,      // for <mat-icon>
-    MatButtonModule,
-    CardComponent,
-    // for <button mat-icon-button>
+  CommonModule,
+  MatCardModule,
+  MatIconModule,
+  MatButtonModule,
+  CardComponent
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
@@ -28,24 +31,13 @@ export class HomeComponent {
     activities: 21
   };
 
-  requests = [
-    {
-      organisation: 'FB-Klub Mentator',
-      title: 'Event Organisation Unterstützung',
-      hours: 330,
-      user: { name: 'Sabine Lorenz', avatar: 'https://i.pravatar.cc/40?img=4' }
-    },
-    {
-      organisation: 'FB-Klub Mentator',
-      title: 'Event Organisation Unterstützung',
-      hours: 400,
-      user: { name: 'Liselotte Pulver', avatar: 'https://i.pravatar.cc/40?img=10' }
-    },
-    {
-      organisation: 'Samariterbund Wien',
-      title: 'Nachweis für Soziale Unterstützung',
-      hours: 200,
-      user: { name: 'Max Öllinger', avatar: 'https://i.pravatar.cc/40?img=8' }
-    }
-  ];
+  requests = MOCK_USERS.slice(0, 3).map((user: User) => ({
+    organisation: MOCK_ORGANISATIONS[Math.floor(Math.random() * MOCK_ORGANISATIONS.length)].orgName,
+        title: MOCK_ACTIVITIES[Math.floor(Math.random() * MOCK_ACTIVITIES.length)].title,
+        hours: Math.floor(Math.random() * 400) + 100,
+        user: {
+          name: user.name,
+          avatar: user.profilePicture
+        }
+    }));
 }
