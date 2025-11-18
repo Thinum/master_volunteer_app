@@ -1,14 +1,15 @@
-import {Component, OnInit} from '@angular/core';
-import {MatIcon} from '@angular/material/icon';
-import {MatButton, MatMiniFabButton} from '@angular/material/button';
-import {MatList, MatListItem} from '@angular/material/list';
-import {MatFormField, MatLabel} from '@angular/material/form-field';
-import {MatInput} from '@angular/material/input';
-import {NgForOf} from '@angular/common';
-import {OrganisationService} from '../../../services/api/organisation.service';
-import {Organisation} from '../../../models/organisation.model';
-import {RouterLink, RouterLinkActive} from '@angular/router';
-import {OrganisationListComponent} from './organisation-list/organisation-list.component';
+import { Component, OnInit } from '@angular/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatMiniFabButton, MatButtonModule } from '@angular/material/button';
+import { MatList, MatListItem } from '@angular/material/list';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { NgForOf } from '@angular/common';
+import { OrganisationService } from '../../../services/api/organisation.service';
+import { Organisation } from '../../../models/organisation.model';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { OrganisationListComponent } from './organisation-list/organisation-list.component';
 import {
   MOCK_JOINED_ORGANISATIONS,
   MOCK_RECOMMENDED_ORGANISATIONS,
@@ -24,7 +25,10 @@ import {
     MatInput,
     MatButton,
     MatMiniFabButton,
-    OrganisationListComponent
+    OrganisationListComponent,
+    RouterLink,
+    MatIconModule,
+    MatButtonModule
   ],
   templateUrl: './organisations-overview.component.html',
   styleUrl: './organisations-overview.component.css'
@@ -59,5 +63,7 @@ export class OrganisationsOverviewComponent implements OnInit{
     } else {
       this.organisationsFiltered = [...this.organisations];
     }
+  }
+  addNew(): void {
   }
 }
