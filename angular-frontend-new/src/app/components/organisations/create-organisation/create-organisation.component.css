@@ -1,0 +1,45 @@
+ .container {
+ padding: 1rem;
+ display: flex;
+ justify-content: center;
+ }
+
+
+ .card {
+ width: 100%;
+ max-width: 600px;
+ padding: 1.5rem;
+ }
+
+
+ mat-form-field {
+ width: 100%;
+ margin-bottom: 1rem;
+ }
+
+
+ h3 {
+ margin-top: 1rem;
+ font-weight: 500;
+ }
+
+
+ .coords {
+ margin: 0.5rem 0 1rem;
+ font-size: 14px;
+ color: #555;
+ }
+
+ .submit-btn {
+ width: 100%;
+ margin-top: 1rem;
+ }
+
+form {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+mat-chip {
+  margin: 4px;
+}
