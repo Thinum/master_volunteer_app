@@ -21,7 +21,7 @@ export const MOCK_ORGANISATIONS: Organisation[] = [
     location: { lat: 48.3069, lon: 14.2858 },
     createdAt: new Date('2023-09-20'),
     body: 'Dedicated to sustainability and green innovation.',
-    profilePicture: 'https://logotypes.dev/Breezy?variant=glyph&version=color',
+    profilePicture: 'https://logotypes.dev/Clearscope?variant=glyph&version=color',
     deactivated: false,
     orgContacts: [MOCK_USERS[2]],
   },
