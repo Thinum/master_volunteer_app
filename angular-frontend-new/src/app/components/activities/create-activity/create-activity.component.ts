@@ -10,6 +10,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatNativeDateModule } from '@angular/material/core';
 import { GoogleMapsModule } from '@angular/google-maps';
+import { CommonModule } from '@angular/common';
+import { Organisation } from '../../../models/organisation.model';
+import { MOCK_ORGANISATIONS } from '../../../mock/mock-organisations';
+
 
 interface Friend {
   name: string;
@@ -43,7 +47,7 @@ interface ActivityDetail {
 
 @Component({
   selector: 'app-create-activity',
-  imports: [MatNativeDateModule, MatChipsModule, MatIconModule, MatDatepickerModule, MatButtonModule, MatCardModule, MatInputModule, MatFormFieldModule, ReactiveFormsModule, GoogleMapsModule ],
+  imports: [MatNativeDateModule, MatChipsModule, MatIconModule, MatDatepickerModule, MatButtonModule, MatCardModule, MatInputModule, MatFormFieldModule, ReactiveFormsModule, GoogleMapsModule, CommonModule ],
   templateUrl: './create-activity.component.html',
   styleUrls: ['./create-activity.component.css']
 })
@@ -53,6 +57,17 @@ export class CreateActivityComponent {
   center = { lat: 48.3069, lng: 14.2858 }; // Linz, Austria
   zoom = 10;
   markerPosition: google.maps.LatLngLiteral | null = null;
+  orgMarkers = MOCK_ORGANISATIONS.map((org: Organisation) => ({
+    position: { lat: org.location.lat, lng: org.location.lon },
+    title: org.orgName,
+    id: org.id,
+    icon: {
+      url: org.profilePicture || '',  // picture URL
+      scaledSize: new google.maps.Size(40, 40), // adjust to your liking
+      origin: new google.maps.Point(0, 0),
+      anchor: new google.maps.Point(20, 20)
+    }
+  }));
 
   constructor(private fb: FormBuilder) {
     this.activityForm = this.fb.group({
