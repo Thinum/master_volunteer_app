@@ -1,0 +1,13 @@
+@for (notification of notificationsToDisplay; track notification.id) {
+  <app-card>
+    <div card-left>
+      <span>{{notification.type}}</span>
+    </div>
+    <div card-body>
+      <span>{{notification.message}}</span>
+    </div>
+    <div card-right>
+      <button><mat-icon>check</mat-icon></button>
+    </div>
+  </app-card>
+}

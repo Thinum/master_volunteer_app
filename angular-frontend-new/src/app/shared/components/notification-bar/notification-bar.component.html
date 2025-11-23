@@ -1,0 +1,6 @@
+<a routerLink="notifications"  routerLinkActive="active" ariaCurrentWhenActive="page" mat-fab>
+  <mat-icon class="material-icons color_blue">notifications</mat-icon>
+  @if (notificationCount > 0) {
+    <app-unread-badge class="unread-notification-badge" [count]="notificationCount"></app-unread-badge>
+  }
+</a>
