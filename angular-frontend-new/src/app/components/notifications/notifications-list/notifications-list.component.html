@@ -7,7 +7,7 @@
       <span>{{notification.message}}</span>
     </div>
     <div card-right>
-      <button><mat-icon>check</mat-icon></button>
+      <button mat-icon-button (click)="onNotificationClick(notification)"><mat-icon>check</mat-icon></button>
     </div>
   </app-card>
 }
