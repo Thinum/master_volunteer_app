@@ -17,7 +17,7 @@ export const routes: Routes = [
   {path: '', component: LoginComponent, data: {title: 'Login'}},
   {path: 'home', component: HomeComponent, data: {title: 'Home'}, canActivate: [authGuard]},
   {path: 'organisations', component: OrganisationsOverviewComponent, data: {title: 'Organisation Overview'}, canActivate: [authGuard]},
-  {path: 'organisations/:id', component: OrganisationDetailComponent, data: {title: 'Organisation'}, canActivate: [authGuard]},
+  {path: 'organisations/:id', component: OrganisationDetailComponent, data: {title: 'Organisation'}},
   {path: 'community', component: CommunityComponent, data: {title: 'Community'}, canActivate: [authGuard]},
   /**TODO change organisations to single organisation just for testing purposes for now */
   {path: 'profile', component: UserProfileComponent, data: {title: 'Profil'}, canActivate: [authGuard]},
