@@ -27,4 +27,19 @@
     <button mat-button="filled">Register</button>
     <button mat-button="filled" (click)="clickLogin()">Login</button>
   </div>
+  <div>
+    <div class="search-container">
+      <mat-form-field appearance="outline" class="search-bar">
+        <mat-label>Search</mat-label>
+        <input #SearchTerm matInput type="text" (input)="filterBy(SearchTerm.value)">
+        <button mat-button matSuffix>
+          <mat-icon>search</mat-icon>
+        </button>
+      </mat-form-field>
+      <button mat-mini-fab color="primary">
+        <mat-icon>filter_alt</mat-icon>
+      </button>
+    </div>
+    <app-organisation-list [organisationsList]="organisationsFiltered" [sectionTitle]="'All Organisations'"/>
+  </div>
 </div>
