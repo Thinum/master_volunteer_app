@@ -24,7 +24,6 @@
     "@angular/router": "^20.3.16",
     "@material/web": "^2.2.0",
     "cytoscape": "^3.33.1",
-    "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },
@@ -43,7 +42,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "rxjs": "~7.8.0",
+    "rxjs": "^7.8.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.33.1",
     "zone.js": "^0.15.1"
