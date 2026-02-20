@@ -1,5 +1,6 @@
 .section {
-  padding: 16px;
+  padding-right: 16px;
+  padding-left: 16px;
 }
 
 .section-title {
