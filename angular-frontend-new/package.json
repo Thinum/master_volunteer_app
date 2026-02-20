@@ -32,7 +32,7 @@
     "@angular/cli": "^20.3.16",
     "@angular/compiler-cli": "^20.3.16",
     "@material/web": "^2.4.1",
-    "@types/jasmine": "~5.1.0",
+    "@types/jasmine": "^6.0.0",
     "angular-eslint": "20.7.0",
     "cytoscape": "^3.33.1",
     "eslint": "^9.28.0",
