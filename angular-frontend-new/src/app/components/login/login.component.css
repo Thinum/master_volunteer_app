@@ -41,3 +41,16 @@ mat-form-field {
 .search-bar {
   flex: 1;
 }
+
+.filter-panel{
+  display: flex;
+  flex-direction: column;
+  margin: 16px;
+  max-width: 400px;
+}
+
+.list{
+  display: flex;
+  margin: 16px;
+  max-width: 400px;
+}

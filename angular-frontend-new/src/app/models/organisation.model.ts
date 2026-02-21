@@ -1,5 +1,15 @@
 import { User } from './user.model';
 
+
+export type OrganisationCategory =
+  | 'Technology'
+  | 'Environment'
+  | 'Education'
+  | 'Health'
+  | 'Culture'
+  | 'Social'
+  | 'Community';
+
 /**
  * Represents an organization in the system.
  */
@@ -33,4 +43,10 @@ export interface Organisation {
 
   /** Organization contacts or representatives (users). */
   orgContacts?: User[];
+
+  /** General Category of the organisation */
+  category: OrganisationCategory;
+
+  /** Tags that can be matched with the user interests etc */
+  tags: string[];
 }
