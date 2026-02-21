@@ -55,7 +55,7 @@ export class RegisterComponent {
 
     this.authService.register(username, email, password)
       .subscribe(() => {
-        this.router.navigate(['login']);
+        this.router.navigate(['']);
       });
   }
 
@@ -70,7 +70,7 @@ export class RegisterComponent {
   }
 
   goToLogin(): void {
-    this.router.navigate(['login']);
+    this.router.navigate(['']);
   }
 
 }
