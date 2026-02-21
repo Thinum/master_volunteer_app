@@ -166,6 +166,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.authService.login(username, password);
   }
 
+clickRegister(): void {
+     this.router.navigate(['register']);
+  }
+
   ngOnDestroy(): void {
     this.loggedInSubscription?.unsubscribe();
   }
