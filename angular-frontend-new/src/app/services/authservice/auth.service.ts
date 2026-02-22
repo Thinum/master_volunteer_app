@@ -74,4 +74,14 @@ export class AuthService {
       }
     }, 5000);
   }
+
+  // TODO: make this work or mock idk ?
+  register(username: string, email: string, password: string) {
+    return this.http.post('/api/auth/register', {
+      username,
+      email,
+      password
+    });
+  }
+
 }

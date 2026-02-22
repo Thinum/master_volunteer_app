@@ -19,3 +19,9 @@
   align-items: center;
   justify-content: center;
 }
+
+.filter-panel{
+  display: flex;
+  flex-direction: column;
+  margin: 16px;
+}

@@ -1,4 +1,4 @@
-import { Organisation } from '../models/organisation.model';
+import { Organisation, OrganisationCategory } from '../models/organisation.model';
 import { MOCK_USERS } from './mock-users';
 
 // ------------------------------------------------------
@@ -14,6 +14,9 @@ export const MOCK_ORGANISATIONS: Organisation[] = [
     body: 'Helping underprivileged communities learn coding skills.',
     deactivated: false,
     orgContacts: [MOCK_USERS[0], MOCK_USERS[1]],
+
+    category: 'Technology',
+    tags: ['coding', 'programming', 'mentorship', 'youth', 'digital skills'],
   },
   {
     id: 2,
@@ -24,6 +27,9 @@ export const MOCK_ORGANISATIONS: Organisation[] = [
     profilePicture: 'https://logotypes.dev/Clearscope?variant=glyph&version=color',
     deactivated: false,
     orgContacts: [MOCK_USERS[2]],
+
+    category: 'Environment',
+    tags: ['sustainability', 'climate', 'renewable energy', 'eco projects'],
   },
   {
     id: 3,
@@ -34,6 +40,9 @@ export const MOCK_ORGANISATIONS: Organisation[] = [
     profilePicture: 'https://logotypes.dev/Contentful?variant=glyph&version=color',
     deactivated: false,
     orgContacts: [MOCK_USERS[3]],
+
+    category: 'Community',
+    tags: ['volunteering', 'local projects', 'non-profit', 'social impact'],
   },
   {
     id: 4,
@@ -44,6 +53,9 @@ export const MOCK_ORGANISATIONS: Organisation[] = [
     profilePicture: 'https://logotypes.dev/Feedly?variant=glyph&version=color',
     deactivated: false,
     orgContacts: [MOCK_USERS[4]],
+
+    category: 'Education',
+    tags: ['schools', 'learning', 'scholarships', 'children', 'global'],
   },
   {
     id: 5,
@@ -54,6 +66,9 @@ export const MOCK_ORGANISATIONS: Organisation[] = [
     profilePicture: 'https://logotypes.dev/Googlefonts?variant=glyph&version=color',
     deactivated: false,
     orgContacts: [MOCK_USERS[5]],
+
+    category: 'Health',
+    tags: ['wellness', 'fitness', 'nutrition', 'mental health', 'prevention'],
   },
   {
     id: 6,
@@ -64,6 +79,9 @@ export const MOCK_ORGANISATIONS: Organisation[] = [
     profilePicture: 'https://logotypes.dev/Instacart?variant=glyph&version=color',
     deactivated: false,
     orgContacts: [MOCK_USERS[6]],
+
+    category: 'Culture',
+    tags: ['diversity', 'exchange programs', 'international', 'inclusion'],
   },
 ];
 
@@ -95,3 +113,23 @@ export const MOCK_FEATURED_ORGANISATIONS: Organisation[] = [
   MOCK_ORGANISATIONS[0], // Tech Aid Association
   MOCK_ORGANISATIONS[1], // Green Future Org
 ];
+
+export function filterByCategory(category: OrganisationCategory) {
+  return MOCK_ORGANISATIONS.filter(org => org.category === category);
+}
+
+export function filterByTag(tag: string) {
+  return MOCK_ORGANISATIONS.filter(org =>
+    org.tags.some(t => t.toLowerCase().includes(tag.toLowerCase()))
+  );
+}
+
+export function searchOrganisations(query: string) {
+  const lowerQuery = query.toLowerCase();
+
+  return MOCK_ORGANISATIONS.filter(org =>
+    org.orgName.toLowerCase().includes(lowerQuery) ||
+    org.body.toLowerCase().includes(lowerQuery) ||
+    org.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+  );
+}
