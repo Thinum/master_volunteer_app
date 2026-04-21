@@ -1,28 +1,42 @@
 .container {
   display: grid;
-  gap: 1rem;
-  padding: 1rem;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background-color: #f9f9fe;
 }
 
 .activity-card {
-  border-radius: 12px;
+  border-radius: 0.75rem;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.activity-card:hover {
+  box-shadow: 0 8px 16px rgba(70, 96, 138, 0.12);
+  transform: translateY(-2px);
 }
 
 .friends {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
 
   .friend-avatar {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     overflow: hidden;
-    background: #e0e0e0;
+    background: linear-gradient(to bottom right, #46608a, #39547d);
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
+    font-weight: 700;
+    font-size: 0.75rem;
+    flex-shrink: 0;
 
     img {
       width: 100%;
@@ -33,12 +47,29 @@
 }
 
 .corner-button {
-  position: fixed; /* Fixes the button on the screen */
-  right: 16px;      /* Distance from the left edge */
-  bottom: 100px;    /* Distance from the bottom edge */
-  z-index: 1000;   /* Ensures it stays on top of other elements */
+  position: fixed;
+  right: 1rem;
+  bottom: 6.5rem;
+  z-index: 100;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(to bottom right, #46608a, #39547d);
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(70, 96, 138, 0.2);
+  transition: all 0.2s ease;
+}
+
+.corner-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(70, 96, 138, 0.3);
+}
+
+.corner-button:active {
+  transform: scale(0.95);
 }

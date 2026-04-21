@@ -1,8 +1,95 @@
-/* You can add global styles to this file, and also import other style files */
+/* Design System Variables */
+:root {
+  /* Colors: Tonal Architecture */
+  --primary: #46608a;
+  --primary-dim: #39547d;
+  --primary-container: #b3cdfe;
+  --on-primary: #f8f8ff;
+  
+  --primary-fixed-dim: #6b8eb8;
+  
+  --surface: #f9f9fe;
+  --surface-bright: #fafbff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f3f3fa;
+  --surface-container: #ececf1;
+  --surface-container-high: #e6e8f1;
+  --surface-container-highest: #e0e2ec;
+  
+  --on-surface: #2f323a;
+  --on-surface-variant: #5c5f68;
+  --outline-variant: #afb2bb;
+  
+  --tertiary: #7d5b80;
+  --tertiary-container: #deccfd;
+  --on-tertiary-container: #3d1f40;
+  
+  --error: #a83836;
+  
+  /* Typography */
+  --font-display: 'Manrope', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  
+  /* Spacing Scale */
+  --spacing-0: 0;
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-6: 1.5rem;
+  --spacing-10: 2.5rem;
+  
+  /* Shadows */
+  --shadow-ambient: 0 20px 40px rgba(47, 50, 58, 0.06);
+  --shadow-hover: 0 4px 12px rgba(70, 96, 138, 0.1);
+  
+  /* Radius */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-full: 9999px;
+}
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body { 
+  height: 100%; 
+  margin: 0;
+  padding: 0;
+}
 
+body { 
+  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: var(--surface);
+  color: var(--on-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography Classes */
+.display-md {
+  font-family: var(--font-display);
+  font-size: 2.75rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.title-md {
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.label-md {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--on-surface-variant);
+}
 
 .hours {
   min-width: 80px;
@@ -11,6 +98,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   .value {
     font-size: 24px;
     font-weight: bold;
+    color: var(--on-surface);
   }
 }
 
@@ -24,16 +112,19 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
   .label {
     font-size: 15px;
+    color: var(--on-surface-variant);
 
     &.month{
       font-size: 35px;
       font-weight: bold;
+      color: var(--on-surface);
     }
   }
 
   .value {
     font-size: 40px;
     font-weight: bold;
+    color: var(--on-surface);
   }
 }
 
@@ -45,7 +136,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   word-break: normal;
 
   .organization{
-    color: grey;
+    color: var(--on-surface-variant);
     font-size: 15px;
     margin-bottom: 0;
   }
@@ -55,10 +146,11 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     font-size: 25px;
     font-weight: bold;
     margin: 0;
+    color: var(--on-surface);
   }
 
   .activity-description{
-    color: grey;
+    color: var(--on-surface-variant);
     font-size: 15px;
     margin-bottom: 0;
   }

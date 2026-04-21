@@ -3,14 +3,19 @@
   --primary-dim: #39547d;
   --primary-container: #b3cdfe;
   --on-primary: #f8f8ff;
+  --primary-fixed-dim: #6b8eb8;
   --surface: #f9f9fe;
+  --surface-bright: #fafbff;
   --surface-container-lowest: #ffffff;
   --surface-container-highest: #e0e2ec;
+  --surface-container-high: #e6e8f1;
   --surface-container-low: #f3f3fa;
+  --surface-container: #ececf1;
   --outline-variant: #afb2bb;
   --on-surface: #2f323a;
   --on-surface-variant: #5c5f68;
   --tertiary-container: #deccfd;
+  --tertiary: #7d5b80;
 }
 
 * {

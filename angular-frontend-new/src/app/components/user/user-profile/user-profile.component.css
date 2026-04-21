@@ -1,8 +1,12 @@
 .profile-card {
-  max-width: 80%;
+  max-width: 90%;
   position: relative;
-  z-index:1;
-  margin: 100px auto 20px;
+  z-index: 1;
+  margin: 6rem auto 1.5rem;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
+  overflow: hidden;
 }
 
 .profile-image {
@@ -10,12 +14,20 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
+  background: linear-gradient(to bottom right, #46608a, #39547d);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
 }
 
 mat-card-header {
-  margin-bottom: 20px;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  background-color: #f3f3fa;
 }
 
 mat-card-content {
-  padding: 16px;
+  padding: 1.5rem;
 }

@@ -1,14 +1,22 @@
 .app-card {
   display: flex;
-  background-color: white;
-  padding: 3px;
+  background-color: #ffffff;
+  padding: 0;
   height: 200px;
-  border-top: solid 1px lightgray;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
+  transition: all 0.2s ease;
+}
+
+.app-card:hover {
+  box-shadow: 0 8px 16px rgba(70, 96, 138, 0.12);
+  transform: translateY(-1px);
 }
 
 .card-left {
   width: 30%;
-  background-color: #EEF9FF !important;
+  background-color: #f3f3fa;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -19,6 +27,7 @@
   width: 65%;
   justify-content: center;
   align-items: center;
+  padding: 1.5rem;
 }
 
 .card-right {
