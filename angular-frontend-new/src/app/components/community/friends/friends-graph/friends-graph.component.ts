@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-friends-graph',
   template: `
   <div class="legend">
-    <div class="legend-title">Relationship Types</div>
+    <div class="legend-title">Relationship Types</div><br />
     <div class="legend-items">
       <div class="legend-item" *ngFor="let item of relationshipLegend">
         <span class="legend-color" [style.background]="item.color"></span>
@@ -24,48 +24,73 @@ import { CommonModule } from '@angular/common';
     .cy-container {
       width: 100%;
       height: 500px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      border-radius: 12px;
+      background: transparent;
+      padding: 16px;
     }
+
+    /* Contextual Surface */
     .legend {
-      padding: 12px;
-      margin-bottom: 12px;
-      background: #F7EDFF;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-family: Arial, sans-serif;
-      max-width: 300px;
+      padding: 16px;
+      margin: 0 auto 16px auto; /* centers horizontally */
+      background-color: #E7EDFF;
+      border-radius: 12px;
+      max-width: 320px;
+
+      box-shadow: 0 20px 40px rgba(47, 50, 58, 0.06);
+
+      font-family: 'Inter', sans-serif;
+
+      text-align: left; /* keeps content left-aligned */
     }
 
+    /* Typography hierarchy */
     .legend-title {
-      font-weight: bold;
-      margin-bottom: 8px;
-      color: #333;
+      font-family: 'Manrope', sans-serif;
+      font-size: 1.125rem; /* title-md */
+      font-weight: 600;
+      color: #2f323a; /* on_surface */
+      margin-bottom: 12px;
     }
 
+    /* Editorial spacing instead of dividers */
     .legend-items {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 10px;
     }
 
+    /* Softer alignment */
     .legend-item {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+
+      padding: 6px 8px;
+      border-radius: 8px;
+
+      /* subtle tonal hover layer (optional) */
+      transition: background 0.2s ease;
     }
 
+    .legend-item:hover {
+      background: #f3f3fa; /* surface-container-low */
+    }
+
+    /* Color block */
     .legend-color {
-      width: 20px;
-      height: 20px;
-      border-radius: 4px;
-      display: inline-block;
-      border: 1px solid #999;
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+
+      /* Ghost border fallback */
+      outline: 1px solid rgba(175, 178, 187, 0.15);
     }
 
+    /* Label styling */
     .legend-label {
-      color: #333;
-      font-size: 14px;
+      font-size: 0.875rem;
+      color: #5c5f68; /* on_surface_variant */
     }
   `],
   imports: [CommonModule]

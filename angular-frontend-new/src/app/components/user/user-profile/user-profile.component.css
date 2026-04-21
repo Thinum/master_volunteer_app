@@ -10,16 +10,17 @@
 }
 
 .profile-image {
-  background-size: cover;
   width: 60px;
   height: 60px;
   border-radius: 50%;
   background: linear-gradient(to bottom right, #46608a, #39547d);
+  background-size: cover;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   color: white;
+  margin-right: 2rem;
 }
 
 mat-card-header {

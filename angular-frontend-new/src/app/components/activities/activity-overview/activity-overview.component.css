@@ -29,7 +29,7 @@
     height: 36px;
     border-radius: 50%;
     overflow: hidden;
-    background: linear-gradient(to bottom right, #46608a, #39547d);
+    background: var(--relationship-friend, var(--avatar-bg));
     color: white;
     display: flex;
     align-items: center;

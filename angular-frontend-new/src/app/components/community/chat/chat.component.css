@@ -10,9 +10,8 @@
   display: flex;
   padding: 1rem;
   background-color: #ffffff;
-  border-bottom: 1px solid rgba(175, 178, 187, 0.15);
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .search-bar {
@@ -20,16 +19,20 @@
   padding: 0.75rem 1rem;
   border: none;
   border-radius: 0.75rem;
-  background-color: #f3f3fa;
-  font-family: inherit;
+  background-color: #e0e2ec;
+  font-family: 'Inter', sans-serif;
   color: #2f323a;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-bar {
+  border: 2px solid transparent;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .search-bar:focus {
-  outline: none;
   background-color: #ffffff;
-  box-shadow: 0 0 0 2px rgba(70, 96, 138, 0.2);
+  border-color: #46608a;
 }
 
 .search-bar::placeholder {
@@ -48,11 +51,10 @@
   border-radius: 0.75rem;
   padding: 1rem;
   margin-bottom: 0.5rem;
-  transition: all 0.2s ease;
   cursor: pointer;
 }
 
-.conversation-card [card-body] {
+.conversation-card .card-body {
   overflow: hidden;
   max-width: calc(100% - 120px);
   display: flex;
@@ -60,14 +62,6 @@
   justify-content: center;
   align-items: flex-start;
   padding: 0.5rem;
-}
-
-.conversation-card:hover {
-  background-color: #f3f3fa;
-}
-
-.conversation-card.active {
-  background-color: #e6e8f1;
 }
 
 .contact-info {
@@ -176,7 +170,7 @@
   border: none;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(70, 96, 138, 0.2);
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .corner-button:hover {

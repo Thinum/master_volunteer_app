@@ -25,6 +25,10 @@
   --on-tertiary-container: #3d1f40;
   
   --error: #a83836;
+
+  /* Relationship / avatar defaults */
+  --relationship-friend: #4cc9f0;
+  --avatar-bg: linear-gradient(to bottom right, var(--primary), var(--primary-dim));
   
   /* Typography */
   --font-display: 'Manrope', sans-serif;
