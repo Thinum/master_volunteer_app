@@ -9,7 +9,6 @@ import {RouterLink, RouterLinkActive} from '@angular/router';
   imports: [
     MatToolbar,
     MatIcon,
-    MatFabAnchor,
     RouterLink,
     RouterLinkActive
   ],

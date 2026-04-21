@@ -1,6 +1,10 @@
 .home-container {
   padding: 16px;
   font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(179, 205, 254, 0.05) 100%);
+  justify-content: center;
+  position: relative;
+  overflow: auto;
 }
 
 /* HEADER */

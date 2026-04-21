@@ -30,7 +30,7 @@ import { CommonModule } from '@angular/common';
     .legend {
       padding: 12px;
       margin-bottom: 12px;
-      background: #fafafa;
+      background: #F7EDFF;
       border: 1px solid #ccc;
       border-radius: 8px;
       font-family: Arial, sans-serif;
