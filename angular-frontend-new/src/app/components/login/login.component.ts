@@ -68,6 +68,11 @@ export class LoginComponent implements OnInit, OnDestroy {
       rememberMe: [false]
     });
 
+    if (this.authService.isLoggedIn()){
+      this.layoutingService.showBottomNavbar.set(true);
+      this.router.navigate(['home']);
+    }
+
     this.loggedInSubscription = this.authService.loggedInEvent.subscribe(
       loggedInEvent => {
         if (loggedInEvent) {
@@ -160,7 +165,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.authService.login(username, password);
   }
 
-clickRegister(): void {
+  clickRegister(): void {
      this.router.navigate(['register']);
   }
 

@@ -2,6 +2,8 @@ package at.jku.volunteer_app.controller;
 
 import at.jku.volunteer_app.contract.AuthToken;
 import at.jku.volunteer_app.contract.AuthUserDTO;
+import at.jku.volunteer_app.contract.RegisterUserDTO;
+import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.service.JwtService;
 import at.jku.volunteer_app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,5 +35,20 @@ public class AuthenticationController {
         } else {
             throw new LoginException("Password is incorrect");
         }
+    }
+
+    @PostMapping("/register")
+    public AuthToken register(@RequestBody RegisterUserDTO registerUserDTO) throws LoginException {
+        UserDetails dbUser = userService.loadUserByUsername(registerUserDTO.getUsername());
+        if (dbUser != null) {
+            throw new LoginException("Username already exists");
+        }
+        User userToAdd = new User();
+        userToAdd.setUsername(registerUserDTO.getUsername());
+        userToAdd.setPassword(registerUserDTO.getPassword());
+        userToAdd.setEmail(registerUserDTO.getEmail());
+        userService.addUser(userToAdd);
+        String token = jwtService.generateToken(userToAdd.getUsername());
+        return new AuthToken(token, jwtService.extractExpiration(token));
     }
 }
