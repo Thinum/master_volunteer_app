@@ -1,27 +1,60 @@
 .forum-header {
   display: flex;
-  gap: 10px;
-  padding: 5px;
-  margin-bottom: 20px;
+  gap: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
   align-items: center;
+  background-color: #ffffff;
+  border-bottom: 1px solid rgba(175, 178, 187, 0.15);
 }
 
 .search-bar {
   flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  background-color: #f3f3fa;
+  font-family: inherit;
+  color: #2f323a;
+  transition: all 0.2s ease;
+}
+
+.search-bar:focus {
+  outline: none;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(70, 96, 138, 0.2);
+}
+
+.search-bar::placeholder {
+  color: #afb2bb;
 }
 
 .corner-button {
-  position: fixed; /* Fixes the button on the screen */
-  right: 16px;      /* Distance from the left edge */
-  bottom: 100px;    /* Distance from the bottom edge */
-  z-index: 1000;   /* Ensures it stays on top of other elements */
+  position: fixed;
+  right: 1rem;
+  bottom: 6.5rem;
+  z-index: 100;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(to bottom right, #46608a, #39547d);
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(70, 96, 138, 0.2);
+  transition: all 0.2s ease;
+}
+
+.corner-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(70, 96, 138, 0.3);
+}
+
+.corner-button:active {
+  transform: scale(0.95);
 }
 
 .forum-list {
@@ -30,14 +63,15 @@
 }
 
 .topic {
-  white-space: nowrap; /* Single line */
+  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* Adds ... for overflow */
+  text-overflow: ellipsis;
   max-width: 100%;
   margin: 0 0 0.25rem 0;
-  font-weight: bold;
-  font-size: 1em;
+  font-weight: 700;
+  font-size: 0.875rem;
   min-width: 0;
+  color: #2f323a;
 }
 
 .last-message {
@@ -46,28 +80,29 @@
   text-overflow: ellipsis;
   max-width: 100%;
   margin: 0;
-  color: #666;
-  font-size: 0.9em;
+  color: #5c5f68;
+  font-size: 0.875rem;
   min-width: 0;
 }
 
 .forum-icon {
-  margin-right: 1rem; /* Adds space between icon and right edge of card/container */
-  width: 32px; /* Or your preferred size, e.g., 40px */
+  margin-right: 1rem;
+  width: 32px;
   height: 32px;
   border-radius: 50%;
   object-fit: cover;
+  background-color: rgba(70, 96, 138, 0.1);
 }
 
 app-card [card-body] {
   overflow: hidden;
-  max-width: calc(100% - 80px); /* Reserves space for left date (~40px) and right icon (~40px); adjust if needed */
+  max-width: calc(100% - 80px);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  padding: 0.5rem; /* Adds internal spacing for better readability */
-  min-width: 0; /* Essential for flexbox truncation */
+  padding: 0.5rem;
+  min-width: 0;
 }
 
 .card-content {

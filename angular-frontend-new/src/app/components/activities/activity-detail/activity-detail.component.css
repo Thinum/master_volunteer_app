@@ -1,24 +1,30 @@
 .detail-card {
   margin: 1rem;
-  padding: 1rem;
-  border-radius: 12px;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
 }
 
 .friends {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
 
   .friend-avatar {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     overflow: hidden;
-    background: #e0e0e0;
+    background: linear-gradient(to bottom right, #46608a, #39547d);
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
+    font-weight: 700;
+    font-size: 0.875rem;
+    flex-shrink: 0;
 
     img {
       width: 100%;
@@ -32,38 +38,44 @@
   text-transform: uppercase;
 }
 
-
-.detail-card {
-  padding: 20px;
-}
-
 .activity-title {
   font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: #2f323a;
+  font-family: 'Manrope', sans-serif;
 }
 
 .info-row {
   display: flex;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  color: #2f323a;
 }
 
 .info-row mat-icon {
-  margin-right: 8px;
+  margin-right: 0.75rem;
+  color: #46608a;
 }
 
 .section {
-  margin-top: 1.5rem;
+  margin-top: 2rem;
 }
 
 .contacts-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 1.5rem;
   margin-top: 1.5rem;
 }
 
 .contact-card {
-  padding: 10px;
+  padding: 1.5rem;
+  background-color: #f3f3fa;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.contact-card:hover {
+  background-color: #ececf1;
 }

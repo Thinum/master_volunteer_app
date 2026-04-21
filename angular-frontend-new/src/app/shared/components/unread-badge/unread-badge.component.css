@@ -1,9 +1,11 @@
 .unread-badge {
-  background-color: #007bff;
+  background: linear-gradient(to bottom right, #46608a, #39547d);
   color: white;
-  border-radius: 10px;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75em;
-  font-weight: bold;
-  margin-top: 0.25rem;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-block;
 }
