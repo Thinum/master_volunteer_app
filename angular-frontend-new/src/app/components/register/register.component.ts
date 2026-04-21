@@ -8,6 +8,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/authservice/auth.service';
 import { signal } from '@angular/core';
+import {Subscription} from 'rxjs';
+import {LayoutingService} from '../../services/layouting.service';
 
 @Component({
   selector: 'app-register',
@@ -29,9 +31,12 @@ export class RegisterComponent {
   protected hidePw = signal(true);
   protected hideConfirmPw = signal(true);
 
+  private loggedInSubscription: Subscription;
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+    private layoutingService: LayoutingService,
     private router: Router
   ) {
     this.registerForm = this.fb.group({
@@ -40,6 +45,19 @@ export class RegisterComponent {
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required],
     }, { validators: this.passwordMatchValidator });
+
+    this.loggedInSubscription = this.authService.loggedInEvent.subscribe(
+      loggedInEvent => {
+        if (loggedInEvent) {
+          this.layoutingService.showBottomNavbar.set(true);
+          this.router.navigate(['home']);
+        }
+      }
+    );
+  }
+
+  ngOnDestroy() {
+    this.loggedInSubscription.unsubscribe();
   }
 
   private passwordMatchValidator(form: FormGroup) {
@@ -53,10 +71,7 @@ export class RegisterComponent {
 
     const { username, email, password } = this.registerForm.value;
 
-    this.authService.register(username, email, password)
-      .subscribe(() => {
-        this.router.navigate(['']);
-      });
+    this.authService.register(username, email, password);
   }
 
   toggleHidePw(event: MouseEvent) {
