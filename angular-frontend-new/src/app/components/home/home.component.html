@@ -32,7 +32,7 @@
   <!-- Requests -->
   <div class="requests">
     <h4>Anfragen Nachweise</h4>
-    <app-card *ngFor="let req of requests">
+    <app-card *ngFor="let req of requests"  class="request-card">
         <div card-left>
           <div class="hours">
             <span class="value">{{ req.hours }}</span>
@@ -50,7 +50,7 @@
           </div>
         </div>
       <div card-right>
-        <button mat-icon-button>
+        <button mat-icon-button class="chat-icon">
           <mat-icon>chat_bubble_outline</mat-icon>
         </button>
       </div>

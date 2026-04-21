@@ -67,6 +67,14 @@
 }
 
 /* REQUESTS */
+.requests {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
 .requests h4 {
   margin-bottom: 1rem;
   font-size: 0.875rem;
@@ -81,10 +89,9 @@
   align-items: center;
   background: #ffffff;
   border-radius: 0.75rem;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
   box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
   transition: all 0.2s ease;
+  width: 100%
 }
 
 .request-card:hover {
@@ -123,4 +130,8 @@
   flex-shrink: 0;
   max-width: 40px !important;
   max-height: 40px !important;
+}
+
+.chat-icon{
+  margin-right: 2rem;
 }
