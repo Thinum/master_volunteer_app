@@ -32,7 +32,7 @@ export class ChatComponent {
     {
       id: 1,
       contact: 'Alice',
-      avatar: 'https://avatar.iran.liara.run/public/1',
+      avatar: 'https://api.dicebear.com/9.x/lorelei/svg/seed=1',
       lastMessage: 'Hey, have you tried the new Angular signals? They\'re amazing for reactivity!',
       timestamp: new Date('2025-10-04T14:00:00'),
       unreadCount: 2,
@@ -41,7 +41,7 @@ export class ChatComponent {
     {
       id: 2,
       contact: 'Bob',
-      avatar: 'https://avatar.iran.liara.run/public/3',
+      avatar: 'https://api.dicebear.com/9.x/lorelei/svg/seed=2',
       lastMessage: 'Let\'s catch up later—free this weekend?',
       timestamp: new Date('2025-10-04T12:30:00'),
       unreadCount: 0,
@@ -50,7 +50,7 @@ export class ChatComponent {
     {
       id: 3,
       contact: 'Charlie',
-      avatar: 'https://avatar.iran.liara.run/public/2',
+      avatar: 'https://api.dicebear.com/9.x/lorelei/svg/seed=3',
       lastMessage: 'Thanks for the code review tips!',
       timestamp: new Date('2025-10-03T16:45:00'),
       unreadCount: 1,
