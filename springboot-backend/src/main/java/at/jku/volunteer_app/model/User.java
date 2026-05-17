@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -26,4 +27,15 @@ public class User {
     private Timestamp createdAt;
 
     private String username;
+
+
+    @OneToMany(mappedBy = "fromUser",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<UserRelationship> relationshipsFrom;
+
+    @OneToMany(mappedBy = "toUser",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<UserRelationship> relationshipsTo;
 }

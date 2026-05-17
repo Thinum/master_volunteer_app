@@ -1,5 +1,6 @@
 package at.jku.volunteer_app.controller;
 
+import at.jku.volunteer_app.contract.AddFriendRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,5 +19,10 @@ public class UserController {
     @PostMapping
     public String addNewUser(@RequestBody User user) {
         return userService.addUser(user);
+    }
+
+    @PostMapping("/addFriend")
+    public boolean addFriend(@RequestBody AddFriendRequest request) {
+        return userService.addFriend(request.userId(), request.friendUserId());
     }
 }
