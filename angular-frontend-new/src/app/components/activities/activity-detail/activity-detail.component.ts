@@ -6,12 +6,9 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { NgFor, NgIf, DatePipe } from '@angular/common';
- import {MatTooltipModule} from '@angular/material/tooltip';
-
-interface Friend {
-  name: string;
-  avatar?: string;
-}
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MOCK_USERS } from '../../../mock/mock-users';
+import {User} from '../../../models/user.model';
 
 interface Contact {
   name: string;
@@ -33,7 +30,7 @@ interface ActivityDetail {
   organization: string;
   createdAt: Date;
   expiresAt: Date;
-  friends: Friend[];
+  friends: User[];
   contacts: Contact[];
   orgContacts: Contact[];
 }
@@ -81,9 +78,9 @@ export class ActivityDetailComponent implements OnInit {
       createdAt: new Date('2025-09-01'),
       expiresAt: new Date('2025-12-31'),
       friends: [
-        { name: 'Alice', avatar: 'https://i.pravatar.cc/40?img=1' },
-        { name: 'Bob', avatar: 'https://i.pravatar.cc/40?img=2' },
-        { name: 'Charlie' } // fallback initials
+        MOCK_USERS[0],
+        MOCK_USERS[1],
+        MOCK_USERS[2],
       ],
       contacts: [
         { name: 'Alice', role: 'Organizer', phone: '123-456-789', email: 'alice@example.com' }
