@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { NgForOf } from '@angular/common';
+import { Router } from '@angular/router';
+
 import { FriendListComponent } from './friend-list/friend-list.component';
 import { FriendsGraphComponent } from './friends-graph/friends-graph.component';
-import { VolunteerService } from '../../../services/api/volunteer.service';
-import { User } from '../../../models/user.model';
 import { ActivitiesSmallCardComponent } from '../../activities/activities-small-card/activities-small-card.component';
-import { Activity } from '../../../models/activity.model';
+
+import { VolunteerService } from '../../../services/api/volunteer.service';
 import { ActivityService } from '../../../services/api/activity.service';
-import { NgForOf } from '@angular/common';
+
+import { User } from '../../../models/user.model';
+import { Activity } from '../../../models/activity.model';
 
 @Component({
   selector: 'app-friends',
@@ -26,7 +30,8 @@ export class FriendsComponent implements OnInit {
 
   constructor(
     private volunteerService: VolunteerService,
-    private activityService: ActivityService
+    private activityService: ActivityService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -37,7 +42,11 @@ export class FriendsComponent implements OnInit {
     this.activityService
       .getActivitiesByUserParticipation(1)
       .subscribe(activities => {
-        this.activitiesOfFriends = activities;
+        this.activitiesOfFriends = activities// Optinal: .slice(0, 3);
       });
+  }
+
+  goToActivity(id: number): void {
+    this.router.navigate(['/activities', id]);
   }
 }
