@@ -2,6 +2,7 @@
 
   <div class="friend-area">
     <h1>Friends</h1>
+
     <app-friend-list
       [friendList]="friends"
       [sectionTitle]="'All friends'">
@@ -12,11 +13,15 @@
     <h1>Activities of Friends</h1>
 
     <ng-container *ngFor="let activity of activitiesOfFriends">
-      <div class="activity-clickable" (click)="goToActivity(activity.id)">
+      <div
+        class="activity-clickable"
+        (click)="goToActivity(activity.id)">
+
         <app-activities-small-card
           [activity]="activity"
           [friends]="friends">
         </app-activities-small-card>
+
       </div>
     </ng-container>
 
@@ -24,6 +29,6 @@
 
 </div>
 
-<div class="fiends-graph">
+<div class="friends-graph">
   <app-friends-graph></app-friends-graph>
 </div>

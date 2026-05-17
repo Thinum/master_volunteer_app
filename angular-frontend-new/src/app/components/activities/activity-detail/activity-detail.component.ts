@@ -7,32 +7,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { NgFor, NgIf, DatePipe } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MOCK_USERS } from '../../../mock/mock-users';
-import {User} from '../../../models/user.model';
+import { MOCK_ACTIVITIES } from '../../../mock/mock-activities';
+import { Activity} from '../../../models/activity.model';
 
 interface Contact {
   name: string;
   role: string;
   phone: string;
   email: string;
-}
-
-interface ActivityDetail {
-  id: number;
-  title: string;
-  date: Date;
-  location: string;
-  description: string;
-  duration: string;
-  skills: string[];
-  qualifications: string[];
-  prerequisites: string[];
-  organization: string;
-  createdAt: Date;
-  expiresAt: Date;
-  friends: User[];
-  contacts: Contact[];
-  orgContacts: Contact[];
 }
 
 @Component({
@@ -54,42 +36,14 @@ interface ActivityDetail {
 })
 export class ActivityDetailComponent implements OnInit {
   activityId!: number;
-  activity!: ActivityDetail | undefined;
+  activity!: Activity | undefined;
 
   constructor(private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.activityId = Number(this.route.snapshot.paramMap.get('id'));
-    this.activity = this.mockActivities.find(a => a.id === this.activityId);
+    this.activity = MOCK_ACTIVITIES.find(a => a.id === this.activityId);
   }
-
-  mockActivities: ActivityDetail[] = [
-    {
-      id: 1,
-      title: 'Hiking Trip',
-      date: new Date('2025-10-12T09:00:00'),
-      location: 'Blue Mountain Park',
-      description: 'A fun day hiking with friends.',
-      duration: '5 hours',
-      skills: ['Endurance', 'Navigation'],
-      qualifications: ['Good physical shape'],
-      prerequisites: ['Hiking boots', 'Water bottle'],
-      organization: 'Outdoor Club',
-      createdAt: new Date('2025-09-01'),
-      expiresAt: new Date('2025-12-31'),
-      friends: [
-        MOCK_USERS[0],
-        MOCK_USERS[1],
-        MOCK_USERS[2],
-      ],
-      contacts: [
-        { name: 'Alice', role: 'Organizer', phone: '123-456-789', email: 'alice@example.com' }
-      ],
-      orgContacts: [
-        { name: 'John Doe', role: 'Club President', phone: '987-654-321', email: 'org@example.com' }
-      ]
-    }
-  ];
 
   onShare() {
     console.log('Shared activity:', this.activity?.title);

@@ -95,7 +95,7 @@
 
     <mat-card class="contact-card" *ngFor="let oc of activity?.orgContacts">
       <mat-card-title>{{ oc.name }}</mat-card-title>
-      <mat-card-subtitle>{{ oc.role }} ({{ activity?.organization }})</mat-card-subtitle>
+      <mat-card-subtitle>{{ oc.role }} ({{ activity?.organisations }})</mat-card-subtitle>
       <p><mat-icon>phone</mat-icon> {{ oc.phone }}</p>
       <p><mat-icon>email</mat-icon> {{ oc.email }}</p>
     </mat-card>
