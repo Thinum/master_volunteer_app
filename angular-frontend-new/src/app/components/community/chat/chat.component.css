@@ -3,48 +3,65 @@
   flex-direction: column;
   height: 100vh;
   padding: 0;
+  background-color: #f9f9fe;
 }
 
 .chat-header {
   display: flex;
   padding: 1rem;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
+  background-color: #ffffff;
   align-items: center;
+  gap: 1.5rem;
 }
 
 .search-bar {
   flex: 1;
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 24px;
-  background-color: white;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  background-color: #e0e2ec;
+  font-family: 'Inter', sans-serif;
+  color: #2f323a;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-bar {
+  border: 2px solid transparent;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.search-bar:focus {
+  background-color: #ffffff;
+  border-color: #46608a;
+}
+
+.search-bar::placeholder {
+  color: #afb2bb;
 }
 
 .chat-list {
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
-  background-color: #fff;
+  background-color: #ffffff;
 }
 
 /* Conversation cards */
-.conversation-card [card-body] {
+.conversation-card {
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.conversation-card .card-body {
   overflow: hidden;
-  max-width: calc(100% - 120px); /* Reserves space for avatar/timestamp (left) and status (right); adjust 120px if your slots are wider */
+  max-width: calc(100% - 120px);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  padding: 0.5rem; /* Optional: Adds breathing room inside body */
-}
-
-.conversation-card:hover {
-  background-color: #f8f9fa;
-}
-
-.conversation-card.active {
-  background-color: #e3f2fd;
+  padding: 0.5rem;
 }
 
 .contact-info {
@@ -57,13 +74,14 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background-color: #007bff;
+  background: linear-gradient(to bottom right, #46608a, #39547d);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
   flex-shrink: 0;
+  font-size: 1.125rem;
 }
 
 .avatar img {
@@ -77,19 +95,22 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  font-size: 0.8em;
-  color: #6c757d;
+  font-size: 0.75rem;
+  color: #5c5f68;
   margin-left: auto;
 }
 
 .unread-badge {
-  background-color: #007bff;
+  background: linear-gradient(to bottom right, #46608a, #39547d);
   color: white;
-  border-radius: 10px;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75em;
-  font-weight: bold;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   margin-top: 0.25rem;
+  display: inline-block;
 }
 
 .convo-content {
@@ -98,12 +119,13 @@
 }
 
 .contact-name {
-  white-space: nowrap; /* Prevents wrapping to single line */
+  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* Adds ... for overflow */
+  text-overflow: ellipsis;
   max-width: 100%;
-  margin: 0 0 0.25rem 0; /* Tightens spacing */
-  font-weight: bold;
+  margin: 0 0 0.25rem 0;
+  font-weight: 700;
+  color: #2f323a;
 }
 
 .last-message-preview {
@@ -112,8 +134,8 @@
   text-overflow: ellipsis;
   max-width: 100%;
   margin: 0;
-  color: #6c757d;
-  font-size: 0.9em;
+  color: #5c5f68;
+  font-size: 0.875rem;
 }
 
 /* Status dots */
@@ -125,7 +147,7 @@
 }
 
 .status-dot.online {
-  background-color: #28a745;
+  background-color: #10b981;
 }
 
 .status-dot.offline {
@@ -133,12 +155,29 @@
 }
 
 .corner-button {
-  position: fixed; /* Fixes the button on the screen */
-  right: 16px;      /* Distance from the left edge */
-  bottom: 100px;    /* Distance from the bottom edge */
-  z-index: 1000;   /* Ensures it stays on top of other elements */
+  position: fixed;
+  right: 1rem;
+  bottom: 6.5rem;
+  z-index: 100;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(to bottom right, #46608a, #39547d);
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(70, 96, 138, 0.2);
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.corner-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(70, 96, 138, 0.3);
+}
+
+.corner-button:active {
+  transform: scale(0.95);
 }

@@ -1,1 +1,5 @@
-<mat-toolbar class="toolbarTop"><span>{{title}}</span></mat-toolbar>
+<mat-toolbar class="toolbarTop"><span class="title">{{title}}</span>
+  @if (shouldDisplayNotifications()) {
+    <app-notification-bar class="notifications"/>
+  }
+</mat-toolbar>

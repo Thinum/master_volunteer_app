@@ -20,11 +20,12 @@ public class UserService implements UserDetailsService {
     @Autowired PasswordEncoder encoder;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> userDetail = repository.findByName(username);
+        Optional<User> userDetail = repository.findByUsername(username);
         // Converting userDetail to UserDetails
         return userDetail.map(UserModelDetails::new)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found " + username));
+                .orElse(null);
     }
+
     public String addUser(User user) {
         user.setPassword(encoder.encode(user.getPassword()));
         repository.save(user);

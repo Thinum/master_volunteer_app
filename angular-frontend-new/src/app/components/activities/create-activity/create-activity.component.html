@@ -21,7 +21,18 @@
                     [center]="center"
                     [zoom]="zoom"
                     (mapClick)="onMapClick($event)">
+
+          <!-- User-selected marker -->
           <map-marker *ngIf="markerPosition" [position]="markerPosition!"></map-marker>
+
+          <!-- Organisation markers -->
+          <map-marker
+            *ngFor="let m of orgMarkers"
+            [position]="m.position"
+            [title]="m.title"
+            [icon]="m.icon">
+          </map-marker>
+
         </google-map>
         <mat-form-field class="invisible" appearance="outline" style="margin-top: 0.5rem;">
           <mat-label>Selected Location</mat-label>

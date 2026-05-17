@@ -1,0 +1,23 @@
+:root {
+  background-color: transparent;
+  color: #2f323a;
+}
+
+a {
+  background-color: transparent;
+  color: #46608a;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #39547d;
+}
+
+.unread-notification-badge {
+  position: relative;
+  top: -8px;
+  left: -8px;
+  font-size: 12px;
+  line-height: 12px;
+}

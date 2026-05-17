@@ -1,0 +1,91 @@
+<div class="container">
+  <form [formGroup]="orgForm" (ngSubmit)="onSubmit()" class="p-4">
+    <!-- Organisation Name -->
+    <mat-form-field appearance="fill" class="w-full mb-3">
+      <mat-label>Organisation Name</mat-label>
+      <input matInput formControlName="orgName"/>
+    </mat-form-field>
+
+    <!-- Description -->
+    <mat-form-field appearance="fill" class="w-full mb-3">
+      <mat-label>Description</mat-label>
+      <textarea matInput rows="4" formControlName="body"></textarea>
+    </mat-form-field>
+
+    <!-- Profile Picture -->
+    <mat-form-field appearance="fill" class="w-full mb-3">
+      <mat-label>Profile Picture URL</mat-label>
+      <input matInput formControlName="profilePicture"/>
+    </mat-form-field>
+
+    <!-- Google Map -->
+    <h3>Select Location</h3>
+    <google-map
+      height="300px"
+      width="100%"
+      [center]="center"
+      [zoom]="zoom"
+      (mapClick)="onMapClick($event)"
+    >
+      <map-marker *ngIf="marker" [position]="marker"></map-marker>
+    </google-map>
+
+    <div class="coords" *ngIf="marker">
+      Selected: {{ marker.lat.toFixed(4) }}, {{ marker.lng.toFixed(4) }}
+    </div>
+
+    <br/><br/><br/>
+    <!-- User + Role selection -->
+    <div class="flex gap-4 mb-4 mt-4">
+
+      <mat-form-field appearance="fill" class="flex-1">
+        <mat-label>Select User</mat-label>
+        <mat-select #userSelect>
+          <mat-option *ngFor="let u of availableUsers" [value]="u.id">
+            {{ u.name }} ({{ u.email }})
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="flex-1">
+        <mat-label>Assign Role</mat-label>
+        <mat-select #roleSelect>
+          <mat-option *ngFor="let r of roles" [value]="r">
+            {{ r }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        (click)="addUserRole(userSelect.value, roleSelect.value)"
+        [disabled]="!userSelect.value || !roleSelect.value"
+      >
+        Add
+      </button>
+    </div>
+
+    <!-- Assigned Users Chips -->
+    <mat-chip-set>
+      <mat-chip
+        *ngFor="let entry of selectedUserRoles; let i = index"
+        color="primary"
+        selected
+        (removed)="removeEntry(i)"
+      >
+        {{ getUserName(entry.userId) }} — {{ entry.role }}
+        <button matChipRemove>
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-chip>
+    </mat-chip-set>
+
+    <br/>
+    <!-- Submit -->
+    <button mat-raised-button color="accent" class="mt-4 w-full">
+      Create Organisation
+    </button>
+  </form>
+</div>

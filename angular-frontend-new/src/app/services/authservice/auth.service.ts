@@ -74,4 +74,21 @@ export class AuthService {
       }
     }, 5000);
   }
+
+  register(username: string, email: string, password: string) {
+    return this.http.post<AuthToken>('http://localhost:8080/auth/register', {
+      username: username,
+      email: email,
+      password: password
+    }).subscribe({
+      next: (authToken) => {
+        this.setSession(authToken);
+      },
+      error: (err) => {
+        console.error('Login failed:', err);
+        this.loggedInEvent.emit(false);
+      }
+    });
+  }
+
 }

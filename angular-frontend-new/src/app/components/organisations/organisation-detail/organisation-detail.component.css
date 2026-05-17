@@ -1,52 +1,207 @@
-.container {
-  padding: 16px;
-}
-
-.top-section {
+.organisation-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 16px;
+  flex-direction: column;
+  gap: 2rem;
 }
 
-.left {
-  width: 45%;
+.header-card {
+  margin-bottom: 0;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
+  padding: 2rem;
 }
 
-.icon-circle {
-  width: 60px;
-  height: 60px;
-  background-color: #2196f3;
-  color: white;
+.header-card .mat-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.header-card .mat-card-header-text {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.header-card .mat-card-title,
+.header-card .mat-card-subtitle {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  line-height: 1.5;
+  color: #2f323a;
+}
+
+.header-card .mat-card-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: linear-gradient(to bottom right, #46608a, #39547d);
+}
+
+.additional-info {
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #5c5f68;
+  flex-wrap: wrap;
 }
 
-.right {
-  width: 45%;
+.additional-info mat-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  color: #46608a;
 }
 
-.middle-section {
+.goals-card {
+  margin-bottom: 0;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
+  padding: 1.5rem;
+}
+
+.progress-bar {
+  margin-bottom: 1rem;
+  height: 8px;
+  border-radius: 9999px;
+  background-color: #e6e8f1;
+  overflow: hidden;
+}
+
+.progress-bar::after {
+  content: '';
+  display: block;
+  height: 100%;
+  background: linear-gradient(to right, #46608a, #39547d);
+}
+
+.middle-row {
   display: flex;
-  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
 }
 
-.projects, .activities {
-  width: 45%;
+.list-card {
+  flex: 1;
+  min-width: 280px;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
+  overflow: hidden;
 }
 
-.bottom-toolbar {
+mat-list-item {
+  min-height: 56px;
+  padding: 1rem 1.75rem;
+  border-bottom: 1px solid rgba(175, 178, 187, 0.15);
   display: flex;
-  justify-content: space-around;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
+  align-items: center;
 }
 
-.mat-mdc-progress-bar {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  --mdc-linear-progress-track-height: 15px;
-  --mdc-linear-progress-active-indicator-height: 15px;
+mat-list-item:last-child {
+  border-bottom: none;
+}
+
+mat-list-item .mat-list-text {
+  flex: 1;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  color: #2f323a;
+}
+
+.friends-card mat-list-item {
+  min-height: 72px;
+}
+
+::ng-deep .mdc-list-item__secondary-text,
+::ng-deep .mat-list-text {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
+  color: #5c5f68;
+}
+
+/* Desktop adjustments */
+@media (min-width: 600px) {
+  .additional-info {
+    gap: 1rem;
+  }
+  .additional-info > *:not(mat-icon):first-of-type {
+    margin-left: 0.75rem;
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 599px) {
+  .organisation-container {
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+  .middle-row {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .header-card .mat-card-title {
+    font-size: 1.5rem;
+  }
+  .additional-info {
+    gap: 0.5rem;
+    font-size: 0.75rem;
+  }
+  .additional-info mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+  .progress-bar {
+    height: 6px;
+    margin-bottom: 1rem;
+  }
+  mat-list-item {
+    min-height: 48px;
+    padding: 0.5rem 1.25rem;
+  }
+  .friends-card mat-list-item {
+    min-height: 64px;
+  }
+  ::ng-deep .mdc-list-item__secondary-text {
+    font-size: 0.75rem;
+  }
+  .list-card mat-nav-list,
+  .list-card mat-list,
+  .friends-card mat-list {
+    overflow-y: auto;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 600px) and (max-width: 959px) {
+  .organisation-container {
+    padding: 1.25rem;
+    gap: 1.75rem;
+  }
+  .middle-row {
+    gap: 1.75rem;
+  }
+  mat-list-item {
+    padding: 0.75rem 1.5rem;
+  }
 }

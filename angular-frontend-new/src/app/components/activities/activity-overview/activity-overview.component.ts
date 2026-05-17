@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { NgFor } from '@angular/common';
-import {NgIf} from '@angular/common';
+import { NgIf } from '@angular/common';
 import { DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
-import {RouterLink, RouterLinkActive} from "@angular/router";
-import {CardComponent} from '../../../shared/components/card/card.component';
+import { RouterLink, RouterLinkActive } from "@angular/router";
+import { CardComponent } from '../../../shared/components/card/card.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
