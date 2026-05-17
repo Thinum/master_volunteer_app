@@ -47,7 +47,12 @@ public class UserService implements UserDetailsService {
 
         User friend = repository.findById(friendId)
                 .orElseThrow();
+        boolean hasFriendRelationship = relationshipRepository.existsFriendship(user, friend, RelationshipType.FRIEND)
+                || relationshipRepository.existsFriendship(friend, user, RelationshipType.FRIEND);
 
+        if (hasFriendRelationship) {
+            throw new IllegalArgumentException("Users already have a friend relationship");
+        }
 
         UserRelationship rel1 = new UserRelationship();
         rel1.setFromUser(user);
