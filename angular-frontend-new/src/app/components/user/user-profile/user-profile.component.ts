@@ -5,6 +5,8 @@ import { User } from '../../../models/user.model';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { VolunteerService } from '../../../services/api/volunteer.service';
+import {MatIcon} from '@angular/material/icon';
+import {MatIconButton} from '@angular/material/button';
 
 @Component({
   selector: 'app-user-profile',
@@ -17,6 +19,8 @@ import { VolunteerService } from '../../../services/api/volunteer.service';
     MatCardContent,
     MatList,
     DatePipe,
+    MatIcon,
+    MatIconButton,
   ],
   styleUrl: './user-profile.component.css',
 })
