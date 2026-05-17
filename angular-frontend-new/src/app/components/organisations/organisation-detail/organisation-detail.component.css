@@ -46,9 +46,8 @@
 .avatar {
   width: 80px;
   height: 80px;
-  border-radius: 50%;
   object-fit: cover;
-  background: linear-gradient(to bottom right, #46608a, #39547d);
+  background: transparent;
 }
 
 .additional-info {
