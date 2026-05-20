@@ -7,9 +7,11 @@ import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.service.JwtService;
 import at.jku.volunteer_app.service.UserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,25 +26,28 @@ public class AuthenticationController {
 
     private final JwtService jwtService;
     private final UserService userService;
-    private final PasswordEncoder encoder;
+    private final AuthenticationManager authenticationManager;
 
-    public AuthenticationController(JwtService jwtService, UserService userService, PasswordEncoder encoder) {
+    public AuthenticationController(JwtService jwtService, UserService userService, AuthenticationManager authenticationManager) {
         this.jwtService = jwtService;
         this.userService = userService;
-        this.encoder = encoder;
+        this.authenticationManager = authenticationManager;
     }
 
     @PostMapping("/login")
     public AuthToken login(@RequestBody AuthUserDTO authUser) throws LoginException {
         try {
-            UserDetails dbUser = userService.loadUserByUsername(authUser.getUsername());
-            if (encoder.matches(authUser.getPassword(), dbUser.getPassword())) {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authUser.getUsername(), authUser.getPassword())
+            );
+            
+            if (authentication.isAuthenticated()) {
                 String token = jwtService.generateToken(authUser.getUsername());
                 return new AuthToken(token, jwtService.extractExpiration(token));
             } else {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
             }
-        } catch (UsernameNotFoundException e) {
+        } catch (AuthenticationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
         }
     }

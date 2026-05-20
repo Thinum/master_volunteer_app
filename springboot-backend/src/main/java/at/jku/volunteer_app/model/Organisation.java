@@ -18,7 +18,8 @@ public class Organisation {
     private int id;
     private String orgName;
     private Location location;
-    private String profilepicture;
+    @Column(name = "profilepicture")
+    private String profilePicture;
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp createdAt;
     private String body;
@@ -30,7 +31,7 @@ public class Organisation {
     private OrganisationCategory category;
 
     @ElementCollection
-    private java.util.List<String> tags;
+    private java.util.Set<String> tags;
 
     @ManyToMany
     @JoinTable(
@@ -38,5 +39,5 @@ public class Organisation {
         joinColumns = @JoinColumn(name = "organisation_id"),
         inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private java.util.List<User> orgContacts;
+    private java.util.Set<User> orgContacts;
 }
