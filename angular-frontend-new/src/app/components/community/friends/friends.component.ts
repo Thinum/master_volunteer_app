@@ -60,7 +60,7 @@ export class FriendsComponent implements OnInit {
                 .map(f => [f.id, f] as [number, User])
             ).values()
           );
-          
+
            */
         },
       });

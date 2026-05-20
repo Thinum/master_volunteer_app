@@ -3,12 +3,12 @@ package at.jku.volunteer_app.service;
 import at.jku.volunteer_app.model.RelationshipType;
 import at.jku.volunteer_app.model.UserRelationship;
 import at.jku.volunteer_app.repository.UserRelationshipRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.model.UserModelDetails;
@@ -18,17 +18,22 @@ import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
-    @Autowired
-    UserRepository repository;
-    @Autowired PasswordEncoder encoder;
-    @Autowired
-    UserRelationshipRepository relationshipRepository;
+
+    private final UserRepository repository;
+    private final PasswordEncoder encoder;
+    private final UserRelationshipRepository relationshipRepository;
+
+    public UserService(UserRepository repository, PasswordEncoder encoder, UserRelationshipRepository relationshipRepository) {
+        this.repository = repository;
+        this.encoder = encoder;
+        this.relationshipRepository = relationshipRepository;
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> userDetail = repository.findByUsername(username);
-        // Converting userDetail to UserDetails
-        return userDetail.map(UserModelDetails::new)
-                .orElse(null);
+        return repository.findByUsername(username)
+                .map(UserModelDetails::new)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
     public String addUser(User user) {
@@ -37,16 +42,17 @@ public class UserService implements UserDetailsService {
         return "User Added Successfully";
     }
 
+    @Transactional
     public boolean addFriend(int userId, int friendId) {
         if (userId == friendId) {
             throw new IllegalArgumentException("Cannot friend yourself");
         }
 
         User user = repository.findById(userId)
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
 
         User friend = repository.findById(friendId)
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalArgumentException("Friend not found with id: " + friendId));
 
 
         UserRelationship rel1 = new UserRelationship();
@@ -62,5 +68,17 @@ public class UserService implements UserDetailsService {
         relationshipRepository.save(rel1);
         relationshipRepository.save(rel2);
         return true;
+    }
+
+    public java.util.List<User> getAllUsers() {
+        return repository.findAll();
+    }
+
+    public User getUserById(int id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    public java.util.List<User> getActiveUsers() {
+        return repository.findAll().stream().filter(User::isActive).toList();
     }
 }

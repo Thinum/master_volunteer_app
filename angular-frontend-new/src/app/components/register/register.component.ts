@@ -46,9 +46,9 @@ export class RegisterComponent {
       confirmPassword: ['', Validators.required],
     }, { validators: this.passwordMatchValidator });
 
-    this.loggedInSubscription = this.authService.loggedInEvent.subscribe(
-      loggedInEvent => {
-        if (loggedInEvent) {
+    this.loggedInSubscription = this.authService.loggedIn$.subscribe(
+      isLoggedIn => {
+        if (isLoggedIn) {
           this.layoutingService.showBottomNavbar.set(true);
           this.router.navigate(['home']);
         }
@@ -71,7 +71,7 @@ export class RegisterComponent {
 
     const { username, email, password } = this.registerForm.value;
 
-    this.authService.register(username, email, password);
+    this.authService.register(username, email, password).subscribe();
   }
 
   toggleHidePw(event: MouseEvent) {

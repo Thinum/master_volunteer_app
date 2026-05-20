@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRelationshipRepository extends JpaRepository<UserRelationship, Integer> {
+public interface UserRelationshipRepository extends JpaRepository<UserRelationship, Long> {
     Optional<UserRelationship> findByType(RelationshipType type);
 
     Optional<UserRelationship> findByFromUser(User user);

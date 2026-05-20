@@ -73,9 +73,9 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.router.navigate(['home']);
     }
 
-    this.loggedInSubscription = this.authService.loggedInEvent.subscribe(
-      loggedInEvent => {
-        if (loggedInEvent) {
+    this.loggedInSubscription = this.authService.loggedIn$.subscribe(
+      isLoggedIn => {
+        if (isLoggedIn) {
           this.layoutingService.showBottomNavbar.set(true);
           this.router.navigate(['home']);
         }
@@ -162,7 +162,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     if (this.loginForm.invalid) return;
 
     const { username, password } = this.loginForm.value;
-    this.authService.login(username, password);
+    this.authService.login(username, password).subscribe();
   }
 
   clickRegister(): void {

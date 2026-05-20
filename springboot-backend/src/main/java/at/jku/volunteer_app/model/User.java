@@ -22,9 +22,11 @@ public class User {
     private String email;
     private String password;
     private String profilePicture;
+    private String phone;
+    private boolean isActive = true;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Timestamp createdAt;
+    private Timestamp joinedAt;
 
     private String username;
 
@@ -32,10 +34,12 @@ public class User {
     @OneToMany(mappedBy = "fromUser",
             cascade = CascadeType.ALL,
             orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<UserRelationship> relationshipsFrom;
 
     @OneToMany(mappedBy = "toUser",
             cascade = CascadeType.ALL,
             orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<UserRelationship> relationshipsTo;
 }
