@@ -9,6 +9,7 @@ import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
 import {NotificationService} from '../../../services/notification.service';
 import {AppNotification, NotificationType, AppNotificationPayload} from '../../../models/notification.model';
+import {CardComponent} from '../../../shared/components/card/card.component';
 
 @Component({
   selector: 'app-user-profile',
