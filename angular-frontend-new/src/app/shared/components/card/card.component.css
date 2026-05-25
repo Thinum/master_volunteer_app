@@ -2,7 +2,6 @@
   display: flex;
   background-color: #ffffff;
   padding: 0;
-  height: 200px;
   border-radius: 0.75rem;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
@@ -26,9 +25,10 @@
 .card-body{
   display: flex;
   width: 65%;
-  justify-content: center;
+  min-width: 200px;
+  justify-content: start;
   align-items: center;
-  padding: 1.5rem;
+  padding-left: 5rem;
 }
 
 .card-right {
@@ -36,4 +36,18 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-left: auto;
+  padding: 1rem;
+}
+
+.app-card.default {
+  min-height: 160px;
+}
+
+.app-card.compact {
+  min-height: 120px;
+}
+
+.app-card.compact .card-left{
+  width: 10%;
 }
