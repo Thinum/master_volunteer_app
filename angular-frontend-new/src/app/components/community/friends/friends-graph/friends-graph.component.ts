@@ -213,10 +213,12 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
         {
           selector: 'node[avatar]',
           style: {
-            'background-fit': 'cover',
-            'background-clip': 'node',
             'background-image': 'data(avatar)',
-            'background-image-crossorigin': 'null' as any,
+            'background-fit': 'cover',
+            'background-repeat': 'no-repeat',
+            'background-clip': 'node',
+            'background-opacity': 1,
+            'background-image-crossorigin': 'anonymous',
           }
         },
 

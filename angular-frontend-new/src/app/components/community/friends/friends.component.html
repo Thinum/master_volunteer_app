@@ -1,16 +1,34 @@
 <div class="friends-group">
+
   <div class="friend-area">
     <h1>Friends</h1>
-    <app-friend-list [friendList]="friends" [sectionTitle]="'All friends'"></app-friend-list>
+
+    <app-friend-list
+      [friendList]="friends"
+      [sectionTitle]="'All friends'">
+    </app-friend-list>
   </div>
+
   <div class="friend-area">
     <h1>Activities of Friends</h1>
+
     <ng-container *ngFor="let activity of activitiesOfFriends">
-      <app-activities-small-card [activity]="activity" [friends]="friends"/>
-      <app-activities-small-card [activity]="activity" [friends]="friends"/>
+      <div
+        class="activity-clickable"
+        (click)="goToActivity(activity.id)">
+
+        <app-activities-small-card
+          [activity]="activity"
+          [friends]="friends">
+        </app-activities-small-card>
+
+      </div>
     </ng-container>
+
   </div>
+
 </div>
-<div class="fiends-graph">
+
+<div class="friends-graph">
   <app-friends-graph></app-friends-graph>
 </div>

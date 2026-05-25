@@ -9,8 +9,11 @@ import java.util.List;
 
 @Service
 public class OrganisationService {
-    @Autowired
-    private OrganisationRepository organisationRepository;
+    private final OrganisationRepository organisationRepository;
+
+    public OrganisationService(OrganisationRepository organisationRepository) {
+        this.organisationRepository = organisationRepository;
+    }
 
     public List<Organisation> getAllOrganisations(){
         return organisationRepository.findAll();

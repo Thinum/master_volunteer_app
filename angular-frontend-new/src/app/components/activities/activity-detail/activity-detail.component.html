@@ -23,8 +23,8 @@
     <h3><mat-icon>group</mat-icon> Your Friends</h3>
     <div class="friends">
     <span *ngFor="let friend of activity?.friends" class="friend-avatar" matTooltip="{{ friend.name }}">
-      <img *ngIf="friend.avatar" [src]="friend.avatar" [alt]="friend.name">
-      <span *ngIf="!friend.avatar" class="initials">{{ friend.name }}</span>
+      <img *ngIf="friend.profilePicture" [src]="friend.profilePicture" [alt]="friend.name">
+      <span *ngIf="!friend.profilePicture" class="initials">{{ friend.name }}</span>
     </span>
     </div>
   </div>
@@ -95,7 +95,7 @@
 
     <mat-card class="contact-card" *ngFor="let oc of activity?.orgContacts">
       <mat-card-title>{{ oc.name }}</mat-card-title>
-      <mat-card-subtitle>{{ oc.role }} ({{ activity?.organization }})</mat-card-subtitle>
+      <mat-card-subtitle>{{ oc.role }} ({{ activity?.organisations }})</mat-card-subtitle>
       <p><mat-icon>phone</mat-icon> {{ oc.phone }}</p>
       <p><mat-icon>email</mat-icon> {{ oc.email }}</p>
     </mat-card>
