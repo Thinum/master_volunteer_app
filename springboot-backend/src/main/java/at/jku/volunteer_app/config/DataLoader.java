@@ -120,9 +120,9 @@ public class DataLoader {
 
             // 3. Create Organisations
             Organisation techAid = new Organisation(0, "Tech Aid Association", new Location(48.2082, 16.3738), "https://logotypes.dev/Protopie?variant=glyph&version=color", new Timestamp(System.currentTimeMillis()), "Helping underprivileged communities learn coding skills.", false, null, OrganisationCategory.Technology, new java.util.HashSet<>(Arrays.asList("coding", "programming", "mentorship")), new java.util.HashSet<>(Arrays.asList(alice, bob)));
-            Organisation greenFuture = new Organisation(0, "Green Future Org", new Location(48.3069, 14.2858), "https://logotypes.dev/Clearscope?variant=glyph&version=color", new Timestamp(System.currentTimeMillis()), "Dedicated to sustainability and green innovation.", false, null, OrganisationCategory.Environment, new java.util.HashSet<>(Arrays.asList("sustainability", "climate", "eco projects")), new java.util.HashSet<>(Arrays.asList(charlie)));
-            Organisation communityConnect = new Organisation(0, "Community Connect", new Location(47.0707, 15.4395), "https://logotypes.dev/Contentful?variant=glyph&version=color", new Timestamp(System.currentTimeMillis()), "Connecting volunteers with local social projects.", false, null, OrganisationCategory.Community, new java.util.HashSet<>(Arrays.asList("volunteering", "local projects", "social impact")), new java.util.HashSet<>(Arrays.asList(diana)));
-            Organisation eduForAll = new Organisation(0, "Education for All", new Location(47.8095, 13.055), "https://logotypes.dev/Feedly?variant=glyph&version=color", new Timestamp(System.currentTimeMillis()), "Providing access to quality education worldwide.", false, null, OrganisationCategory.Education, new java.util.HashSet<>(Arrays.asList("schools", "learning", "children")), new java.util.HashSet<>(Arrays.asList(ethan)));
+            Organisation greenFuture = new Organisation(0, "Green Future Org", new Location(48.3069, 14.2858), "https://logotypes.dev/Clearscope?variant=glyph&version=color", new Timestamp(System.currentTimeMillis()), "Dedicated to sustainability and green innovation.", false, null, OrganisationCategory.Environment, new java.util.HashSet<>(Arrays.asList("sustainability", "climate", "eco projects")), new java.util.HashSet<>(List.of(charlie)));
+            Organisation communityConnect = new Organisation(0, "Community Connect", new Location(47.0707, 15.4395), "https://logotypes.dev/Contentful?variant=glyph&version=color", new Timestamp(System.currentTimeMillis()), "Connecting volunteers with local social projects.", false, null, OrganisationCategory.Community, new java.util.HashSet<>(Arrays.asList("volunteering", "local projects", "social impact")), new java.util.HashSet<>(List.of(diana)));
+            Organisation eduForAll = new Organisation(0, "Education for All", new Location(47.8095, 13.055), "https://logotypes.dev/Feedly?variant=glyph&version=color", new Timestamp(System.currentTimeMillis()), "Providing access to quality education worldwide.", false, null, OrganisationCategory.Education, new java.util.HashSet<>(Arrays.asList("schools", "learning", "children")), new java.util.HashSet<>(List.of(ethan)));
             
             List<Organisation> organisations = Arrays.asList(techAid, greenFuture, communityConnect, eduForAll);
             organisationRepository.saveAll(organisations);
@@ -132,7 +132,7 @@ public class DataLoader {
             parkCleanup.setTitle("Community Park Cleanup");
             parkCleanup.setBody("Join our team to clean and maintain the park area. Gloves and tools provided.");
             parkCleanup.setDescription("A community-driven initiative to clean up the local park, remove litter, and improve green spaces.");
-            parkCleanup.setOrganisations(Arrays.asList(greenFuture));
+            parkCleanup.setOrganisations(List.of(greenFuture));
             parkCleanup.setDate(Timestamp.valueOf("2025-10-12 09:00:00"));
             parkCleanup.setStartTime("09:00");
             parkCleanup.setEndTime("14:00");
@@ -155,7 +155,7 @@ public class DataLoader {
             codingWorkshop.setTitle("Coding Workshop for Kids");
             codingWorkshop.setBody("Teach kids how to write their first lines of code. A fun and educational event!");
             codingWorkshop.setDescription("Interactive workshop introducing children to programming basics using visual and simple coding tools.");
-            codingWorkshop.setOrganisations(Arrays.asList(techAid));
+            codingWorkshop.setOrganisations(List.of(techAid));
             codingWorkshop.setDate(Timestamp.valueOf("2025-10-20 09:00:00"));
             codingWorkshop.setStartTime("09:00");
             codingWorkshop.setEndTime("12:00");
@@ -179,7 +179,7 @@ public class DataLoader {
             foodBank.setTitle("Local Food Bank Assistance");
             foodBank.setBody("Help us sort and distribute food to those in need.");
             foodBank.setDescription("Support the local food bank by organizing incoming donations and preparing food packages for families.");
-            foodBank.setOrganisations(Arrays.asList(communityConnect));
+            foodBank.setOrganisations(List.of(communityConnect));
             foodBank.setDate(Timestamp.valueOf("2025-11-05 10:00:00"));
             foodBank.setStartTime("10:00");
             foodBank.setEndTime("16:00");
@@ -203,7 +203,7 @@ public class DataLoader {
             reforestation.setTitle("Mountain Reforestation Project");
             reforestation.setBody("Planting trees to restore the local forest ecosystem.");
             reforestation.setDescription("A physically demanding but rewarding day of planting native tree species in the mountain area.");
-            reforestation.setOrganisations(Arrays.asList(greenFuture));
+            reforestation.setOrganisations(List.of(greenFuture));
             reforestation.setDate(Timestamp.valueOf("2025-05-15 08:00:00"));
             reforestation.setStartTime("08:00");
             reforestation.setEndTime("17:00");
@@ -229,8 +229,8 @@ public class DataLoader {
             Appointment appt2 = new Appointment(0, "Coding Workshop Intro", "First session for beginners", "Linz Tech Center", Timestamp.valueOf("2025-12-05 14:00:00"), Timestamp.valueOf("2025-12-05 18:00:00"), charlie.getId(), codingWorkshop);
             
             // Add appointments to activities
-            parkCleanup.setAppointments(Arrays.asList(appt1));
-            codingWorkshop.setAppointments(Arrays.asList(appt2));
+            parkCleanup.setAppointments(List.of(appt1));
+            codingWorkshop.setAppointments(List.of(appt2));
             
             activityRepository.save(parkCleanup);
             activityRepository.save(codingWorkshop);
