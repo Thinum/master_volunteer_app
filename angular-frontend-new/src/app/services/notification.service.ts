@@ -1,25 +1,27 @@
 import { Injectable } from '@angular/core';
 import {MOCK_NOTIFICATIONS} from '../mock/mock-notification';
-import {Observable, of} from 'rxjs';
 import {AppNotification} from '../models/notification.model';
+import {environment} from '../../environments/environment';
+import {HttpClient} from '@angular/common/http';
+import {AuthService} from './authservice/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationService {
-  // Maybe remove for push notifications
+  private apiUrl = `${environment.apiUrl}/notifications`;
 
-  private readonly mockNotificationObservable: Observable<AppNotification[]>;
-  constructor() {
-    this.mockNotificationObservable = of(MOCK_NOTIFICATIONS);
-  }
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   getNotifications(){
-    return this.mockNotificationObservable;
+    return this.http.get<AppNotification[]>(`${this.apiUrl}/notifications`)
   }
 
-  setNotificationRead(notification: AppNotification){
-    MOCK_NOTIFICATIONS[notification.id] = notification;
-    MOCK_NOTIFICATIONS[notification.id].wasRead = true;
+  createNotification(notification: AppNotification){
+    return this.http.post<AppNotification>(`${this.apiUrl}/addNotification`, notification)
+  }
+
+  readNotification(notification: AppNotification){
+    return this.http.post<AppNotification>(`${this.apiUrl}/read`, notification)
   }
 }

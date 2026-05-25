@@ -14,8 +14,6 @@ import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.model.UserModelDetails;
 import at.jku.volunteer_app.repository.UserRepository;
 
-import java.util.Optional;
-
 @Service
 public class UserService implements UserDetailsService {
 
@@ -30,7 +28,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserModelDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return repository.findByUsername(username)
                 .map(UserModelDetails::new)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));

@@ -3,7 +3,7 @@
     <div mat-card-avatar class="profile-image" [style.background-image]="'url(' + user?.profilePicture + ')'"></div>
     <mat-card-title> {{ user?.name }} </mat-card-title>
     <mat-card-subtitle> {{ user?.email }} </mat-card-subtitle>
-    <div class="icon-wrapper">
+    <div class="icon-wrapper" (click)="sendFriendRequest()">
       <button matIconButton>
         <mat-icon>person_add</mat-icon>
       </button>

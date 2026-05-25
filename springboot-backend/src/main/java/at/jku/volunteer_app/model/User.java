@@ -43,4 +43,10 @@ public class User {
             orphanRemoval = true)
     @JsonIgnore
     private List<UserRelationship> relationshipsTo;
+
+    @OneToMany(mappedBy = "user",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true)
+    @JsonIgnore
+    private List<Notification> notifications;
 }

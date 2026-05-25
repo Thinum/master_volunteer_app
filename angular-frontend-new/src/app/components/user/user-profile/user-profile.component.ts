@@ -7,6 +7,8 @@ import { ActivatedRoute } from '@angular/router';
 import { VolunteerService } from '../../../services/api/volunteer.service';
 import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
+import {NotificationService} from '../../../services/notification.service';
+import {AppNotification, NotificationType, AppNotificationPayload} from '../../../models/notification.model';
 
 @Component({
   selector: 'app-user-profile',
@@ -30,7 +32,8 @@ export class UserProfileComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private volunteerService: VolunteerService
+    private volunteerService: VolunteerService,
+    private notificationService: NotificationService,
   ) {}
 
   ngOnInit(): void {
@@ -44,5 +47,18 @@ export class UserProfileComponent implements OnInit {
         this.user = user;
       });
     }
+  }
+
+  public sendFriendRequest(){
+    let notification: AppNotification = {
+      createdAt: new Date(),
+      hasBeenRead: false,
+      user: this.user,
+      type: NotificationType.FRIEND_REQUEST,
+    }
+    this.notificationService.createNotification(notification).subscribe({
+      next: result => console.log(result),
+      error: err => console.error(err)
+    });
   }
 }

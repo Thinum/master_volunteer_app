@@ -40,6 +40,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/entreprise/**").permitAll() //TEST WE WILL CHANGE IT LATER
                         .requestMatchers("/formation/**").permitAll()
+                        .requestMatchers("/notifications/**").permitAll()
                         .requestMatchers("/demande/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
                         .requestMatchers("/organisations/**").permitAll()
