@@ -32,3 +32,10 @@ mat-card-header {
 mat-card-content {
   padding: 1.5rem;
 }
+
+.icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}

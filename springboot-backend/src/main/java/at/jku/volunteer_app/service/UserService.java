@@ -52,7 +52,9 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
 
         User friend = repository.findById(friendId)
-                .orElseThrow(() -> new IllegalArgumentException("Friend not found with id: " + friendId));
+                .orElseThrow();
+        boolean hasFriendRelationship = relationshipRepository.existsFriendship(user, friend, RelationshipType.FRIEND)
+                || relationshipRepository.existsFriendship(friend, user, RelationshipType.FRIEND);
 
 
         UserRelationship rel1 = new UserRelationship();

@@ -1,5 +1,6 @@
 package at.jku.volunteer_app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,12 +35,12 @@ public class User {
     @OneToMany(mappedBy = "fromUser",
             cascade = CascadeType.ALL,
             orphanRemoval = true)
-    @com.fasterxml.jackson.annotation.JsonIgnore
+    @JsonIgnore
     private List<UserRelationship> relationshipsFrom;
 
     @OneToMany(mappedBy = "toUser",
             cascade = CascadeType.ALL,
             orphanRemoval = true)
-    @com.fasterxml.jackson.annotation.JsonIgnore
+    @JsonIgnore
     private List<UserRelationship> relationshipsTo;
 }
