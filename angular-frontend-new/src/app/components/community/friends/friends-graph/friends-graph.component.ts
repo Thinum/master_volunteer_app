@@ -3,6 +3,7 @@ import cytoscape from 'cytoscape';
 
 import { MOCK_USERS, MOCK_USER_RELATIONSHIPS, UserRelationship, RELATIONSHIP_COLORS } from '../../../../mock/mock-users';
 import { User } from '../../../../models/user.model';
+import {Router} from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -98,6 +99,8 @@ import { CommonModule } from '@angular/common';
 
 export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
   @ViewChild('cyContainer', { static: true }) cyContainer!: ElementRef;
+  constructor(private router: Router) {}
+
   private animationRunning = false;
   private nodeAnimations = new Map<string, boolean>();
   public relationshipLegend: { type: string; color: string }[] = [];
@@ -138,6 +141,7 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
     const nodes = MOCK_USERS.map(user => ({
       data: {
         id: `u${user.id}`,
+        userId: user.id,
         label: user.name,
         avatar: user.profilePicture
       }
@@ -242,9 +246,16 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
         }
       ]
     });
+    // ----- Icon  logic -----
+    cy.on('tap', 'node', (event) => {
+      const node = event.target;
 
+      const userId = node.data('userId');
 
-    // ----- Your existing animation logic (unchanged) -----
+      this.router.navigate(['/profile', userId]);
+    });
+
+    // ----- Animation logic -----
 
     cy.on('grab', 'node', (event: any) => {
       const node = event.target;

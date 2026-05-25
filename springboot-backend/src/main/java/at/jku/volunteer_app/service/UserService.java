@@ -78,6 +78,16 @@ public class UserService implements UserDetailsService {
         return repository.findById(id).orElse(null);
     }
 
+    public java.util.List<User> getFriends(int userId) {
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+
+        return relationshipRepository.findAllByFromUserAndType(user, RelationshipType.FRIEND)
+                .stream()
+                .map(UserRelationship::getToUser)
+                .toList();
+    }
+
     public java.util.List<User> getActiveUsers() {
         return repository.findAll().stream().filter(User::isActive).toList();
     }

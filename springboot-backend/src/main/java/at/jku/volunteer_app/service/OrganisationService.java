@@ -23,6 +23,10 @@ public class OrganisationService {
         return organisationRepository.findById(id).get();
     }
 
+    public List<Organisation> getOrganisationsForUser(at.jku.volunteer_app.model.User user) {
+        return organisationRepository.findAllByOrgContactsContains(user);
+    }
+
     public Organisation addOrganisation(Organisation organisation) {
         return organisationRepository.save(organisation);
     }

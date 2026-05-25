@@ -35,6 +35,10 @@ public class ActivityService {
         return activityRepository.findByProjectId(projectId).get();
     }
 
+    public List<Activity> getActivitiesForUser(at.jku.volunteer_app.model.User user) {
+        return activityRepository.findAllByFriendsContains(user);
+    }
+
     public void deleteActivity(int id) {
         activityRepository.deleteById(id);
     }

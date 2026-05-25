@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FriendsGraphComponent } from './friends-graph.component';
+import { Router} from '@angular/router';
 
 describe('FriendsGraphComponent', () => {
   let component: FriendsGraphComponent;
@@ -8,7 +9,7 @@ describe('FriendsGraphComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FriendsGraphComponent]
+      imports: [FriendsGraphComponent, Router]
     })
     .compileComponents();
 

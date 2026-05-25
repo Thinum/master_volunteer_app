@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { User } from '../../models/user.model';
+import { Organisation } from '../../models/organisation.model';
+import { Activity } from '../../models/activity.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -23,6 +25,27 @@ export class VolunteerService {
    */
   getVolunteerById(id: number) {
     return this.http.get<User>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Returns friends of a volunteer by their ID
+   */
+  getFriends(id: number) {
+    return this.http.get<User[]>(`${this.apiUrl}/${id}/friends`);
+  }
+
+  /**
+   * Returns organisations of a volunteer by their ID
+   */
+  getOrganisations(id: number) {
+    return this.http.get<Organisation[]>(`${this.apiUrl}/${id}/organisations`);
+  }
+
+  /**
+   * Returns activities of a volunteer by their ID
+   */
+  getActivities(id: number) {
+    return this.http.get<Activity[]>(`${this.apiUrl}/${id}/activities`);
   }
 
   /**

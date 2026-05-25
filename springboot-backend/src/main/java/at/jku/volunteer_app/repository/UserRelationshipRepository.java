@@ -15,6 +15,8 @@ public interface UserRelationshipRepository extends JpaRepository<UserRelationsh
 
     Optional<UserRelationship> findByToUser(User user);
 
+    java.util.List<UserRelationship> findAllByFromUserAndType(User fromUser, RelationshipType type);
+
     @Query("""
     SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END
     FROM UserRelationship r
