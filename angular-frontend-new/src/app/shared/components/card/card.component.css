@@ -26,7 +26,7 @@
   display: flex;
   width: 65%;
   min-width: 200px;
-  justify-content: start;
+  justify-content: center;
   align-items: center;
   padding-left: 5rem;
 }
@@ -36,8 +36,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-left: auto;
-  padding: 1rem;
 }
 
 .app-card.default {
@@ -50,4 +48,13 @@
 
 .app-card.compact .card-left{
   width: 10%;
+}
+
+.app-card.compact .card-right{
+  margin-left: auto;
+  padding: 1rem;
+}
+
+.app-card.compact .card-body{
+  justify-content: start;
 }
