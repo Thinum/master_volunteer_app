@@ -1,9 +1,13 @@
 package at.jku.volunteer_app.controller;
 
 import at.jku.volunteer_app.contract.AddFriendRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.service.UserService;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 
 @RestController
@@ -20,6 +24,19 @@ public class UserController {
         this.userService = userService;
         this.organisationService = organisationService;
         this.activityService = activityService;
+    }
+
+    @GetMapping("/me")
+    public User getCurrentUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
+        }
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+        return user;
     }
 
     @PostMapping

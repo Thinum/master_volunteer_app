@@ -21,6 +21,13 @@ export class VolunteerService {
   }
 
   /**
+   * Returns the current logged in user
+   */
+  getCurrentUser() {
+    return this.http.get<User>(`${this.apiUrl}/me`);
+  }
+
+  /**
    * Returns a single volunteer by their ID
    */
   getVolunteerById(id: number) {

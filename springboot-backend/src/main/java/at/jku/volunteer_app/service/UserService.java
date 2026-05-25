@@ -91,4 +91,8 @@ public class UserService implements UserDetailsService {
     public java.util.List<User> getActiveUsers() {
         return repository.findAll().stream().filter(User::isActive).toList();
     }
+
+    public User getUserByUsername(String username) {
+        return repository.findByUsername(username).orElse(null);
+    }
 }

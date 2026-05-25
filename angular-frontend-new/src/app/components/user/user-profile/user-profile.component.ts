@@ -39,12 +39,26 @@ export class UserProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
-      this.id = Number(params.get('id'));
-      if (!isNaN(this.id) && this.id) {
-        this.loadUser(this.id);
+      const idParam = params.get('id');
+      if (idParam) {
+        this.id = Number(idParam);
+        if (!isNaN(this.id)) {
+          this.loadUser(this.id);
+        }
       } else {
-        // Default to user 1 if no ID or invalid ID
-        this.loadUser(1);
+        this.loadCurrentUser();
+      }
+    });
+  }
+
+  loadCurrentUser(): void {
+    this.volunteerService.getCurrentUser().subscribe(user => {
+      this.user = user;
+      if (user.id) {
+        this.id = user.id;
+        this.loadFriends(user.id);
+        this.loadOrganisations(user.id);
+        this.loadActivities(user.id);
       }
     });
   }

@@ -21,6 +21,7 @@ public class User {
     private int id;
     private String name;
     private String email;
+    @JsonIgnore
     private String password;
     private String profilePicture;
     private String phone;
