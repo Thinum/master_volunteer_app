@@ -10,8 +10,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/organisations")
 public class OrganisationController {
-    @Autowired
-    private OrganisationService organisationService;
+    private final OrganisationService organisationService;
+
+    public OrganisationController(OrganisationService organisationService) {
+        this.organisationService = organisationService;
+    }
 
     @GetMapping
     public List<Organisation> getAllOrganisations() {

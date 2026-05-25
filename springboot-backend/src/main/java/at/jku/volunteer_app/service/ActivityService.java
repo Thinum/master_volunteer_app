@@ -9,8 +9,12 @@ import java.util.List;
 
 @Service
 public class ActivityService {
-    @Autowired
-    private ActivityRepository activityRepository;
+    private final ActivityRepository activityRepository;
+
+    public ActivityService(ActivityRepository activityRepository) {
+        this.activityRepository = activityRepository;
+    }
+
     public List<Activity> getAllActivities(){
         return activityRepository.findAll();
     }

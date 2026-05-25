@@ -6,87 +6,140 @@ import { MOCK_SKILLS } from './mock-skills';
 
 export const MOCK_ACTIVITIES: Activity[] = [
   {
-  id: 1,
-  title: 'Community Park Cleanup',
-  body: 'Join our team to clean and maintain the park area. Gloves and tools provided.',
-  projectId: 101,
-  organisations: [MOCK_ORGANISATIONS[0]],
-  appointments: [MOCK_APPOINTMENTS[0]],
-  friends: [MOCK_USERS[0], MOCK_USERS[1]],
-  skills: [MOCK_SKILLS[0].name, MOCK_SKILLS[1].name, MOCK_SKILLS[2].name],
-  qualifications: ['None required'],
-  prerequisites: ['Basic fitness'],
-  createdAt: new Date('2025-10-01T12:00:00Z'),
+    id: 1,
+    title: 'Community Park Cleanup',
+    body: 'Join our team to clean and maintain the park area. Gloves and tools provided.',
+    description: 'A community-driven initiative to clean up the local park, remove litter, and improve green spaces.',
+
+    projectId: 101,
+    organisations: [MOCK_ORGANISATIONS[0]],
+    appointments: [MOCK_APPOINTMENTS[0]],
+
+    // scheduling
+    date: new Date('2025-10-12T09:00:00Z'),
+    startTime: '09:00',
+    endTime: '14:00',
+    duration: '5 hours',
+    expiresAt: new Date('2025-12-31T23:59:59Z'),
+
+    // location
+    location: 'Blue Mountain Park',
+    coordinates: {
+      lat: 48.3069,
+      lng: 14.2858,
+    },
+
+    // people
+    friends: [MOCK_USERS[0], MOCK_USERS[1], MOCK_USERS[2], MOCK_USERS[3]],
+    contacts: [
+      {
+        name: 'Emily Carter',
+        role: 'Event Coordinator',
+        phone: '123-456-789',
+        email: 'emily@example.com',
+      },
+    ],
+    orgContacts: [
+      {
+        name: 'John Doe',
+        role: 'Club President',
+        phone: '987-654-321',
+        email: 'org@example.com',
+      },
+    ],
+    createdBy: MOCK_USERS[0],
+
+    // skills & requirements
+    skills: [
+      MOCK_SKILLS[0].name,
+      MOCK_SKILLS[1].name,
+      MOCK_SKILLS[2].name,
+    ],
+    qualifications: ['None required'],
+    prerequisites: ['Basic fitness', 'Comfortable working outdoors'],
+
+    // logistics
+    capacity: 25,
+    spotsTaken: 8,
+    equipmentProvided: ['Gloves', 'Trash bags', 'Grabbers'],
+
+    // meta
+    tags: ['environment', 'community', 'volunteering'],
+    difficulty: 'easy',
+    isPublic: true,
+    status: 'open',
+
+    createdAt: new Date('2025-10-01T12:00:00Z'),
     updatedAt: new Date('2025-10-15T12:00:00Z'),
   },
+
   {
     id: 2,
     title: 'Coding Workshop for Kids',
     body: 'Teach kids how to write their first lines of code. A fun and educational event!',
+    description: 'Interactive workshop introducing children to programming basics using visual and simple coding tools.',
+
     projectId: 102,
     organisations: [MOCK_ORGANISATIONS[1]],
     appointments: [MOCK_APPOINTMENTS[1]],
-    friends: [MOCK_USERS[2]],
-    skills: [MOCK_SKILLS[3].name, MOCK_SKILLS[4].name, MOCK_SKILLS[6].name, MOCK_SKILLS[8]?.name],
-    qualifications: ['Basic coding experience'],
-    prerequisites: ['Patience and enthusiasm'],
+
+    // scheduling
+    date: new Date('2025-10-20T09:00:00Z'),
+    startTime: '09:00',
+    endTime: '12:00',
+    duration: '3 hours',
+    expiresAt: new Date('2025-11-01T23:59:59Z'),
+
+    // location
+    location: 'Tech Learning Center',
+    coordinates: {
+      lat: 48.3060,
+      lng: 14.2865,
+    },
+
+    // people
+    friends: [MOCK_USERS[2], MOCK_USERS[0]],
+    contacts: [
+      {
+        name: 'Sarah Müller',
+        role: 'Workshop Lead',
+        phone: '222-333-444',
+        email: 'sarah@example.com',
+      },
+    ],
+    orgContacts: [
+      {
+        name: 'Anna Schmidt',
+        role: 'Education Manager',
+        phone: '555-666-777',
+        email: 'edu@example.com',
+      },
+    ],
+    createdBy: MOCK_USERS[2],
+
+    // skills & requirements
+    skills: [
+      MOCK_SKILLS[3].name,
+      MOCK_SKILLS[4].name,
+      MOCK_SKILLS[6].name,
+      MOCK_SKILLS[8]?.name,
+    ].filter(Boolean),
+
+    qualifications: ['Basic coding experience', 'Experience with children preferred'],
+    prerequisites: ['Patience', 'Laptop required'],
+
+    // logistics
+    capacity: 15,
+    spotsTaken: 5,
+    equipmentProvided: ['Computers', 'Learning materials'],
+
+    // meta
+    tags: ['education', 'coding', 'kids'],
+    difficulty: 'medium',
+    isPublic: true,
+    status: 'upcoming',
+
     createdAt: new Date('2025-10-20T09:00:00Z'),
     updatedAt: new Date('2025-11-01T12:00:00Z'),
   },
-  {
-    id: 3,
-    title: 'Beach Cleanup Drive',
-    body: 'Help keep our local beaches clean and safe for everyone. Bags and gloves will be provided.',
-    projectId: 103,
-    organisations: [MOCK_ORGANISATIONS[2]],
-    appointments: [MOCK_APPOINTMENTS[2]],
-    friends: [MOCK_USERS[1], MOCK_USERS[3]],
-    skills: [MOCK_SKILLS[0].name, MOCK_SKILLS[5].name],
-    qualifications: ['None required'],
-    prerequisites: ['Basic fitness', 'Sun protection recommended'],
-    createdAt: new Date('2025-11-05T08:00:00Z'),
-    updatedAt: new Date('2025-11-10T12:00:00Z'),
-  },
-  {
-    id: 4,
-    title: 'Art & Craft Workshop',
-    body: 'Teach children how to make simple arts and crafts. Materials will be provided.',
-    projectId: 104,
-    organisations: [MOCK_ORGANISATIONS[3]],
-    appointments: [MOCK_APPOINTMENTS[3]],
-    friends: [MOCK_USERS[2], MOCK_USERS[4]],
-    skills: [MOCK_SKILLS[6].name, MOCK_SKILLS[7].name],
-    qualifications: ['Experience with children preferred'],
-    prerequisites: ['Creativity and patience'],
-    createdAt: new Date('2025-11-12T10:00:00Z'),
-    updatedAt: new Date('2025-11-15T12:00:00Z'),
-  },
-  {
-    id: 5,
-    title: 'Fundraising Charity Event',
-    body: 'Assist in organizing a fundraising event for local charities. Tasks include promotion, setup, and logistics.',
-    projectId: 105,
-    organisations: [MOCK_ORGANISATIONS[4]],
-    appointments: [MOCK_APPOINTMENTS[4]],
-    friends: [MOCK_USERS[0], MOCK_USERS[5]],
-    skills: [MOCK_SKILLS[1].name, MOCK_SKILLS[3].name, MOCK_SKILLS[8]?.name],
-    qualifications: ['Good communication skills'],
-    prerequisites: ['Teamwork and reliability'],
-    createdAt: new Date('2025-11-20T09:00:00Z'),
-    updatedAt: new Date('2025-11-25T12:00:00Z'),
-  },
-  {
-    id: 6,
-    title: 'Local Library Support',
-    body: 'Help organize books, assist visitors, and manage library events.',
-    projectId: 106,
-    organisations: [MOCK_ORGANISATIONS[5]],
-    appointments: [MOCK_APPOINTMENTS[5]],
-    friends: [MOCK_USERS[3], MOCK_USERS[6]],
-    skills: [MOCK_SKILLS[2].name, MOCK_SKILLS[4].name],
-    qualifications: ['Attention to detail'],
-    prerequisites: ['Interest in literature'],
-    createdAt: new Date('2025-12-01T09:00:00Z'),
-    updatedAt: new Date('2025-12-05T12:00:00Z'),
-  }
 ];

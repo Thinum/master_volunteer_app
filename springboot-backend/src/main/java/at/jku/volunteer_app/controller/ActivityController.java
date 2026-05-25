@@ -10,8 +10,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/activities")
 public class ActivityController {
-    @Autowired
-    private ActivityService activityService;
+    private final ActivityService activityService;
+
+    public ActivityController(ActivityService activityService) {
+        this.activityService = activityService;
+    }
 
     @GetMapping
     public List<Activity> getAllActivities() {
@@ -21,6 +24,13 @@ public class ActivityController {
     @GetMapping("/{id}")
     public Activity getActivityById(@PathVariable int id) {
         return activityService.getActivityById(id);
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<Activity> getActivitiesByUserId(@PathVariable int userId) {
+        return activityService.getAllActivities().stream()
+                .filter(a -> a.getFriends().stream().anyMatch(u -> u.getId() == userId))
+                .toList();
     }
 
     @PostMapping

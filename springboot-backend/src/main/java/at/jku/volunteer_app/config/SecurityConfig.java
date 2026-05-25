@@ -1,6 +1,5 @@
 package at.jku.volunteer_app.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,12 +23,15 @@ import at.jku.volunteer_app.service.UserService;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    @Autowired
-    JwtAuthFilter authFilter;
 
-    @Bean
-    public UserService userDetailService() {
-        return new UserService();
+    private final JwtAuthFilter authFilter;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
+
+    public SecurityConfig(JwtAuthFilter authFilter, UserService userService, PasswordEncoder passwordEncoder) {
+        this.authFilter = authFilter;
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Bean
@@ -40,7 +42,8 @@ public class SecurityConfig {
                         .requestMatchers("/formation/**").permitAll()
                         .requestMatchers("/demande/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
-                        .requestMatchers("/organisations/**").authenticated()
+                        .requestMatchers("/organisations/**").permitAll()
+                        .requestMatchers("/activities/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/auth/register").permitAll()// .authenticated()
                         .requestMatchers("/auth/admin/**").permitAll()     // .authenticated()
@@ -53,17 +56,11 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Password Encoding
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailService());
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        authenticationProvider.setUserDetailsService(userService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder);
         return authenticationProvider;
     }
 

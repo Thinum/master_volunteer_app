@@ -1,21 +1,23 @@
 .friends-group {
   display: flex;
   flex-direction: column;
-width: 100%;
-  gap: 1rem;
-  padding: 1rem;
-  margin: 1rem;
-
-  h1 {
-    font-family: 'Manrope', sans-serif;
-    font-size: 1.75rem;
-  font-weight: 800;
-    color: #2f323a;
-    margin: 0 0 1rem 0;
-    text-align: center;
-  }
+  gap: 24px;
 }
 
 .friend-area {
-  max-width: 85svw;
+  padding: 12px;
+}
+
+.activity-clickable {
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.activity-clickable:hover {
+  transform: scale(1.02);
+  opacity: 0.9;
+}
+
+.fiends-graph {
+  margin-top: 20px;
 }

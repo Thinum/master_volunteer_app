@@ -1,6 +1,8 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { AuthUserDTOModel } from '../../models/contract/AuthUserDTO.model';
 import { AuthToken } from '../../models/contract/AuthToken.model';
 
@@ -11,42 +13,44 @@ export const AUTH_TOKEN_STRING = 'authToken';
   providedIn: 'root'
 })
 export class AuthService {
-  public loggedInEvent = new EventEmitter<boolean>();
+  private loggedInSubject = new BehaviorSubject<boolean>(this.hasValidToken());
+  public loggedIn$ = this.loggedInSubject.asObservable();
   private tokenCheckInterval: any;
 
   constructor(private http: HttpClient, private router: Router) {
     if (this.isLoggedIn()) {
-      this.loggedInEvent.emit(true);
       this.startTokenCheck();
     } else {
       this.logout();
     }
   }
 
-  public login(username: string, password: string) {
+  public login(username: string, password: string): Observable<AuthToken> {
     const body: AuthUserDTOModel = { username, password };
-    this.http.post<AuthToken>('http://localhost:8080/auth/login', body)
-      .subscribe({
-        next: (authToken) => {
+    return this.http.post<AuthToken>(`${environment.apiUrl}/auth/login`, body)
+      .pipe(
+        tap((authToken) => {
           this.setSession(authToken);
-        },
-        error: (err) => {
-          console.error('Login failed:', err);
-          this.loggedInEvent.emit(false);
-        }
-      });
+          this.loggedInSubject.next(true);
+        })
+      );
   }
 
   public logout() {
     localStorage.removeItem(AUTH_TOKEN_STRING);
     localStorage.removeItem(EXPIRY_DATE_STRING);
-    this.loggedInEvent.emit(false);
+    this.loggedInSubject.next(false);
     this.router.navigate(['']);
     if (this.tokenCheckInterval) clearInterval(this.tokenCheckInterval);
   }
 
   public isLoggedIn(): boolean {
-    return new Date().getTime() < this.getExpiration().getTime();
+    return this.hasValidToken();
+  }
+
+  private hasValidToken(): boolean {
+    const expiry = this.getExpiration();
+    return new Date().getTime() < expiry.getTime();
   }
 
   public isAuthenticated(){
@@ -56,7 +60,6 @@ export class AuthService {
   private setSession(authToken: AuthToken) {
     localStorage.setItem(AUTH_TOKEN_STRING, authToken.token);
     localStorage.setItem(EXPIRY_DATE_STRING, authToken.expiryDate.toString());
-    this.loggedInEvent.emit(true);
     this.startTokenCheck();
   }
 
@@ -75,20 +78,16 @@ export class AuthService {
     }, 5000);
   }
 
-  register(username: string, email: string, password: string) {
-    return this.http.post<AuthToken>('http://localhost:8080/auth/register', {
+  register(username: string, email: string, password: string): Observable<AuthToken> {
+    return this.http.post<AuthToken>(`${environment.apiUrl}/auth/register`, {
       username: username,
       email: email,
       password: password
-    }).subscribe({
-      next: (authToken) => {
+    }).pipe(
+      tap((authToken) => {
         this.setSession(authToken);
-      },
-      error: (err) => {
-        console.error('Login failed:', err);
-        this.loggedInEvent.emit(false);
-      }
-    });
+        this.loggedInSubject.next(true);
+      })
+    );
   }
-
 }

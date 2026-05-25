@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.geo.Point;
 
 import java.sql.Timestamp;
 
@@ -18,12 +17,27 @@ public class Organisation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String orgName;
-    private Point point;
-    private String profilepicture;
+    private Location location;
+    @Column(name = "profilepicture")
+    private String profilePicture;
     @Temporal(TemporalType.TIMESTAMP)
-    private Timestamp created_at;
+    private Timestamp createdAt;
     private String body;
     private boolean deactivated;
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp reactivationTime;
+
+    @Enumerated(EnumType.STRING)
+    private OrganisationCategory category;
+
+    @ElementCollection
+    private java.util.Set<String> tags;
+
+    @ManyToMany
+    @JoinTable(
+        name = "organisation_contacts",
+        joinColumns = @JoinColumn(name = "organisation_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private java.util.Set<User> orgContacts;
 }
