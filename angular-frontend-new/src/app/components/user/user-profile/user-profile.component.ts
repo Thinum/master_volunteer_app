@@ -6,10 +6,11 @@ import { DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { VolunteerService } from '../../../services/api/volunteer.service';
 import {MatIcon} from '@angular/material/icon';
-import {MatIconButton} from '@angular/material/button';
+import {MatFabButton, MatIconButton} from '@angular/material/button';
 import {NotificationService} from '../../../services/notification.service';
 import {AppNotification, NotificationType, AppNotificationPayload} from '../../../models/notification.model';
 import {CardComponent} from '../../../shared/components/card/card.component';
+import {ShareButtonComponent} from '../../../shared/components/share-button/share-button.component';
 
 @Component({
   selector: 'app-user-profile',
@@ -23,7 +24,9 @@ import {CardComponent} from '../../../shared/components/card/card.component';
     DatePipe,
     MatIcon,
     MatIconButton,
-    CardComponent
+    CardComponent,
+    ShareButtonComponent,
+    MatFabButton,
   ],
   styleUrl: './user-profile.component.css',
 })
