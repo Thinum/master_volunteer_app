@@ -103,7 +103,9 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
 
   private animationRunning = false;
   private nodeAnimations = new Map<string, boolean>();
-  public relationshipLegend: { type: string; color: string }[] = [];
+  public relationshipLegend: { type: string; color: string }[] = Object.entries(RELATIONSHIP_COLORS).map(
+    ([type, color]) => ({ type, color })
+  );
 
   private preloadImage(url: string): Promise<string> {
     return new Promise((resolve) => {
@@ -129,11 +131,6 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-
-    // Initialize legend
-    this.relationshipLegend = Object.entries(RELATIONSHIP_COLORS).map(
-      ([type, color]) => ({ type, color })
-    );
 
     //
     // --- Convert MOCK_USERS -> Cytoscape Nodes ---

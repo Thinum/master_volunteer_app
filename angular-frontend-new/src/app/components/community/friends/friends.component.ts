@@ -5,7 +5,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FriendListComponent } from './friend-list/friend-list.component';
 import { FriendsGraphComponent } from './friends-graph/friends-graph.component';
+import { ActivityGraphComponent } from './activity-graph/activity-graph.component';
 import { ActivitiesSmallCardComponent } from '../../activities/activities-small-card/activities-small-card.component';
+import { MatTabGroup, MatTab } from '@angular/material/tabs';
+import { NgIf } from '@angular/common';
 
 import { VolunteerService } from '../../../services/api/volunteer.service';
 import { ActivityService } from '../../../services/api/activity.service';
@@ -19,8 +22,12 @@ import { Activity } from '../../../models/activity.model';
   imports: [
     FriendListComponent,
     FriendsGraphComponent,
+    ActivityGraphComponent,
     ActivitiesSmallCardComponent,
     NgForOf,
+    NgIf,
+    MatTabGroup,
+    MatTab,
   ],
   templateUrl: './friends.component.html',
   styleUrl: './friends.component.css',
@@ -28,6 +35,7 @@ import { Activity } from '../../../models/activity.model';
 export class FriendsComponent implements OnInit {
   friends: User[] = [];
   activitiesOfFriends: Activity[] = [];
+  activeTab = 0;
 
   private destroyRef = inject(DestroyRef);
 

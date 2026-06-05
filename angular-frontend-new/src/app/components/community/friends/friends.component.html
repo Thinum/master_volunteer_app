@@ -30,5 +30,17 @@
 </div>
 
 <div class="friends-graph">
-  <app-friends-graph></app-friends-graph>
+
+  <mat-tab-group [(selectedIndex)]="activeTab">
+    <mat-tab label="Relationship Graph">
+      <div style="margin-top: 16px;">
+        <app-friends-graph *ngIf="activeTab === 0"></app-friends-graph>
+      </div>
+    </mat-tab>
+    <mat-tab label="Activity Graph">
+      <div style="margin-top: 16px;">
+        <app-activity-graph *ngIf="activeTab === 1"></app-activity-graph>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
 </div>
