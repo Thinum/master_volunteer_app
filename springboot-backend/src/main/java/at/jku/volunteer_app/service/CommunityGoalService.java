@@ -26,8 +26,6 @@ public class CommunityGoalService {
         goal.setOrganisation(organisationService.getOrganisationById(organisationId));
         goal.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         goal.setStatus("ACTIVE");
-        // currentValue kannst du vorerst auf 0 lassen, Progress später berechnen
-        goal.setCurrentValue(0);
         return communityGoalRepository.save(goal);
     }
 
