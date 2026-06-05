@@ -41,7 +41,7 @@ h3 {
   margin-top: 1.5rem;
   padding: 1rem;
   background: linear-gradient(to bottom right, #46608a, #39547d);
-  color: white;
+  color: #ffffff !important;
   border: none;
   border-radius: 0.75rem;
   font-size: 0.875rem;
