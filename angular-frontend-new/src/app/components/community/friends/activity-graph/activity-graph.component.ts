@@ -333,7 +333,7 @@ export class ActivityGraphComponent implements AfterViewInit, OnDestroy {
     const userIds = new Set(MOCK_USERS.map(u => u.id));
 
     for (const act of filteredActivities) {
-      const participants = act.friends || [];
+      const participants = act.participants || [];
       for (let i = 0; i < participants.length; i++) {
         for (let j = i + 1; j < participants.length; j++) {
           const uA = participants[i];
