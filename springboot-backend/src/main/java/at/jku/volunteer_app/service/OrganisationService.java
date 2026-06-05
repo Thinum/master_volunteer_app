@@ -1,18 +1,25 @@
 package at.jku.volunteer_app.service;
 
+import at.jku.volunteer_app.model.Activity;
+import at.jku.volunteer_app.model.OrganisationMember;
+import at.jku.volunteer_app.model.User;
+import at.jku.volunteer_app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import at.jku.volunteer_app.model.Organisation;
 import at.jku.volunteer_app.repository.OrganisationRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrganisationService {
     private final OrganisationRepository organisationRepository;
+    private final UserRepository userRepository;
 
-    public OrganisationService(OrganisationRepository organisationRepository) {
+    public OrganisationService(OrganisationRepository organisationRepository, UserRepository userRepository) {
         this.organisationRepository = organisationRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Organisation> getAllOrganisations(){
@@ -38,5 +45,29 @@ public class OrganisationService {
     public boolean deleteOrganisation(int id) {
         return false;
         //TODO: Change
+    }
+
+    public boolean joinOrganisation(int organisationId, int userId) {
+        Optional<Organisation> optionalOrganisation = organisationRepository.findById(organisationId);
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalOrganisation.isEmpty() || optionalUser.isEmpty()) {
+            return false;
+        }
+        Organisation organisation = optionalOrganisation.get();
+        User user = optionalUser.get();
+        boolean alreadyMember = organisation.getOrgMembers().stream()
+                .anyMatch(member -> member.getUser().getId() == userId);
+
+        if (alreadyMember) {
+            return false;
+        }
+        OrganisationMember organisationMember = new OrganisationMember();
+        organisationMember.setUser(user);
+        organisationMember.setOrganisation(organisation);
+        organisationMember.setEngagementLevel(0);
+        organisationMember.setJoinedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+        organisation.getOrgMembers().add(organisationMember);
+        organisationRepository.save(organisation);
+        return true;
     }
 }
