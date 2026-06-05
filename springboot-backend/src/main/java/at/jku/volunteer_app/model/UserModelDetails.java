@@ -1,5 +1,6 @@
 package at.jku.volunteer_app.model;
 
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -10,11 +11,14 @@ import java.util.List;
 public class UserModelDetails implements UserDetails {
     private String username;
     private String password;
+    @Getter
+    private int userId;
     private List<GrantedAuthority> authorities;
 
     public UserModelDetails(User user) {
         this.username = user.getUsername();
         this.password = user.getPassword();
+        this.userId = user.getId();
         this.authorities = new ArrayList<>();
     }
 
@@ -40,4 +44,5 @@ public class UserModelDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() { return true; }
+
 }

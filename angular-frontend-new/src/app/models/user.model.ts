@@ -1,3 +1,6 @@
+import { Organisation } from './organisation.model';
+import { Activity } from './activity.model';
+
 /**
  * Represents a user in the system.
  */
@@ -22,4 +25,13 @@ export interface User {
 
   /** Indicates whether the user is currently active. */
   isActive?: boolean;
+
+  /** List of friends for the user. */
+  friends?: User[];
+
+  /** List of organisations joined by the user. */
+  organisations?: Organisation[];
+
+  /** List of activities joined by the user. */
+  activities?: Activity[];
 }

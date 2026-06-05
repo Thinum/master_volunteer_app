@@ -14,8 +14,6 @@ import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.model.UserModelDetails;
 import at.jku.volunteer_app.repository.UserRepository;
 
-import java.util.Optional;
-
 @Service
 public class UserService implements UserDetailsService {
 
@@ -30,7 +28,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserModelDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return repository.findByUsername(username)
                 .map(UserModelDetails::new)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
@@ -80,7 +78,21 @@ public class UserService implements UserDetailsService {
         return repository.findById(id).orElse(null);
     }
 
+    public java.util.List<User> getFriends(int userId) {
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+
+        return relationshipRepository.findAllByFromUserAndType(user, RelationshipType.FRIEND)
+                .stream()
+                .map(UserRelationship::getToUser)
+                .toList();
+    }
+
     public java.util.List<User> getActiveUsers() {
         return repository.findAll().stream().filter(User::isActive).toList();
+    }
+
+    public User getUserByUsername(String username) {
+        return repository.findByUsername(username).orElse(null);
     }
 }

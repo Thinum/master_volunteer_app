@@ -21,6 +21,7 @@ public class User {
     private int id;
     private String name;
     private String email;
+    @JsonIgnore
     private String password;
     private String profilePicture;
     private String phone;
@@ -43,4 +44,10 @@ public class User {
             orphanRemoval = true)
     @JsonIgnore
     private List<UserRelationship> relationshipsTo;
+
+    @OneToMany(mappedBy = "user",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true)
+    @JsonIgnore
+    private List<Notification> notifications;
 }

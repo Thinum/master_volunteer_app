@@ -1,0 +1,9 @@
+.share-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.share-btn mat-icon {
+  margin-right: 4px;
+}

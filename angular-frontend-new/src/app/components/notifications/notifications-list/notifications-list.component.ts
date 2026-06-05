@@ -24,6 +24,9 @@ export class NotificationsListComponent {
     }
 
     public onNotificationClick(notification: AppNotification) {
-      this.notificationService.setNotificationRead(notification);
+      this.notificationService.readNotification(notification).subscribe({
+        next: result => console.log(result),
+        error: err => console.error(err),
+      })
     }
 }
