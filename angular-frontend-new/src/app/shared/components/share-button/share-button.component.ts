@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Clipboard, ClipboardModule } from '@angular/cdk/clipboard';
 import { VolunteerService } from '../../../services/api/volunteer.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-share-button',
@@ -23,26 +24,39 @@ export class ShareButtonComponent {
     private snackBar: MatSnackBar
   ) {}
 
-  share() {
-    this.volunteerService.getCurrentUser().subscribe({
-      next: (user) => {
-        const url = new URL(window.location.href);
-        // Add user ID to the current URL
-        url.searchParams.set('userId', user.id.toString());
-        const sharedUrl = url.toString();
+  async share() {
+    const url = new URL(window.location.href);
+    const segments = url.pathname.split('/');
+    let urlToCopy;
+    if (segments.includes("profile")){
+      urlToCopy = await this.generateProfileUrl(url, segments);
+    } else {
+      urlToCopy = url.toString();
+    }
+    if(this.clipboard.copy(urlToCopy)) {
+      this.showSnackBar('Link with your ID copied to clipboard!');
+    } else {
+      this.showSnackBar('Could not copy link to clipboard!');
+    }
+  }
 
-        if (this.clipboard.copy(sharedUrl)) {
-          this.showSnackBar('Link with your ID copied to clipboard!');
-        }
-      },
-      error: (err) => {
+  private async generateProfileUrl(baseUrl: URL, segments: string[]): Promise<string> {
+    const lastPathSegment = segments[segments.length - 1];
+    let profileUrl = "";
+    if (lastPathSegment == "profile") {
+      try {
+        const user = await firstValueFrom(this.volunteerService.getCurrentUser());
+
+        profileUrl = baseUrl.toString().concat(`/${user.id}`);
+        console.log(profileUrl);
+
+      } catch (err) {
         console.error('Could not get current user', err);
-        // Fallback: share current URL without user ID
-        if (this.clipboard.copy(window.location.href)) {
-          this.showSnackBar('Link copied to clipboard!');
-        }
       }
-    });
+    } else {
+      profileUrl = baseUrl.toString()
+    }
+    return profileUrl;
   }
 
   private showSnackBar(message: string) {
