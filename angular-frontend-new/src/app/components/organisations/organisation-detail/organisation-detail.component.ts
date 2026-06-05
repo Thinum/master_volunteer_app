@@ -14,6 +14,7 @@ import { User } from '../../../models/user.model'
 import { Router } from '@angular/router';
 import { CommunityGoalService } from '../../../services/api/community-goal.service';
 import { CommunityGoal } from '../../../models/community-goal.model';
+import {MatButton, MatIconButton} from '@angular/material/button';
 
 @Component({
   selector: 'app-organisation-detail',
@@ -27,6 +28,7 @@ import { CommunityGoal } from '../../../models/community-goal.model';
     NgIf,
     RouterLink,
     RouterLinkActive,
+    MatIconButton,
   ],
   templateUrl: './organisation-detail.component.html',
   styleUrl: './organisation-detail.component.css'

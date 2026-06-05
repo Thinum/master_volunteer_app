@@ -211,12 +211,6 @@ mat-list-item .mat-list-text {
   justify-content: space-between;
 }
 
-.goals-add-btn {
-  border: none;
-  background: transparent;
-  padding: 4px;
-}
-
 .goals-add-btn .mat-icon {
   color: #005cbb;         /* blaues Plus */
 }
