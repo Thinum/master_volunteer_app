@@ -143,6 +143,20 @@ export class ActivityGraphComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.initWhenVisible();
+    });
+  }
+
+  private initWhenVisible(): void {
+    const el = this.cyContainer.nativeElement;
+
+    const rect = el.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      setTimeout(() => this.initWhenVisible(), 100);
+      return;
+    }
+
     this.initGraph();
   }
 
@@ -153,10 +167,6 @@ export class ActivityGraphComponent implements AfterViewInit, OnDestroy {
     this.cy = cytoscape({
       container: this.cyContainer.nativeElement,
       elements: elements,
-      layout: {
-        name: 'cose',
-        animate: true,
-      },
       style: [
         //
         // --- NODE STYLE ---
@@ -211,6 +221,11 @@ export class ActivityGraphComponent implements AfterViewInit, OnDestroy {
       ]
     });
 
+    setTimeout(() => {
+      this.cy.resize();
+      this.cy.fit();
+    }, 100);
+
     // Save initial layout reference
     this.activeLayout = this.cy.layout({
       name: 'cose',
@@ -243,6 +258,15 @@ export class ActivityGraphComponent implements AfterViewInit, OnDestroy {
         this.nodeAnimations.set(nodeId, true);
         this.startSingleNodeAnimation(node);
       }, 500);
+    });
+
+    requestAnimationFrame(() => {
+      this.activeLayout = this.cy.layout({
+        name: 'cose',
+        animate: true
+      });
+
+      this.activeLayout.run();
     });
 
     this.cy.ready(() => {
