@@ -26,7 +26,6 @@ import {ShareButtonComponent} from '../../../shared/components/share-button/shar
     MatIconButton,
     CardComponent,
     ShareButtonComponent,
-    MatFabButton,
   ],
   styleUrl: './user-profile.component.css',
 })

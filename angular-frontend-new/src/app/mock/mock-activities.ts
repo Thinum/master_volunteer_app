@@ -30,7 +30,7 @@ export const MOCK_ACTIVITIES: Activity[] = [
     },
 
     // people
-    friends: [MOCK_USERS[0], MOCK_USERS[1], MOCK_USERS[2], MOCK_USERS[3]],
+    participants: [MOCK_USERS[0], MOCK_USERS[1], MOCK_USERS[2], MOCK_USERS[3]],
     contacts: [
       {
         name: 'Emily Carter',
@@ -98,7 +98,7 @@ export const MOCK_ACTIVITIES: Activity[] = [
     },
 
     // people
-    friends: [MOCK_USERS[2], MOCK_USERS[0]],
+    participants: [MOCK_USERS[2], MOCK_USERS[0], MOCK_USERS[6]],
     contacts: [
       {
         name: 'Sarah Müller',
