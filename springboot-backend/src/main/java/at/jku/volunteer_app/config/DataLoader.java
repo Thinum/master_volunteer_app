@@ -9,7 +9,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Configuration
 public class DataLoader {
@@ -95,7 +97,7 @@ public class DataLoader {
             george.setActive(true);
             george.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             george.setUsername("george");
-            
+
             // Admin User
             Org_Admin admin = new Org_Admin();
             admin.setName("Admin User");
@@ -118,11 +120,46 @@ public class DataLoader {
             relationshipRepository.save(new UserRelationship(null, ethan, george, RelationshipType.PARTNER));
 
             // 3. Create Organisations
-            Organisation techAid = new Organisation(0, "Tech Aid Association", new Location(48.2082, 16.3738), "https://logotypes.dev/Protopie?variant=glyph&version=color", new Timestamp(System.currentTimeMillis()), "Helping underprivileged communities learn coding skills.", false, null, OrganisationCategory.Technology, new java.util.HashSet<>(Arrays.asList("coding", "programming", "mentorship")), new java.util.HashSet<>(Arrays.asList(alice, bob)));
-            Organisation greenFuture = new Organisation(0, "Green Future Org", new Location(48.3069, 14.2858), "https://logotypes.dev/Clearscope?variant=glyph&version=color", new Timestamp(System.currentTimeMillis()), "Dedicated to sustainability and green innovation.", false, null, OrganisationCategory.Environment, new java.util.HashSet<>(Arrays.asList("sustainability", "climate", "eco projects")), new java.util.HashSet<>(List.of(charlie)));
-            Organisation communityConnect = new Organisation(0, "Community Connect", new Location(47.0707, 15.4395), "https://logotypes.dev/Contentful?variant=glyph&version=color", new Timestamp(System.currentTimeMillis()), "Connecting volunteers with local social projects.", false, null, OrganisationCategory.Community, new java.util.HashSet<>(Arrays.asList("volunteering", "local projects", "social impact")), new java.util.HashSet<>(List.of(diana)));
-            Organisation eduForAll = new Organisation(0, "Education for All", new Location(47.8095, 13.055), "https://logotypes.dev/Feedly?variant=glyph&version=color", new Timestamp(System.currentTimeMillis()), "Providing access to quality education worldwide.", false, null, OrganisationCategory.Education, new java.util.HashSet<>(Arrays.asList("schools", "learning", "children")), new java.util.HashSet<>(List.of(ethan)));
-            
+            Organisation techAid = createOrganisation(
+                    "Tech Aid Association",
+                    new Location(48.2082, 16.3738),
+                    "https://logotypes.dev/Protopie?variant=glyph&version=color",
+                    "Helping underprivileged communities learn coding skills.",
+                    OrganisationCategory.Technology,
+                    Set.of("coding", "programming", "mentorship"),
+                    Set.of(alice, bob)
+            );
+
+            Organisation greenFuture = createOrganisation(
+                    "Green Future Org",
+                    new Location(48.3069, 14.2858),
+                    "https://logotypes.dev/Clearscope?variant=glyph&version=color",
+                    "Dedicated to sustainability and green innovation.",
+                    OrganisationCategory.Environment,
+                    Set.of("sustainability", "climate", "eco projects"),
+                    Set.of(charlie)
+            );
+
+            Organisation communityConnect = createOrganisation(
+                    "Community Connect",
+                    new Location(47.0707, 15.4395),
+                    "https://logotypes.dev/Contentful?variant=glyph&version=color",
+                    "Connecting volunteers with local social projects.",
+                    OrganisationCategory.Community,
+                    Set.of("volunteering", "local projects", "social impact"),
+                    Set.of(diana)
+            );
+
+            Organisation eduForAll = createOrganisation(
+                    "Education for All",
+                    new Location(47.8095, 13.055),
+                    "https://logotypes.dev/Feedly?variant=glyph&version=color",
+                    "Providing access to quality education worldwide.",
+                    OrganisationCategory.Education,
+                    Set.of("schools", "learning", "children"),
+                    Set.of(ethan)
+            );
+
             List<Organisation> organisations = Arrays.asList(techAid, greenFuture, communityConnect, eduForAll);
             organisationRepository.saveAll(organisations);
 
@@ -226,15 +263,47 @@ public class DataLoader {
             // 5. Create Appointments
             Appointment appt1 = new Appointment(0, "Park Cleanup Session 1", "Initial clearing", "Pasching Park", Timestamp.valueOf("2025-11-20 09:00:00"), Timestamp.valueOf("2025-11-20 12:00:00"), alice.getId(), parkCleanup);
             Appointment appt2 = new Appointment(0, "Coding Workshop Intro", "First session for beginners", "Linz Tech Center", Timestamp.valueOf("2025-12-05 14:00:00"), Timestamp.valueOf("2025-12-05 18:00:00"), charlie.getId(), codingWorkshop);
-            
+
             // Add appointments to activities
             parkCleanup.setAppointments(List.of(appt1));
             codingWorkshop.setAppointments(List.of(appt2));
-            
+
             activityRepository.save(parkCleanup);
             activityRepository.save(codingWorkshop);
 
             System.out.println("Database seeded successfully!");
         };
+    }
+
+    private Organisation createOrganisation(String orgName,
+                                            Location location,
+                                            String profilePicture,
+                                            String body,
+                                            OrganisationCategory category,
+                                            Set<String> tags,
+                                            Set<? extends User> members) {
+        Organisation organisation = new Organisation();
+        organisation.setOrgName(orgName);
+        organisation.setLocation(location);
+        organisation.setProfilePicture(profilePicture);
+        organisation.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        organisation.setBody(body);
+        organisation.setDeactivated(false);
+        organisation.setReactivationTime(null);
+        organisation.setCategory(category);
+        organisation.setTags(new HashSet<>(tags));
+        organisation.setOrgContacts(new HashSet<>(members));
+
+        Set<OrganisationMember> organisationMembers = new HashSet<>();
+        for (User member : members) {
+            OrganisationMember organisationMember = new OrganisationMember();
+            organisationMember.setOrganisation(organisation);
+            organisationMember.setUser(member);
+            organisationMember.setEngagementLevel(0);
+            organisationMember.setJoinedAt(new Timestamp(System.currentTimeMillis()));
+            organisationMembers.add(organisationMember);
+        }
+        organisation.setOrgMembers(organisationMembers);
+        return organisation;
     }
 }
