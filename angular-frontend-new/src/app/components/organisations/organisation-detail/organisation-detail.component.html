@@ -16,9 +16,20 @@
   </mat-card>
 
   <mat-card class="goals-card">
-    <mat-card-header>
+    <mat-card-header class="goals-header">
       <mat-card-title>Goals</mat-card-title>
+
+      <button
+        mat-icon-button
+        class="goals-add-btn"
+        [routerLink]="['/community-goals']"
+        [queryParams]="{ organisationId: id }"
+        aria-label="Add goal">
+        <mat-icon>add</mat-icon>
+      </button>
+
     </mat-card-header>
+
     <mat-card-content>
       <p>New Monthly Users</p>
       <mat-progress-bar mode="determinate" value="70" class="progress-bar"></mat-progress-bar>
