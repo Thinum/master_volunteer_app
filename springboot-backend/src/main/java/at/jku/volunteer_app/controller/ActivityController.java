@@ -1,6 +1,7 @@
 package at.jku.volunteer_app.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import at.jku.volunteer_app.model.UserModelDetails;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import at.jku.volunteer_app.model.Activity;
 import at.jku.volunteer_app.service.ActivityService;
@@ -29,7 +30,7 @@ public class ActivityController {
     @GetMapping("/user/{userId}")
     public List<Activity> getActivitiesByUserId(@PathVariable int userId) {
         return activityService.getAllActivities().stream()
-                .filter(a -> a.getFriends().stream().anyMatch(u -> u.getId() == userId))
+                .filter(a -> a.getParticipants().stream().anyMatch(u -> u.getId() == userId))
                 .toList();
     }
 
@@ -41,5 +42,10 @@ public class ActivityController {
     @DeleteMapping("/{id}")
     public void deleteActivity(@PathVariable int id) {
         activityService.deleteActivity(id);
+    }
+
+    @PostMapping( "/join/{id}")
+    public boolean joinActivity(@AuthenticationPrincipal UserModelDetails userDetails, @PathVariable int id) {
+        return activityService.joinActivity(id, userDetails.getUserId());
     }
 }

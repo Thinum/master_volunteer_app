@@ -13,6 +13,10 @@
     <span>{{ activity?.date | date:'fullDate' }} – {{ activity?.date | date:'shortTime' }}</span>
   </div>
 
+  <div class="info-row">
+    <button matButton="filled" [disabled]="hasJoined" (click)="joinActivity()">{{hasJoined ? "Joined" : "Join"}}</button>
+  </div>
+
   <!-- Description -->
   <div class="section">
     <h3><mat-icon>description</mat-icon> Description</h3>
@@ -22,7 +26,8 @@
   <div class="section">
     <h3><mat-icon>group</mat-icon> Your Friends</h3>
     <div class="friends">
-    <span *ngFor="let friend of activity?.friends" class="friend-avatar" matTooltip="{{ friend.name }}">
+      <!-- TODO: Use friends that are part of participants-->
+    <span *ngFor="let friend of activity?.participants" class="friend-avatar" matTooltip="{{ friend.name }}">
       <img *ngIf="friend.profilePicture" [src]="friend.profilePicture" [alt]="friend.name">
       <span *ngIf="!friend.profilePicture" class="initials">{{ friend.name }}</span>
     </span>

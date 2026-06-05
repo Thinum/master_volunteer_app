@@ -9,6 +9,8 @@ import { NgFor, NgIf, DatePipe } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MOCK_ACTIVITIES } from '../../../mock/mock-activities';
 import { Activity} from '../../../models/activity.model';
+import {VolunteerService} from '../../../services/api/volunteer.service';
+import {ActivityService} from '../../../services/api/activity.service';
 
 interface Contact {
   name: string;
@@ -37,12 +39,17 @@ interface Contact {
 export class ActivityDetailComponent implements OnInit {
   activityId!: number;
   activity!: Activity | undefined;
+  hasJoined: boolean = false;
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private volunteerService: VolunteerService,
+              private activityService: ActivityService) {}
 
   ngOnInit(): void {
     this.activityId = Number(this.route.snapshot.paramMap.get('id'));
     this.activity = MOCK_ACTIVITIES.find(a => a.id === this.activityId);
+    this.volunteerService.getCurrentUser().subscribe(user => {
+      this.hasJoined = this.activity?.participants?.some((usr) => usr.id === user.id) ?? false;
+    });
   }
 
   onShare() {
@@ -55,5 +62,22 @@ export class ActivityDetailComponent implements OnInit {
 
   onDelete() {
     console.log('Activity deleted:', this.activity?.title);
+  }
+
+  joinActivity(){
+    this.activityService.joinActivity(this.activityId).subscribe({
+      next: result => {
+        if (result) {
+          console.log('Joined activity:', result);
+          this.hasJoined = true;
+        } else {
+          console.error('Could not join activity')
+        }
+      },
+      error: err =>
+        // TODO: Maybe move to message bar
+        console.error('Could not join activity', err)
+      },
+    );
   }
 }

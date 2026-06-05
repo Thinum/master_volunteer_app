@@ -53,7 +53,7 @@ public class Activity {
         joinColumns = @JoinColumn(name = "activity_id"),
         inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<User> friends; // Participants
+    private List<User> participants;
 
     @ManyToOne
     @JoinColumn(name = "created_by_id")

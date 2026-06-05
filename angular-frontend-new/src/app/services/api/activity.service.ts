@@ -31,4 +31,8 @@ export class ActivityService {
   getActivitiesByUserParticipation(userId: number) {
     return this.http.get<Activity[]>(`${this.apiUrl}/user/${userId}`);
   }
+
+  joinActivity(activityId: number) {
+    return this.http.post<boolean>(`${this.apiUrl}/join/${activityId}`, {});
+  }
 }
