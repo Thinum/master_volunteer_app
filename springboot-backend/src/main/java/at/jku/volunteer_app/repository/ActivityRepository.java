@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface ActivityRepository extends JpaRepository<Activity, Integer> {
     Optional<Activity> findById(int id);
     Optional<Activity> findByProjectId(int projectId);
-    java.util.List<Activity> findAllByFriendsContains(at.jku.volunteer_app.model.User user);
+    java.util.List<Activity> findAllByParticipantsContains(at.jku.volunteer_app.model.User user);
 }

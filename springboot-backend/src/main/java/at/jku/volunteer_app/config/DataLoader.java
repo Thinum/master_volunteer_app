@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -149,7 +148,7 @@ public class DataLoader {
             parkCleanup.setStatus("open");
             parkCleanup.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             parkCleanup.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-            parkCleanup.setFriends(Arrays.asList(alice, bob, charlie, diana));
+            parkCleanup.setParticipants(Arrays.asList(alice, bob, charlie, diana));
 
             Activity codingWorkshop = new Activity();
             codingWorkshop.setTitle("Coding Workshop for Kids");
@@ -172,7 +171,7 @@ public class DataLoader {
             codingWorkshop.setStatus("upcoming");
             codingWorkshop.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             codingWorkshop.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-            codingWorkshop.setFriends(Arrays.asList(charlie, alice));
+            codingWorkshop.setParticipants(Arrays.asList(charlie, alice));
 
             // Extended Activity 1
             Activity foodBank = new Activity();
@@ -196,7 +195,7 @@ public class DataLoader {
             foodBank.setStatus("open");
             foodBank.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             foodBank.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-            foodBank.setFriends(Arrays.asList(ethan, fiona));
+            foodBank.setParticipants(Arrays.asList(ethan, fiona));
 
             // Extended Activity 2
             Activity reforestation = new Activity();
@@ -220,7 +219,7 @@ public class DataLoader {
             reforestation.setStatus("upcoming");
             reforestation.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             reforestation.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-            reforestation.setFriends(Arrays.asList(alice, george, bob));
+            reforestation.setParticipants(Arrays.asList(alice, george, bob));
 
             activityRepository.saveAll(Arrays.asList(parkCleanup, codingWorkshop, foodBank, reforestation));
 

@@ -16,7 +16,7 @@ export interface Activity {
   // relations
   organisations: Organisation[];
   appointments: Appointment[];
-  friends?: User[];
+  participants?: User[];
 
   // scheduling
   date?: Date;
