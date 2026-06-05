@@ -1,6 +1,8 @@
 package at.jku.volunteer_app.controller;
 
+import at.jku.volunteer_app.model.UserModelDetails;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import at.jku.volunteer_app.model.Organisation;
 import at.jku.volunteer_app.service.OrganisationService;
@@ -39,5 +41,10 @@ public class OrganisationController {
     @DeleteMapping("/{id}")
     public boolean deleteOrganisation(@PathVariable int id) {
         return organisationService.deleteOrganisation(id);
+    }
+
+    @PostMapping( "/join/{id}")
+    public boolean joinOrganisation(@AuthenticationPrincipal UserModelDetails userDetails, @PathVariable int id) {
+        return organisationService.joinOrganisation(id, userDetails.getUserId());
     }
 }

@@ -40,4 +40,7 @@ public class Organisation {
         inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private java.util.Set<User> orgContacts;
+
+    @OneToMany(mappedBy = "organisation")
+    private java.util.Set<OrganisationMember> orgMembers;
 }
