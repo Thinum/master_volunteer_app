@@ -56,7 +56,7 @@ public class ActivityService {
         }
         Activity activity = optionalActivity.get();
         User user = optionalUser.get();
-        if (activity.getParticipants().contains(user)) {
+        if (activity.getParticipants().stream().anyMatch(user1 -> user1.getId() == userId)) {
             return false;
         }
         activity.getParticipants().add(user);

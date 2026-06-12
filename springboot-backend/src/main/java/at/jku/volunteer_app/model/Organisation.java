@@ -42,5 +42,7 @@ public class Organisation {
     private java.util.Set<User> orgContacts;
 
     @OneToMany(mappedBy = "organisation")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private java.util.Set<OrganisationMember> orgMembers;
 }
