@@ -1,5 +1,6 @@
 package at.jku.volunteer_app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,13 +21,14 @@ public class OrganisationMember {
 
     @ManyToOne
     @JoinColumn(name = "organisation_id")
+    @JsonIgnore
     private Organisation organisation;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    private int EngagementLevel;
+    private int engagementLevel;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp joinedAt;

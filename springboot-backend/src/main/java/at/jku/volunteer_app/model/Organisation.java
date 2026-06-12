@@ -41,7 +41,7 @@ public class Organisation {
     )
     private java.util.Set<User> orgContacts;
 
-    @OneToMany(mappedBy = "organisation")
+    @OneToMany(mappedBy = "organisation", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private java.util.Set<OrganisationMember> orgMembers;

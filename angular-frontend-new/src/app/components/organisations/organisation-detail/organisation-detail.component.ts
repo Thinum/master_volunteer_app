@@ -15,6 +15,7 @@ import { Router } from '@angular/router';
 import { CommunityGoalService } from '../../../services/api/community-goal.service';
 import { CommunityGoal } from '../../../models/community-goal.model';
 import {MatButton, MatIconButton} from '@angular/material/button';
+import {Organisation} from '../../../models/organisation.model';
 
 @Component({
   selector: 'app-organisation-detail',
@@ -29,15 +30,17 @@ import {MatButton, MatIconButton} from '@angular/material/button';
     RouterLink,
     RouterLinkActive,
     MatIconButton,
+    MatButton,
   ],
   templateUrl: './organisation-detail.component.html',
   styleUrl: './organisation-detail.component.css'
 })
 export class OrganisationDetailComponent implements OnInit {
-detailedOrganisation: any;
+detailedOrganisation?: Organisation;
 id?: number | null;
 friends: User[] = [];
 goals: CommunityGoal[] = [];
+hasJoined: boolean = false;
 
 constructor(
     private route: ActivatedRoute,
@@ -48,21 +51,28 @@ constructor(
   ) {}
 
   ngOnInit(): void {
-  this.id = parseInt(this.route.snapshot.paramMap.get('id') ?? '-1');
+    this.id = parseInt(this.route.snapshot.paramMap.get('id') ?? '-1');
 
-  if (this.id) {
-    this.organisationService.getOrganisationById(this.id)
-      .subscribe(org => this.detailedOrganisation = org);
+    if (this.id) {
+      this.organisationService.getOrganisationById(this.id)
+        .subscribe(org => {
+          this.detailedOrganisation = org;
+          this.volunteerService.getCurrentUser().subscribe(user => {
+            this.hasJoined = this.detailedOrganisation?.orgMembers?.
+              some((orgMember) => orgMember.user.id === user.id) ?? false;
+          });
+        });
 
-    this.communityGoalService.getGoalsForOrganisation(this.id)
-      .subscribe(goals => this.goals = goals);
+      this.communityGoalService.getGoalsForOrganisation(this.id)
+        .subscribe(goals => this.goals = goals);
+
+   }
+
+    this.volunteerService.getAllVolunteers()
+      .subscribe(users => {
+        this.friends = users;
+      });
   }
-
-  this.volunteerService.getAllVolunteers()
-    .subscribe(users => {
-      this.friends = users;
-    });
-}
 
   goToCommunityGoals(): void {
     if (!this.id) {
@@ -81,5 +91,23 @@ constructor(
       return 0;
     }
     return (current / target) * 100;
+  }
+
+  joinOrganisation(){
+    if (this.id === null || this.id === undefined) return;
+    this.organisationService.joinOrganisation(this.id).subscribe({
+        next: result => {
+          if (result) {
+            console.log('Joined activity:', result);
+            this.hasJoined = true;
+          } else {
+            console.error('Could not join activity')
+          }
+        },
+        error: err =>
+          // TODO: Maybe move to message bar
+          console.error('Could not join activity', err)
+      },
+    );
   }
 }

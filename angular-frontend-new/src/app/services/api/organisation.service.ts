@@ -32,4 +32,8 @@ export class OrganisationService {
   addOrganisation(org: Organisation): Observable<Organisation> {
     return this.http.post<Organisation>(this.apiUrl, org);
   }
+
+  joinOrganisation(orgId: number | null | undefined): Observable<boolean> {
+    return this.http.post<boolean>(`${this.apiUrl}/join/${orgId}`, {});
+  }
 }

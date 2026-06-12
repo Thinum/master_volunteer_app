@@ -1,4 +1,5 @@
 import { User } from './user.model';
+import {OrganisationMember} from './organisationMember.model';
 
 
 export type OrganisationCategory =
@@ -43,6 +44,8 @@ export interface Organisation {
 
   /** Organization contacts or representatives (users). */
   orgContacts?: User[];
+
+  orgMembers?: OrganisationMember[];
 
   /** General Category of the organisation */
   category: OrganisationCategory;

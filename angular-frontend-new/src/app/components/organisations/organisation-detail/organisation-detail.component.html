@@ -13,6 +13,9 @@
         <mat-icon>calendar_today</mat-icon> Created: {{ detailedOrganisation.createdAt | date:'mediumDate' }}
       </mat-card-subtitle>
     </mat-card-header>
+    <mat-card-actions>
+      <button matButton="filled" [disabled]="hasJoined" (click)="joinOrganisation()">{{hasJoined ? "Joined" : "Join"}}</button>
+    </mat-card-actions>
   </mat-card>
 
   <mat-card class="goals-card">
