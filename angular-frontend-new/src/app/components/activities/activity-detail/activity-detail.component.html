@@ -121,12 +121,6 @@
       <p><mat-icon>email</mat-icon> {{ oc.email }}</p>
     </mat-card>
   </div>
-
-  <!-- Actions -->
-  <mat-card-actions align="end">
-    <button mat-raised-button color="primary" (click)="onShare()">Share</button>
-    <button mat-stroked-button color="accent" (click)="onCancel()">Cancel</button>
-    <button mat-raised-button color="warn" (click)="onDelete()">Delete</button>
-  </mat-card-actions>
-
+  <app-share-button  class="corner-button"/>
 </mat-card>
+

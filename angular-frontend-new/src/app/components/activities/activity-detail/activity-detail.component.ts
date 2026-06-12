@@ -12,6 +12,7 @@ import { Activity} from '../../../models/activity.model';
 import {VolunteerService} from '../../../services/api/volunteer.service';
 import {ActivityService} from '../../../services/api/activity.service';
 import {MatListItem} from '@angular/material/list';
+import {ShareButtonComponent} from '../../../shared/components/share-button/share-button.component';
 
 interface Contact {
   name: string;
@@ -34,7 +35,8 @@ interface Contact {
     DatePipe,
     MatTooltipModule,
     MatListItem,
-    RouterLink
+    RouterLink,
+    ShareButtonComponent
   ],
   templateUrl: './activity-detail.component.html',
   styleUrl: './activity-detail.component.css'
