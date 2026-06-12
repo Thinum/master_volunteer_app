@@ -24,6 +24,22 @@
   </div>
 
   <div class="section">
+    <h3><mat-icon>event</mat-icon> Organisations</h3>
+    @for (org of activity?.organisations; track org.id) {
+      <mat-list-item>
+        <a class="organisation-list-element" [routerLink]="['/organisations', org.id]" routerLinkActive="active" ariaCurrentWhenActive="page">
+          @if (org.profilePicture) {
+            <img [src]="org.profilePicture" [alt]="org.orgName + ' profile'" class="avatar">
+          } @else {
+            <mat-icon class="avatar-placeholder">groups</mat-icon>
+          }
+          <span class="link-text">{{ org.orgName }}</span>
+        </a>
+      </mat-list-item>
+    }
+  </div>
+
+  <div class="section">
     <h3><mat-icon>group</mat-icon> Your Friends</h3>
     <div class="friends">
       <!-- TODO: Use friends that are part of participants-->
