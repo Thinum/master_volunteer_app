@@ -25,7 +25,6 @@ import { Activity } from '../../../models/activity.model';
     ActivityGraphComponent,
     ActivitiesSmallCardComponent,
     NgForOf,
-    NgIf,
     MatTabGroup,
     MatTab,
   ],
