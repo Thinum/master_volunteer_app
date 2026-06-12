@@ -98,6 +98,76 @@ public class DataLoader {
             george.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             george.setUsername("george");
 
+            Member tom = new Member();
+            tom.setName("Tom");
+            tom.setEmail("tom@mail.com");
+            tom.setPassword(passwordEncoder.encode("password"));
+            tom.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=tom&size=512");
+            tom.setPhone("+43 660 333 1001");
+            tom.setActive(true);
+            tom.setJoinedAt(new Timestamp(System.currentTimeMillis()));
+            tom.setUsername("tom");
+
+            Member sandra = new Member();
+            sandra.setName("Sandra");
+            sandra.setEmail("sandra@mail.com");
+            sandra.setPassword(passwordEncoder.encode("password"));
+            sandra.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=sandra&size=512");
+            sandra.setPhone("+43 660 333 1002");
+            sandra.setActive(true);
+            sandra.setJoinedAt(new Timestamp(System.currentTimeMillis()));
+            sandra.setUsername("sandra");
+
+            Member mia = new Member();
+            mia.setName("Mia");
+            mia.setEmail("mia@mail.com");
+            mia.setPassword(passwordEncoder.encode("password"));
+            mia.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=mia&size=512");
+            mia.setPhone("+43 660 333 1003");
+            mia.setActive(true);
+            mia.setJoinedAt(new Timestamp(System.currentTimeMillis()));
+            mia.setUsername("mia");
+
+            Member bella = new Member();
+            bella.setName("Bella");
+            bella.setEmail("bella@mail.com");
+            bella.setPassword(passwordEncoder.encode("password"));
+            bella.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=bella&size=512");
+            bella.setPhone("+43 660 333 1004");
+            bella.setActive(true);
+            bella.setJoinedAt(new Timestamp(System.currentTimeMillis()));
+            bella.setUsername("bella");
+
+            Member sophia = new Member();
+            sophia.setName("Sophia");
+            sophia.setEmail("sophia@mail.com");
+            sophia.setPassword(passwordEncoder.encode("password"));
+            sophia.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=sophia&size=512");
+            sophia.setPhone("+43 660 333 1005");
+            sophia.setActive(true);
+            sophia.setJoinedAt(new Timestamp(System.currentTimeMillis()));
+            sophia.setUsername("sophia");
+
+            Member lukas = new Member();
+            lukas.setName("Lukas");
+            lukas.setEmail("lukas@mail.com");
+            lukas.setPassword(passwordEncoder.encode("password"));
+            lukas.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=lukas&size=512");
+            lukas.setPhone("+43 660 333 1006");
+            lukas.setActive(true);
+            lukas.setJoinedAt(new Timestamp(System.currentTimeMillis()));
+            lukas.setUsername("lukas");
+
+            Member emma = new Member();
+            emma.setName("Emma");
+            emma.setEmail("emma@mail.com");
+            emma.setPassword(passwordEncoder.encode("password"));
+            emma.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=emma&size=512");
+            emma.setPhone("+43 660 333 1007");
+            emma.setActive(true);
+            emma.setJoinedAt(new Timestamp(System.currentTimeMillis()));
+            emma.setUsername("emma");
+
             // Admin User
             Org_Admin admin = new Org_Admin();
             admin.setName("Admin User");
@@ -109,7 +179,9 @@ public class DataLoader {
             admin.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             admin.setUsername("admin");
 
-            userRepository.saveAll(Arrays.asList(alice, bob, charlie, diana, ethan, fiona, george, admin));
+            userRepository.saveAll(Arrays.asList(alice, bob, charlie,
+                    diana, ethan, fiona, george, tom, sandra, mia,
+                    bella, sophia, lukas, emma, admin));
 
 
             // 2. Create User Relationships
@@ -118,6 +190,14 @@ public class DataLoader {
             relationshipRepository.save(new UserRelationship(null, alice, diana, RelationshipType.RELATIVE));
             relationshipRepository.save(new UserRelationship(null, bob, charlie, RelationshipType.SIBLING));
             relationshipRepository.save(new UserRelationship(null, ethan, george, RelationshipType.PARTNER));
+            relationshipRepository.save(new UserRelationship(null, tom, sandra, RelationshipType.FRIEND));
+            relationshipRepository.save(new UserRelationship(null, tom, bella, RelationshipType.FRIEND));
+            relationshipRepository.save(new UserRelationship(null, sandra, mia, RelationshipType.FRIEND));
+            relationshipRepository.save(new UserRelationship(null, bella, sophia, RelationshipType.SIBLING));
+            relationshipRepository.save(new UserRelationship(null, lukas, tom, RelationshipType.FRIEND));
+            relationshipRepository.save(new UserRelationship(null, emma, bella, RelationshipType.FRIEND));
+            relationshipRepository.save(new UserRelationship(null, mia, sophia, RelationshipType.ACQUAINTANT));
+            relationshipRepository.save(new UserRelationship(null, george, tom, RelationshipType.ACQUAINTANT));
 
             // 3. Create Organisations
             Organisation techAid = createOrganisation(
@@ -160,7 +240,56 @@ public class DataLoader {
                     Set.of(ethan)
             );
 
-            List<Organisation> organisations = Arrays.asList(techAid, greenFuture, communityConnect, eduForAll);
+            Organisation herzFuerMenschen = createOrganisation(
+                    "Herz für Menschen",
+                    new Location(48.2100, 16.3700),
+                    "https://logotypes.dev/Notion?variant=glyph&version=color",
+                    "Supporting vulnerable people through community initiatives.",
+                    OrganisationCategory.Community,
+                    Set.of("charity", "community", "social support"),
+                    Set.of(sandra)
+            );
+
+            Organisation localLearningSupport = createOrganisation(
+                    "Local Learning Support",
+                    new Location(48.3000, 14.2900),
+                    "https://logotypes.dev/Linear?variant=glyph&version=color",
+                    "Tutoring and mentoring for students.",
+                    OrganisationCategory.Education,
+                    Set.of("education", "tutoring", "mentoring"),
+                    Set.of(mia)
+            );
+
+            Organisation pawsAndHearts = createOrganisation(
+                    "Paws & Hearts",
+                    new Location(48.3200, 14.3000),
+                    "https://logotypes.dev/Figma?variant=glyph&version=color",
+                    "Helping animals find safe homes.",
+                    OrganisationCategory.Community,
+                    Set.of("animals", "rescue", "shelter"),
+                    Set.of(emma)
+            );
+
+            Organisation volunteerFire = createOrganisation(
+                    "Volunteer Fire Service Linz",
+                    new Location(48.3050, 14.2860),
+                    "https://logotypes.dev/Firefox?variant=glyph&version=color",
+                    "Volunteer fire and emergency support.",
+                    OrganisationCategory.Community,
+                    Set.of("fire service", "emergency", "rescue"),
+                    Set.of(lukas)
+            );
+
+            List<Organisation> organisations = Arrays.asList(
+                    techAid,
+                    greenFuture,
+                    communityConnect,
+                    eduForAll,
+                    herzFuerMenschen,
+                    localLearningSupport,
+                    pawsAndHearts,
+                    volunteerFire
+            );
             organisationRepository.saveAll(organisations);
 
             // 4. Create Activities
@@ -210,6 +339,168 @@ public class DataLoader {
             codingWorkshop.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             codingWorkshop.setParticipants(Arrays.asList(charlie, alice));
 
+            Activity charityConcert = new Activity();
+            charityConcert.setTitle("Setting up a Charity Concert for Trauma Recovery");
+            charityConcert.setBody("Help organize a charity concert supporting trauma recovery programs.");
+            charityConcert.setDescription("Volunteers assist with planning, logistics, fundraising and coordination.");
+            charityConcert.setOrganisations(List.of(herzFuerMenschen));
+            charityConcert.setDate(Timestamp.valueOf("2025-12-10 15:00:00"));
+            charityConcert.setStartTime("15:00");
+            charityConcert.setEndTime("20:00");
+            charityConcert.setDuration("5 hours");
+            charityConcert.setExpiresAt(Timestamp.valueOf("2025-12-31 23:59:59"));
+            charityConcert.setLocation("Linz Community Hall");
+            charityConcert.setCoordinates(new Coordinates(48.3069, 14.2858));
+            charityConcert.setCreatedBy(sandra);
+            charityConcert.setSkills(Arrays.asList(
+                    "Event Planning",
+                    "Communication",
+                    "Fundraising",
+                    "Teamwork"
+            ));
+            charityConcert.setCapacity(50);
+            charityConcert.setSpotsTaken(18);
+            charityConcert.setDifficulty("medium");
+            charityConcert.setPublic(true);
+            charityConcert.setStatus("open");
+            charityConcert.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            charityConcert.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+            charityConcert.setParticipants(Arrays.asList(
+                    sandra,
+                    tom,
+                    bella,
+                    mia,
+                    sophia
+            ));
+
+            Activity winterSupport = new Activity();
+            winterSupport.setTitle("Winter Support Initiative - Food Distribution");
+            winterSupport.setBody("Distribute food and winter supplies.");
+            winterSupport.setDescription("Community goal activity supporting vulnerable people during winter.");
+            winterSupport.setOrganisations(List.of(herzFuerMenschen));
+            winterSupport.setDate(Timestamp.valueOf("2025-12-18 09:00:00"));
+            winterSupport.setStartTime("09:00");
+            winterSupport.setEndTime("15:00");
+            winterSupport.setDuration("6 hours");
+            winterSupport.setExpiresAt(Timestamp.valueOf("2025-12-31 23:59:59"));
+            winterSupport.setLocation("Community Center Linz");
+            winterSupport.setCoordinates(new Coordinates(48.3069, 14.2858));
+            winterSupport.setCreatedBy(sandra);
+            winterSupport.setSkills(Arrays.asList(
+                    "Teamwork",
+                    "Community Outreach",
+                    "Organization"
+            ));
+            winterSupport.setCapacity(30);
+            winterSupport.setSpotsTaken(12);
+            winterSupport.setDifficulty("easy");
+            winterSupport.setPublic(true);
+            winterSupport.setStatus("open");
+            winterSupport.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            winterSupport.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+            winterSupport.setParticipants(Arrays.asList(
+                    tom,
+                    sandra,
+                    bella,
+                    emma
+            ));
+
+            Activity tutoringSession = new Activity();
+            tutoringSession.setTitle("Math Tutoring Session");
+            tutoringSession.setBody("Support students preparing for exams.");
+            tutoringSession.setDescription("One-on-one tutoring and learning support.");
+            tutoringSession.setOrganisations(List.of(localLearningSupport));
+            tutoringSession.setDate(Timestamp.valueOf("2025-11-08 16:00:00"));
+            tutoringSession.setStartTime("16:00");
+            tutoringSession.setEndTime("19:00");
+            tutoringSession.setDuration("3 hours");
+            tutoringSession.setExpiresAt(Timestamp.valueOf("2025-12-01 23:59:59"));
+            tutoringSession.setLocation("Learning Center Linz");
+            tutoringSession.setCoordinates(new Coordinates(48.3010, 14.2880));
+            tutoringSession.setCreatedBy(mia);
+            tutoringSession.setSkills(Arrays.asList(
+                    "Teaching",
+                    "Communication",
+                    "Mentoring",
+                    "Mathematics"
+            ));
+            tutoringSession.setCapacity(20);
+            tutoringSession.setSpotsTaken(7);
+            tutoringSession.setDifficulty("medium");
+            tutoringSession.setPublic(true);
+            tutoringSession.setStatus("open");
+            tutoringSession.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            tutoringSession.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+            tutoringSession.setParticipants(Arrays.asList(
+                    mia,
+                    sophia,
+                    emma
+            ));
+
+            Activity animalCare = new Activity();
+            animalCare.setTitle("Animal Shelter Care Day");
+            animalCare.setBody("Help care for animals awaiting adoption.");
+            animalCare.setDescription("Volunteers assist with feeding, cleaning and socializing shelter animals.");
+            animalCare.setOrganisations(List.of(pawsAndHearts));
+            animalCare.setDate(Timestamp.valueOf("2025-11-09 09:00:00"));
+            animalCare.setStartTime("09:00");
+            animalCare.setEndTime("13:00");
+            animalCare.setDuration("4 hours");
+            animalCare.setExpiresAt(Timestamp.valueOf("2025-12-01 23:59:59"));
+            animalCare.setLocation("Paws & Hearts Shelter");
+            animalCare.setCoordinates(new Coordinates(48.3200, 14.3000));
+            animalCare.setCreatedBy(emma);
+            animalCare.setSkills(Arrays.asList(
+                    "Animal Care",
+                    "Teamwork",
+                    "Responsibility",
+                    "Cleaning"
+            ));
+            animalCare.setCapacity(20);
+            animalCare.setSpotsTaken(6);
+            animalCare.setDifficulty("easy");
+            animalCare.setPublic(true);
+            animalCare.setStatus("open");
+            animalCare.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            animalCare.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+            animalCare.setParticipants(Arrays.asList(
+                    emma,
+                    bella,
+                    sophia
+            ));
+
+            Activity fireTraining = new Activity();
+            fireTraining.setTitle("Volunteer Firefighter Training");
+            fireTraining.setBody("Learn emergency response and rescue procedures.");
+            fireTraining.setDescription("Practical training for volunteer firefighters.");
+            fireTraining.setOrganisations(List.of(volunteerFire));
+            fireTraining.setDate(Timestamp.valueOf("2025-11-20 18:00:00"));
+            fireTraining.setStartTime("18:00");
+            fireTraining.setEndTime("21:00");
+            fireTraining.setDuration("3 hours");
+            fireTraining.setExpiresAt(Timestamp.valueOf("2025-12-31 23:59:59"));
+            fireTraining.setLocation("Volunteer Fire Station Linz");
+            fireTraining.setCoordinates(new Coordinates(48.3050, 14.2860));
+            fireTraining.setCreatedBy(lukas);
+            fireTraining.setSkills(Arrays.asList(
+                    "Emergency Response",
+                    "First Aid",
+                    "Teamwork",
+                    "Physical Fitness"
+            ));
+            fireTraining.setCapacity(25);
+            fireTraining.setSpotsTaken(8);
+            fireTraining.setDifficulty("hard");
+            fireTraining.setPublic(true);
+            fireTraining.setStatus("open");
+            fireTraining.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            fireTraining.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+            fireTraining.setParticipants(Arrays.asList(
+                    lukas,
+                    tom,
+                    george
+            ));
+
             // Extended Activity 1
             Activity foodBank = new Activity();
             foodBank.setTitle("Local Food Bank Assistance");
@@ -258,18 +549,51 @@ public class DataLoader {
             reforestation.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             reforestation.setParticipants(Arrays.asList(alice, george, bob));
 
-            activityRepository.saveAll(Arrays.asList(parkCleanup, codingWorkshop, foodBank, reforestation));
+            activityRepository.saveAll(Arrays.asList(
+                    parkCleanup,
+                    codingWorkshop,
+                    foodBank,
+                    reforestation,
+                    charityConcert,
+                    winterSupport,
+                    tutoringSession,
+                    animalCare,
+                    fireTraining
+            ));
 
             // 5. Create Appointments
             Appointment appt1 = new Appointment(0, "Park Cleanup Session 1", "Initial clearing", "Pasching Park", Timestamp.valueOf("2025-11-20 09:00:00"), Timestamp.valueOf("2025-11-20 12:00:00"), alice.getId(), parkCleanup);
             Appointment appt2 = new Appointment(0, "Coding Workshop Intro", "First session for beginners", "Linz Tech Center", Timestamp.valueOf("2025-12-05 14:00:00"), Timestamp.valueOf("2025-12-05 18:00:00"), charlie.getId(), codingWorkshop);
+            Appointment appt3 = new Appointment(0, "Concert Planning Meeting", "Initial planning and task assignment", "Linz Community Hall", Timestamp.valueOf("2025-11-15 18:00:00"), Timestamp.valueOf("2025-11-15 20:00:00"), sandra.getId(), charityConcert);
+            Appointment appt4 = new Appointment(0, "Fundraising Coordination", "Coordinate sponsors and donations", "Linz Community Hall", Timestamp.valueOf("2025-11-22 17:00:00"), Timestamp.valueOf("2025-11-22 19:00:00"), sandra.getId(), charityConcert);
+            Appointment appt5 = new Appointment(0, "Final Concert Setup", "Prepare stage, seating and logistics", "Linz Community Hall", Timestamp.valueOf("2025-12-09 14:00:00"), Timestamp.valueOf("2025-12-09 19:00:00"), sandra.getId(), charityConcert);
+            Appointment appt6 = new Appointment(0, "Food Package Assembly", "Prepare food packages for distribution", "Community Center Linz", Timestamp.valueOf("2025-12-12 10:00:00"), Timestamp.valueOf("2025-12-12 15:00:00"), sandra.getId(), winterSupport);
+            Appointment appt7 = new Appointment(0, "Winter Clothing Sorting", "Sort donated clothing items", "Community Center Linz", Timestamp.valueOf("2025-12-15 09:00:00"), Timestamp.valueOf("2025-12-15 13:00:00"), sandra.getId(), winterSupport);
+            Appointment appt8 = new Appointment(0, "Food Distribution Day", "Distribute packages to families", "Community Center Linz", Timestamp.valueOf("2025-12-18 09:00:00"), Timestamp.valueOf("2025-12-18 15:00:00"), sandra.getId(), winterSupport);
+            Appointment appt9 = new Appointment(0, "Math Tutoring Group A", "Support students with mathematics", "Learning Center Linz", Timestamp.valueOf("2025-11-08 16:00:00"), Timestamp.valueOf("2025-11-08 19:00:00"), mia.getId(), tutoringSession);
+            Appointment appt10 = new Appointment(0, "Exam Preparation Workshop", "Exam preparation and mentoring", "Learning Center Linz", Timestamp.valueOf("2025-11-15 16:00:00"), Timestamp.valueOf("2025-11-15 19:00:00"), mia.getId(), tutoringSession);
+            Appointment appt11 = new Appointment(0, "Homework Support Evening", "Individual learning support", "Learning Center Linz", Timestamp.valueOf("2025-11-22 17:00:00"), Timestamp.valueOf("2025-11-22 20:00:00"), mia.getId(), tutoringSession);
+            Appointment appt12 = new Appointment(0, "Shelter Cleaning Day", "Cleaning and maintenance", "Paws & Hearts Shelter", Timestamp.valueOf("2025-11-09 09:00:00"), Timestamp.valueOf("2025-11-09 13:00:00"), emma.getId(), animalCare);
+            Appointment appt13 = new Appointment(0, "Dog Walking Session", "Exercise and socialization", "Paws & Hearts Shelter", Timestamp.valueOf("2025-11-16 10:00:00"), Timestamp.valueOf("2025-11-16 12:00:00"), emma.getId(), animalCare);
+            Appointment appt14 = new Appointment(0, "Basic Firefighter Training", "Emergency response exercises", "Volunteer Fire Station Linz", Timestamp.valueOf("2025-11-20 18:00:00"), Timestamp.valueOf("2025-11-20 21:00:00"), lukas.getId(), fireTraining);
+            Appointment appt15 = new Appointment(0, "Rescue Simulation Exercise", "Practical rescue scenario", "Volunteer Fire Station Linz", Timestamp.valueOf("2025-11-27 18:00:00"), Timestamp.valueOf("2025-11-27 21:00:00"), lukas.getId(), fireTraining);
 
             // Add appointments to activities
             parkCleanup.setAppointments(List.of(appt1));
             codingWorkshop.setAppointments(List.of(appt2));
+            charityConcert.setAppointments(List.of(appt3, appt4, appt5));
+            winterSupport.setAppointments(List.of(appt6, appt7, appt8));
+            tutoringSession.setAppointments(List.of(appt9, appt10, appt11));
+            animalCare.setAppointments(List.of(appt12, appt13));
+            fireTraining.setAppointments(List.of(appt14, appt15));
 
             activityRepository.save(parkCleanup);
             activityRepository.save(codingWorkshop);
+            activityRepository.save(charityConcert);
+            activityRepository.save(winterSupport);
+            activityRepository.save(tutoringSession);
+            activityRepository.save(animalCare);
+            activityRepository.save(fireTraining);
 
             System.out.println("Database seeded successfully!");
         };
