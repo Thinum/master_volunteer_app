@@ -1,54 +1,168 @@
 <div class="home-container">
   <!-- Header -->
-  <div class="header">
+  <div class="header" *ngIf="currentUser">
     <div class="user-info">
-      <img class="profile-pic" src="https://i.pravatar.cc/40?img=3" alt="Profile Picture">
+      <img class="profile-pic" [src]="currentUser.profilePicture || 'https://i.pravatar.cc/40?img=3'" alt="Profile Picture">
       <div>
-        <h3>{{ user.name }}</h3>
-        <p class="role">Rolle: {{ user.role }}</p>
+        <h3>Willkommen zurück, {{ currentUser.name }}!</h3>
+        <p class="role">Dabei seit: {{ currentUser.joinedAt | date:'mediumDate' }}</p>
       </div>
     </div>
     <div class="stats">
       <div class="stat">
-        <span class="value">{{ user.badges }}</span>
-        <span class="label">Badges</span>
+        <span class="value">{{ friendsCount }}</span>
+        <span class="label">Freunde</span>
       </div>
       <div class="stat">
-        <span class="value">{{ user.functions }}</span>
-        <span class="label">Funktionen</span>
+        <span class="value">{{ organisationsCount }}</span>
+        <span class="label">Organisationen</span>
       </div>
       <div class="stat">
-        <span class="value">{{ user.activities }}</span>
+        <span class="value">{{ activitiesCount }}</span>
         <span class="label">Aktivitäten</span>
       </div>
     </div>
   </div>
 
   <!-- Notification -->
-  <div class="notification">
+  <div class="notification" *ngIf="requests && requests.length > 0">
     Sie haben <b>{{ requests.length }}</b> neue Nachweisanfragen, bitte geben Sie diese frei.
   </div>
 
-  <!-- Requests -->
-  <div class="requests">
-    <h4>Anfragen Nachweise</h4>
-    <app-card size="compact" *ngFor="let req of requests"  class="request-card">
+  <!-- Dynamic Content Layout Grid -->
+  <div class="home-grid">
+    <!-- Left Column: Highlights (Last Joined, Last Friend) -->
+    <div class="grid-section">
+      <h4>Deine neuesten Highlights</h4>
+
+      <!-- Last Activity Joined -->
+      <app-card size="compact" class="highlight-card" *ngIf="lastActivity">
         <div card-left>
-          <div class="hours">
-            <span class="value">{{ req.hours }}</span>
-            <span class="label"> Stunden</span>
+          <div class="highlight-icon green">
+            <mat-icon>event_available</mat-icon>
           </div>
         </div>
         <div card-body>
-          <div class="request-info">
-            <h5>{{ req.organisation }}</h5>
-            <p class="title">{{ req.title }}</p>
-            <div class="request-user">
-              <img [src]="req.user.avatar" alt="{{ req.user.name }}" class="avatar"/>
-              <span>{{ req.user.name }}</span>
+          <div class="highlight-info">
+            <span class="category-tag">Letzte beigetretene Aktivität</span>
+            <h5>{{ lastActivity.title }}</h5>
+            <p>{{ lastActivity.location || 'Online / Kein fester Ort' }}</p>
+          </div>
+        </div>
+      </app-card>
+      <br/>
+      <!-- Last Organisation Joined -->
+      <app-card size="compact" class="highlight-card" *ngIf="lastOrganisation">
+        <div card-left>
+          <div class="highlight-icon blue">
+            <mat-icon>business</mat-icon>
+          </div>
+        </div>
+        <div card-body>
+          <div class="highlight-info">
+            <span class="category-tag">Letzte beigetretene Organisation</span>
+            <h5>{{ lastOrganisation.orgName }}</h5>
+            <p>Bereich: {{ lastOrganisation.category }}</p>
+          </div>
+        </div>
+      </app-card>
+      <br/>
+
+      <!-- Last Friend Added -->
+      <app-card size="compact" class="highlight-card" *ngIf="lastFriend">
+        <div card-left>
+          <img [src]="lastFriend.profilePicture || 'https://i.pravatar.cc/40?img=5'" alt="{{ lastFriend.name }}" class="avatar"/>
+        </div>
+        <div card-body>
+          <div class="highlight-info">
+            <span class="category-tag">Neuester Freund</span>
+            <h5>{{ lastFriend.name }}</h5>
+            <p>E-Mail: {{ lastFriend.email }}</p>
+          </div>
+        </div>
+      </app-card>
+
+      <!-- If everything is empty (Fallback) -->
+      <div class="empty-highlights" *ngIf="!lastActivity && !lastOrganisation && !lastFriend">
+        <mat-icon class="empty-icon">spa</mat-icon>
+        <p>Noch keine Aktivitäten vorhanden. Tritt einer Organisation bei oder lade Freunde ein, um hier deine persönlichen Highlights zu sehen!</p>
+      </div>
+    </div>
+
+    <!-- Right Column: Community Goals of Last Organisation -->
+    <div class="grid-section" *ngIf="lastOrganisation">
+      <h4>Community-Ziele: {{ lastOrganisation.orgName }}</h4>
+
+      <div class="goals-container" *ngIf="communityGoals && communityGoals.length > 0; else noGoals">
+        <div class="goal-item" *ngFor="let goal of communityGoals">
+          <div class="goal-header">
+            <span class="goal-title">{{ goal.title }}</span>
+            <span class="goal-values">{{ goal.currentValue || 0 }} / {{ goal.targetValue }}</span>
+          </div>
+          <div class="progress-bar-background">
+            <div class="progress-bar-fill" [style.width.%]="getGoalProgress(goal)"></div>
+          </div>
+          <p class="goal-desc" *ngIf="goal.description">{{ goal.description }}</p>
+        </div>
+      </div>
+
+      <ng-template #noGoals>
+        <div class="empty-goals">
+          <mat-icon class="empty-icon">insights</mat-icon>
+          <p>Für diese Organisation sind zurzeit keine aktiven Community-Ziele definiert.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Recommended Activities Section -->
+  <div class="recommended-section" *ngIf="recommendedActivities && recommendedActivities.length > 0">
+    <h4>Empfohlene Aktivitäten für Dich</h4>
+    <div class="recommended-grid">
+      <app-card size="compact" *ngFor="let act of recommendedActivities" class="rec-card">
+        <div card-left>
+          <div class="rec-badge">
+            <mat-icon>explore</mat-icon>
+          </div>
+        </div>
+        <div card-body>
+          <div class="rec-content">
+            <h5>{{ act.title }}</h5>
+            <p class="rec-desc">{{ act.description || act.body }}</p>
+            <div class="skills-tags" *ngIf="act.skills && act.skills.length > 0">
+              <span class="skill-tag" *ngFor="let skill of act.skills">{{ skill }}</span>
             </div>
           </div>
         </div>
+        <div card-right>
+          <button mat-raised-button color="primary" class="join-button" (click)="joinActivity(act.id)">
+            Teilnehmen
+          </button>
+        </div>
+      </app-card>
+    </div>
+  </div>
+
+  <!-- Requests list -->
+  <div class="requests" *ngIf="requests && requests.length > 0">
+    <h4>Anfragen Nachweise</h4>
+    <app-card size="compact" *ngFor="let req of requests" class="request-card">
+      <div card-left>
+        <div class="hours">
+          <span class="value">{{ req.hours }}</span>
+          <span class="label"> Stunden</span>
+        </div>
+      </div>
+      <div card-body>
+        <div class="request-info">
+          <h5>{{ req.organisation }}</h5>
+          <p class="title">{{ req.title }}</p>
+          <div class="request-user">
+            <img [src]="req.user.avatar" alt="{{ req.user.name }}" class="avatar"/>
+            <span>{{ req.user.name }}</span>
+          </div>
+        </div>
+      </div>
       <div card-right>
         <button mat-icon-button class="chat-icon">
           <mat-icon>chat_bubble_outline</mat-icon>
