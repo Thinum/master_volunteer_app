@@ -35,7 +35,7 @@
 
     <mat-tab label="Relationship Graph">
       <div [hidden]="activeTab !== 0">
-        <app-friends-graph></app-friends-graph>
+        <app-friends-graph [userId]="currentUserId"></app-friends-graph>
       </div>
     </mat-tab>
 

@@ -1,10 +1,15 @@
 import { AfterViewInit, Component, ElementRef, ViewChild, OnDestroy, inject } from '@angular/core';
 import cytoscape from 'cytoscape';
+import { forkJoin } from 'rxjs';
 
 import { MOCK_USERS } from '../../../../mock/mock-users';
 import { MOCK_ACTIVITIES } from '../../../../mock/mock-activities';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ActivityService } from '../../../../services/api/activity.service';
+import { VolunteerService } from '../../../../services/api/volunteer.service';
+import { User } from '../../../../models/user.model';
+import { Activity } from '../../../../models/activity.model';
 
 @Component({
   selector: 'app-activity-graph',
@@ -106,14 +111,17 @@ import { CommonModule } from '@angular/common';
 export class ActivityGraphComponent implements AfterViewInit, OnDestroy {
   @ViewChild('cyContainer', { static: true }) cyContainer!: ElementRef;
 
-  activities = MOCK_ACTIVITIES;
-  selectedActivities = new Set<number>(MOCK_ACTIVITIES.map(a => a.id));
+  activities: Activity[] = [];
+  selectedActivities = new Set<number>();
 
+  private loadedUsers: User[] = [];
   private animationRunning = false;
   private nodeAnimations = new Map<string, boolean>();
   private cy!: cytoscape.Core;
   private activeLayout?: cytoscape.Layouts;
   private router = inject(Router);
+  private activityService = inject(ActivityService);
+  private volunteerService = inject(VolunteerService);
 
   // Distinct colors for different activities
   private activityColors: string[] = [
@@ -161,9 +169,31 @@ export class ActivityGraphComponent implements AfterViewInit, OnDestroy {
   }
 
   private initGraph(): void {
-    // Collect elements
-    const elements = this.getGraphElements();
+    forkJoin({
+      activities: this.activityService.getAllActivities(),
+      users: this.volunteerService.getAllVolunteers()
+    }).subscribe({
+      next: ({ activities, users }) => {
+        this.activities = activities;
+        this.loadedUsers = users;
+        this.selectedActivities = new Set<number>(activities.map(a => a.id));
 
+        const elements = this.getGraphElements();
+        this.createCytoscapeGraph(elements);
+      },
+      error: (err) => {
+        console.warn('Failed to load activities from API, falling back to mock data', err);
+        this.activities = MOCK_ACTIVITIES;
+        this.loadedUsers = MOCK_USERS;
+        this.selectedActivities = new Set<number>(MOCK_ACTIVITIES.map(a => a.id));
+
+        const elements = this.getGraphElements();
+        this.createCytoscapeGraph(elements);
+      }
+    });
+  }
+
+  private createCytoscapeGraph(elements: cytoscape.ElementDefinition[]): void {
     this.cy = cytoscape({
       container: this.cyContainer.nativeElement,
       elements: elements,
@@ -319,18 +349,31 @@ export class ActivityGraphComponent implements AfterViewInit, OnDestroy {
   }
 
   private getGraphElements(): cytoscape.ElementDefinition[] {
-    const nodes = MOCK_USERS.map(user => ({
-      data: {
-        id: `u${user.id}`,
-        userId: user.id,
-        label: user.name,
-        avatar: user.profilePicture
+    const filteredActivities = this.activities.filter(act => this.selectedActivities.has(act.id));
+    const activeParticipantIds = new Set<number>();
+
+    for (const act of filteredActivities) {
+      const participants = act.participants || [];
+      for (const p of participants) {
+        if (p && p.id) {
+          activeParticipantIds.add(p.id);
+        }
       }
-    }));
+    }
+
+    const nodes = this.loadedUsers
+      .filter(user => activeParticipantIds.has(user.id))
+      .map(user => ({
+        data: {
+          id: `u${user.id}`,
+          userId: user.id,
+          label: user.name,
+          avatar: user.profilePicture
+        }
+      }));
 
     const edges: cytoscape.ElementDefinition[] = [];
-    const filteredActivities = MOCK_ACTIVITIES.filter(act => this.selectedActivities.has(act.id));
-    const userIds = new Set(MOCK_USERS.map(u => u.id));
+    const userIds = new Set(this.loadedUsers.map(u => u.id));
 
     for (const act of filteredActivities) {
       const participants = act.participants || [];

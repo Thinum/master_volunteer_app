@@ -64,6 +64,11 @@ public class UserController {
         return userService.getFriends(id);
     }
 
+    @GetMapping("/{id}/relationships")
+    public List<at.jku.volunteer_app.contract.RelationshipDTO> getRelationshipsForGraph(@PathVariable int id) {
+        return userService.getRelationshipsForGraph(id);
+    }
+
     @GetMapping("/{id}/organisations")
     public List<at.jku.volunteer_app.model.Organisation> getOrganisations(@PathVariable int id) {
         User user = userService.getUserById(id);
