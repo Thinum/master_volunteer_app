@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
-import { NgForOf, NgIf } from '@angular/common';
+import {DatePipe, NgForOf, NgIf} from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,8 +14,12 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Organisation, OrganisationCategory } from '../../models/organisation.model';
 import {
-  MOCK_FEATURED_ORGANISATIONS
-} from '../../mock/mock-organisations';
+  MatAccordion,
+  MatExpansionPanel, MatExpansionPanelDescription,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle
+} from '@angular/material/expansion';
+import {Activity} from '../../models/activity.model';
 
 @Component({
   selector: 'app-login',
@@ -29,7 +33,13 @@ import {
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatChipsModule
+    MatChipsModule,
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+    MatExpansionPanelDescription,
+    DatePipe
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
@@ -38,16 +48,18 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   protected loginForm: FormGroup;
   protected hidePw = signal(true);
-  
+
   // Organisation properties
   protected organisations: Organisation[] = [];
   protected organisationsFiltered: Organisation[] = [];
-  
+
+  protected activitiesByOrganisationId: Record<number, Activity[]> = {};
+
   protected searchTerm = '';
   protected selectedCategory: OrganisationCategory | null = null;
   protected selectedTags: string[] = [];
   protected showFilters = false;
-  
+
   protected categories: OrganisationCategory[] = [];
   protected tags: string[] = [];
 
@@ -68,7 +80,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       rememberMe: [false]
     });
 
-    if (this.authService.isLoggedIn()){
+    if (this.authService.isLoggedIn()) {
       this.layoutingService.showBottomNavbar.set(true);
       this.router.navigate(['home']);
     }
@@ -90,6 +102,9 @@ export class LoginComponent implements OnInit, OnDestroy {
   private loadOrganisations(): void {
     this.organisationService.getAllOrganisations().subscribe(orgs => {
       this.organisations = orgs;
+      for (let org of orgs) {
+        this.loadExampleActivitiesForOrganisation(org.id);
+      }
       this.organisationsFiltered = [...orgs];
       this.extractCategoriesAndTags();
     });
@@ -161,15 +176,27 @@ export class LoginComponent implements OnInit, OnDestroy {
   clickLogin(): void {
     if (this.loginForm.invalid) return;
 
-    const { username, password } = this.loginForm.value;
+    const {username, password} = this.loginForm.value;
     this.authService.login(username, password).subscribe();
   }
 
   clickRegister(): void {
-     this.router.navigate(['register']);
+    this.router.navigate(['register']);
   }
 
   ngOnDestroy(): void {
     this.loggedInSubscription?.unsubscribe();
+  }
+
+  loadExampleActivitiesForOrganisation(organisationId: number)
+  {
+    this.organisationService.getExampleActivitiesForOrganisation(organisationId).subscribe({
+      next: activities => {
+        this.activitiesByOrganisationId[organisationId] = activities;
+      },
+      error: err => {
+        console.error('Failed to load organisation activities', err);
+      }
+    });
   }
 }

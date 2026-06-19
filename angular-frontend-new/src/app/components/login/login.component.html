@@ -121,7 +121,7 @@
     <!-- Browse Organisations Section -->
     <div class="browse-section">
       <h2 class="section-title">Browse Organisations</h2>
-      
+
       <!-- Search Container -->
       <div class="search-container">
         <mat-form-field appearance="outline" class="search-bar">
@@ -172,17 +172,94 @@
       <div class="organisations-list">
         <div *ngIf="organisationsFiltered.length > 0; else noOrganisations" class="list-content">
           <div *ngFor="let org of organisationsFiltered" class="org-item">
-            <div class="org-card">
-              <img *ngIf="org.profilePicture" [src]="org.profilePicture" [alt]="org.orgName" class="org-avatar">
-              <mat-icon *ngIf="!org.profilePicture" class="org-avatar-placeholder">groups</mat-icon>
-              <div class="org-info">
-                <h4 class="org-name">{{ org.orgName }}</h4>
-                <p class="org-body">{{ org.body }}</p>
-                <div *ngIf="org.tags && org.tags.length > 0" class="org-tags">
-                  <span *ngFor="let tag of org.tags" class="tag">{{ tag }}</span>
-                </div>
-              </div>
-            </div>
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header class="org-panel-header">
+                  <mat-panel-title class="org-panel-title">
+                    <img
+                      *ngIf="org.profilePicture"
+                      [src]="org.profilePicture"
+                      [alt]="org.orgName"
+                      class="org-avatar">
+                  </mat-panel-title>
+
+                  <mat-panel-description class="org-panel-description">
+                    <mat-icon
+                      *ngIf="!org.profilePicture"
+                      class="org-avatar-placeholder">
+                      groups
+                    </mat-icon>
+
+                    <div class="org-info">
+                      <h4 class="org-name">{{ org.orgName }}</h4>
+                      <p class="org-body">{{ org.body }}</p>
+
+                      <div *ngIf="org.tags && org.tags.length > 0" class="org-tags">
+                        <span *ngFor="let tag of org.tags" class="tag">{{ tag }}</span>
+                      </div>
+                    </div>
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                @for (activity of activitiesByOrganisationId[org.id]; track activity.id) {
+                  <div class="activities-list">
+                    @for (activity of activitiesByOrganisationId[org.id]; track activity.id) {
+                      <article class="activity-card">
+                        <div class="activity-icon-wrap">
+                          <mat-icon>event</mat-icon>
+                        </div>
+
+                        <div class="activity-content">
+                          <div class="activity-header">
+                            <h5 class="activity-title">{{ activity.title }}</h5>
+                            <span class="activity-date">
+                                {{ activity.date | date: 'MMM d, y' }}
+                              </span>
+                          </div>
+
+                          <div class="activity-meta">
+                              <span>
+                                <mat-icon>schedule</mat-icon>
+                                {{ activity.date | date: 'shortTime' }}
+                              </span>
+
+                            @if (activity.location) {
+                              <span>
+                                  <mat-icon>place</mat-icon>
+                                {{ activity.location }}
+                                </span>
+                            }
+
+                            @if (activity.duration) {
+                              <span>
+                                  <mat-icon>timer</mat-icon>
+                                {{ activity.duration }}
+                                </span>
+                            }
+                          </div>
+
+                          <p class="activity-description">
+                            {{ activity.description }}
+                          </p>
+
+                          @if (activity.skills.length) {
+                            <div class="activity-tags">
+                              @for (skill of activity.skills; track skill) {
+                                <span class="activity-tag">{{ skill }}</span>
+                              }
+                            </div>
+                          }
+                        </div>
+                      </article>
+                    } @empty {
+                      <div class="empty-activities">
+                        <mat-icon>event_busy</mat-icon>
+                        <p>No activities available for this organisation.</p>
+                      </div>
+                    }
+                  </div>
+                }
+              </mat-expansion-panel>
+            </mat-accordion>
           </div>
         </div>
         <ng-template #noOrganisations>

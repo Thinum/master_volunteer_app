@@ -1,5 +1,6 @@
 package at.jku.volunteer_app.controller;
 
+import at.jku.volunteer_app.model.Activity;
 import at.jku.volunteer_app.model.UserModelDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -46,5 +47,10 @@ public class OrganisationController {
     @PostMapping( "/join/{id}")
     public boolean joinOrganisation(@AuthenticationPrincipal UserModelDetails userDetails, @PathVariable int id) {
         return organisationService.joinOrganisation(id, userDetails.getUserId());
+    }
+
+    @GetMapping("/{id}/exampleActivities")
+    public List<Activity> getExampleActivities(@PathVariable int id){
+        return this.organisationService.getExampleActivities(id);
     }
 }

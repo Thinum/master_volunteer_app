@@ -3,6 +3,7 @@ package at.jku.volunteer_app.service;
 import at.jku.volunteer_app.model.Activity;
 import at.jku.volunteer_app.model.OrganisationMember;
 import at.jku.volunteer_app.model.User;
+import at.jku.volunteer_app.repository.ActivityRepository;
 import at.jku.volunteer_app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,10 +17,13 @@ import java.util.Optional;
 public class OrganisationService {
     private final OrganisationRepository organisationRepository;
     private final UserRepository userRepository;
+    private final ActivityRepository activityRepository;
 
-    public OrganisationService(OrganisationRepository organisationRepository, UserRepository userRepository) {
+    public OrganisationService(OrganisationRepository organisationRepository, UserRepository userRepository,
+                               ActivityRepository activityRepository) {
         this.organisationRepository = organisationRepository;
         this.userRepository = userRepository;
+        this.activityRepository = activityRepository;
     }
 
     public List<Organisation> getAllOrganisations(){
@@ -69,5 +73,11 @@ public class OrganisationService {
         organisation.getOrgMembers().add(organisationMember);
         organisationRepository.save(organisation);
         return true;
+    }
+
+    //Gets activities for an organization that are displayed for non-locked in users
+    public List<Activity> getExampleActivities(int organisationId){
+        // Just as a test we return all activities for the organisation
+        return this.activityRepository.findAllByOrganisations_Id(organisationId);
     }
 }

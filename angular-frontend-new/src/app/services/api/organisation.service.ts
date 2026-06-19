@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Organisation } from '../../models/organisation.model';
 import { environment } from '../../../environments/environment';
+import {Activity} from '../../models/activity.model';
 
 @Injectable({
   providedIn: 'root',
@@ -35,5 +36,9 @@ export class OrganisationService {
 
   joinOrganisation(orgId: number | null | undefined): Observable<boolean> {
     return this.http.post<boolean>(`${this.apiUrl}/join/${orgId}`, {});
+  }
+
+  getExampleActivitiesForOrganisation(orgId: number): Observable<Activity[]> {
+    return this.http.get<Activity[]>(`${this.apiUrl}/${orgId}/exampleActivities`);
   }
 }
