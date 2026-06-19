@@ -41,7 +41,7 @@
 
     <mat-tab label="Activity Graph">
       <div [hidden]="activeTab !== 1">
-        <app-activity-graph></app-activity-graph>
+        <app-activity-graph [userId]="currentUserId"></app-activity-graph>
       </div>
     </mat-tab>
 
