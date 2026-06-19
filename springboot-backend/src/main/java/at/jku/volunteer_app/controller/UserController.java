@@ -1,6 +1,12 @@
 package at.jku.volunteer_app.controller;
 
 import at.jku.volunteer_app.contract.AddFriendRequest;
+import at.jku.volunteer_app.model.RelationshipType;
+import at.jku.volunteer_app.service.OrganisationService;
+import at.jku.volunteer_app.service.ActivityService;
+import at.jku.volunteer_app.contract.RelationshipDTO;
+import at.jku.volunteer_app.model.Organisation;
+import at.jku.volunteer_app.model.Activity;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -15,12 +21,12 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final at.jku.volunteer_app.service.OrganisationService organisationService;
-    private final at.jku.volunteer_app.service.ActivityService activityService;
+    private final OrganisationService organisationService;
+    private final ActivityService activityService;
 
     public UserController(UserService userService, 
-                          at.jku.volunteer_app.service.OrganisationService organisationService,
-                          at.jku.volunteer_app.service.ActivityService activityService) {
+                          OrganisationService organisationService,
+                          ActivityService activityService) {
         this.userService = userService;
         this.organisationService = organisationService;
         this.activityService = activityService;
@@ -65,19 +71,19 @@ public class UserController {
     }
 
     @GetMapping("/{id}/relationships")
-    public List<at.jku.volunteer_app.contract.RelationshipDTO> getRelationshipsForGraph(@PathVariable int id) {
+    public List<RelationshipDTO> getRelationshipsForGraph(@PathVariable int id) {
         return userService.getRelationshipsForGraph(id);
     }
 
     @GetMapping("/{id}/organisations")
-    public List<at.jku.volunteer_app.model.Organisation> getOrganisations(@PathVariable int id) {
+    public List<Organisation> getOrganisations(@PathVariable int id) {
         User user = userService.getUserById(id);
         if (user == null) return List.of();
         return organisationService.getOrganisationsForUser(user);
     }
 
     @GetMapping("/{id}/activities")
-    public List<at.jku.volunteer_app.model.Activity> getActivities(@PathVariable int id) {
+    public List<Activity> getActivities(@PathVariable int id) {
         User user = userService.getUserById(id);
         if (user == null) return List.of();
         return activityService.getActivitiesForUser(user);
@@ -86,5 +92,18 @@ public class UserController {
     @GetMapping("/active")
     public List<User> getActiveUsers() {
         return userService.getActiveUsers();
+    }
+
+    @GetMapping("/{id}/relationships/{type}")
+    public List<User> getByType(
+            @PathVariable int id,
+            @PathVariable RelationshipType type
+    ) {
+        return userService.getRelatedUsers(id, type);
+    }
+
+    @GetMapping("/{id}/connections")
+    public List<User> getAllConnectedUsers(@PathVariable int id) {
+        return userService.getAllConnectedUsers(id);
     }
 }

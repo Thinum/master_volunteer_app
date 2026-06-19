@@ -62,31 +62,14 @@ export class FriendsComponent implements OnInit {
       });
   }
 
-  private loadDataForUser(userId: number): void {
-    this.volunteerService.getAllVolunteers()
+  loadDataForUser(userId: number): void {
+    this.volunteerService.getConnections(userId)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(users => { this.friends = users; });
+      .subscribe(friends => this.friends = friends);
 
-    this.activityService
-      .getActivitiesByUserParticipation(userId)
+    this.activityService.getActivitiesByUserParticipation(userId)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (activities) => {
-          this.activitiesOfFriends = activities;
-
-          /*
-          // collect friends from all activities safely
-          this.friends = Array.from(
-            new Map(
-              (activities as Activity[])
-                .flatMap(a => (a.friends ?? []) as User[])
-                .map(f => [f.id, f] as [number, User])
-            ).values()
-          );
-
-           */
-        },
-      });
+      .subscribe(activities => this.activitiesOfFriends = activities);
   }
 
   goToActivity(id: number): void {

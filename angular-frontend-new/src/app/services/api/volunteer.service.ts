@@ -3,8 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { User } from '../../models/user.model';
 import { Organisation } from '../../models/organisation.model';
 import { Activity } from '../../models/activity.model';
-import { RelationshipDTO } from '../../models/relationship.model';
+import { RelationshipDTO, RelationshipType } from '../../models/relationship.model';
 import { environment } from '../../../environments/environment';
+
 
 @Injectable({
   providedIn: 'root',
@@ -33,6 +34,24 @@ export class VolunteerService {
    */
   getVolunteerById(id: number) {
     return this.http.get<User>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Returns users of a volunteer by their ID and relationship
+   */
+  getRelatedUsers(id: number, type: RelationshipType) {
+    return this.http.get<User[]>(
+      `${this.apiUrl}/${id}/relationships/${type}`
+    );
+  }
+
+  /**
+   * Returns every user of a volunteer they have a relationship with
+   */
+  getConnections(id: number) {
+    return this.http.get<User[]>(
+      `${this.apiUrl}/${id}/connections`
+    );
   }
 
   /**

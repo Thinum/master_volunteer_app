@@ -7,3 +7,15 @@ export interface RelationshipDTO {
   type: string; // e.g. "FRIEND", "SIBLING", "PARTNER", etc.
   likeScore: number;
 }
+
+//TODO change type above
+
+export enum RelationshipType {
+  FRIEND = 'FRIEND',
+  PARTNER = 'PARTNER',
+  ACQUAINTANT = 'ACQUAINTANT',
+  RELATIVE = 'RELATIVE',
+  PARENT = 'PARENT',
+  CHILD = 'CHILD',
+  SIBLING = 'SIBLING'
+}

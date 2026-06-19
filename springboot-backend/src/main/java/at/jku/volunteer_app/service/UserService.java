@@ -4,6 +4,7 @@ import at.jku.volunteer_app.model.RelationshipType;
 import at.jku.volunteer_app.model.UserRelationship;
 import at.jku.volunteer_app.repository.UserRelationshipRepository;
 import org.springframework.security.core.userdetails.UserDetails;
+import at.jku.volunteer_app.contract.RelationshipDTO;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.model.UserModelDetails;
 import at.jku.volunteer_app.repository.UserRepository;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -40,6 +45,65 @@ public class UserService implements UserDetailsService {
         return "User Added Successfully";
     }
 
+    private boolean isBidirectional(RelationshipType type) {
+        return switch (type) {
+            case FRIEND, PARTNER, SIBLING, RELATIVE -> true;
+            case PARENT, CHILD, ACQUAINTANT -> false;
+        };
+    }
+
+    @Transactional
+    public void addRelationship(int userId, int targetId, RelationshipType type) {
+        if (userId == targetId) {
+            throw new IllegalArgumentException("Cannot create relationship with yourself");
+        }
+
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+
+        User target = repository.findById(targetId)
+                .orElseThrow();
+
+        UserRelationship rel = new UserRelationship();
+        rel.setFromUser(user);
+        rel.setToUser(target);
+        rel.setType(type);
+
+        relationshipRepository.save(rel);
+
+        if (isBidirectional(type)) {
+            UserRelationship reverse = new UserRelationship();
+            reverse.setFromUser(target);
+            reverse.setToUser(user);
+            reverse.setType(type);
+            relationshipRepository.save(reverse);
+        }
+    }
+
+    public List<RelationshipDTO> getAllRelationships(int userId) {
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND,
+                        "User not found with id: " + userId));
+
+        return relationshipRepository.findAll().stream()
+                .filter(rel ->
+                        rel.getFromUser().getId() == userId ||
+                                rel.getToUser().getId() == userId
+                )
+                .map(rel -> new at.jku.volunteer_app.contract.RelationshipDTO(
+                        rel.getId(),
+                        rel.getFromUser().getId(),
+                        rel.getFromUser().getName(),
+                        rel.getToUser().getId(),
+                        rel.getToUser().getName(),
+                        rel.getType(),
+                        rel.getLikeScore()
+                ))
+                .toList();
+    }
+
+    //TODO: replace it with just calling addRelationship(with RelationShipType fiend)
     @Transactional
     public boolean addFriend(int userId, int friendId) {
         if (userId == friendId) {
@@ -70,7 +134,37 @@ public class UserService implements UserDetailsService {
         return true;
     }
 
-    public java.util.List<User> getAllUsers() {
+    public List<User> getRelatedUsers(int userId, RelationshipType type) {
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+
+        return relationshipRepository.findAllByFromUserAndType(user, type)
+                .stream()
+                .map(UserRelationship::getToUser)
+                .toList();
+    }
+
+    public List<User> getAllConnectedUsers(int userId) {
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+
+        return relationshipRepository.findAll().stream()
+                .filter(rel ->
+                        rel.getFromUser().getId() == userId ||
+                                rel.getToUser().getId() == userId
+                )
+                .map(rel -> {
+                    if (rel.getFromUser().getId() == userId) {
+                        return rel.getToUser();
+                    } else {
+                        return rel.getFromUser();
+                    }
+                })
+                .distinct()
+                .toList();
+    }
+
+    public List<User> getAllUsers() {
         return repository.findAll();
     }
 
@@ -78,17 +172,11 @@ public class UserService implements UserDetailsService {
         return repository.findById(id).orElse(null);
     }
 
-    public java.util.List<User> getFriends(int userId) {
-        User user = repository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
-
-        return relationshipRepository.findAllByFromUserAndType(user, RelationshipType.FRIEND)
-                .stream()
-                .map(UserRelationship::getToUser)
-                .toList();
+    public List<User> getFriends(int userId) {
+        return getRelatedUsers(userId, RelationshipType.FRIEND);
     }
 
-    public java.util.List<User> getActiveUsers() {
+    public List<User> getActiveUsers() {
         return repository.findAll().stream().filter(User::isActive).toList();
     }
 
@@ -96,14 +184,14 @@ public class UserService implements UserDetailsService {
         return repository.findByUsername(username).orElse(null);
     }
 
-    public java.util.List<at.jku.volunteer_app.contract.RelationshipDTO> getRelationshipsForGraph(int userId) {
+    public List<RelationshipDTO> getRelationshipsForGraph(int userId) {
         User user = repository.findById(userId)
                 .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
                         org.springframework.http.HttpStatus.NOT_FOUND, "User not found with id: " + userId));
 
-        java.util.List<UserRelationship> allRels = relationshipRepository.findAll();
+        List<UserRelationship> allRels = relationshipRepository.findAll();
 
-        java.util.Set<Integer> contactIds = new java.util.HashSet<>();
+        Set<Integer> contactIds = new HashSet<>();
         contactIds.add(userId);
 
         for (UserRelationship rel : allRels) {
