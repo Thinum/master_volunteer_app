@@ -95,4 +95,36 @@ public class UserService implements UserDetailsService {
     public User getUserByUsername(String username) {
         return repository.findByUsername(username).orElse(null);
     }
+
+    public java.util.List<at.jku.volunteer_app.contract.RelationshipDTO> getRelationshipsForGraph(int userId) {
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "User not found with id: " + userId));
+
+        java.util.List<UserRelationship> allRels = relationshipRepository.findAll();
+
+        java.util.Set<Integer> contactIds = new java.util.HashSet<>();
+        contactIds.add(userId);
+
+        for (UserRelationship rel : allRels) {
+            if (rel.getFromUser().getId() == userId) {
+                contactIds.add(rel.getToUser().getId());
+            } else if (rel.getToUser().getId() == userId) {
+                contactIds.add(rel.getFromUser().getId());
+            }
+        }
+
+        return allRels.stream()
+                .filter(rel -> contactIds.contains(rel.getFromUser().getId()) && contactIds.contains(rel.getToUser().getId()))
+                .map(rel -> new at.jku.volunteer_app.contract.RelationshipDTO(
+                        rel.getId(),
+                        rel.getFromUser().getId(),
+                        rel.getFromUser().getName(),
+                        rel.getToUser().getId(),
+                        rel.getToUser().getName(),
+                        rel.getType(),
+                        rel.getLikeScore()
+                ))
+                .toList();
+    }
 }

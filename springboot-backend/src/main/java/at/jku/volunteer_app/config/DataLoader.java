@@ -185,19 +185,28 @@ public class DataLoader {
 
 
             // 2. Create User Relationships
-            relationshipRepository.save(new UserRelationship(null, alice, bob, RelationshipType.FRIEND));
-            relationshipRepository.save(new UserRelationship(null, alice, charlie, RelationshipType.ACQUAINTANT));
-            relationshipRepository.save(new UserRelationship(null, alice, diana, RelationshipType.RELATIVE));
-            relationshipRepository.save(new UserRelationship(null, bob, charlie, RelationshipType.SIBLING));
-            relationshipRepository.save(new UserRelationship(null, ethan, george, RelationshipType.PARTNER));
-            relationshipRepository.save(new UserRelationship(null, tom, sandra, RelationshipType.FRIEND));
-            relationshipRepository.save(new UserRelationship(null, tom, bella, RelationshipType.FRIEND));
-            relationshipRepository.save(new UserRelationship(null, sandra, mia, RelationshipType.FRIEND));
-            relationshipRepository.save(new UserRelationship(null, bella, sophia, RelationshipType.SIBLING));
-            relationshipRepository.save(new UserRelationship(null, lukas, tom, RelationshipType.FRIEND));
-            relationshipRepository.save(new UserRelationship(null, emma, bella, RelationshipType.FRIEND));
-            relationshipRepository.save(new UserRelationship(null, mia, sophia, RelationshipType.ACQUAINTANT));
-            relationshipRepository.save(new UserRelationship(null, george, tom, RelationshipType.ACQUAINTANT));
+            // FRIEND
+            relationshipRepository.save(new UserRelationship(null, alice, bob, RelationshipType.FRIEND, 85));
+            relationshipRepository.save(new UserRelationship(null, tom, sandra, RelationshipType.FRIEND, 75));
+            relationshipRepository.save(new UserRelationship(null, tom, bella, RelationshipType.FRIEND, 80));
+            relationshipRepository.save(new UserRelationship(null, sandra, mia, RelationshipType.FRIEND, 70));
+            relationshipRepository.save(new UserRelationship(null, lukas, tom, RelationshipType.FRIEND, 65));
+            relationshipRepository.save(new UserRelationship(null, emma, bella, RelationshipType.FRIEND, 88));
+            // PARTNER
+            relationshipRepository.save(new UserRelationship(null, ethan, george, RelationshipType.PARTNER, 78));
+            // ACQUAINTANT
+            relationshipRepository.save(new UserRelationship(null, alice, charlie, RelationshipType.ACQUAINTANT, 60));
+            relationshipRepository.save(new UserRelationship(null, mia, sophia, RelationshipType.ACQUAINTANT, 55));
+            relationshipRepository.save(new UserRelationship(null, george, tom, RelationshipType.ACQUAINTANT, 50));
+            // RELATIVE
+            relationshipRepository.save(new UserRelationship(null, alice, diana, RelationshipType.RELATIVE, 92));
+            // SIBLING
+            relationshipRepository.save(new UserRelationship(null, bob, charlie, RelationshipType.SIBLING, 70));
+            relationshipRepository.save(new UserRelationship(null, bella, sophia, RelationshipType.SIBLING, 95));
+            // PARENT
+            relationshipRepository.save(new UserRelationship(null, diana, alice, RelationshipType.PARENT, 90));
+            // CHILD
+            relationshipRepository.save(new UserRelationship(null, alice, diana, RelationshipType.CHILD, 90));
 
             // 3. Create Organisations
             Organisation techAid = createOrganisation(

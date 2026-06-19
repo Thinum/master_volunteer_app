@@ -1,10 +1,13 @@
-import { AfterViewInit, Component, ElementRef, ViewChild, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild, OnDestroy, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
 import cytoscape from 'cytoscape';
+import { forkJoin } from 'rxjs';
 
-import { MOCK_USERS, MOCK_USER_RELATIONSHIPS, UserRelationship, RELATIONSHIP_COLORS } from '../../../../mock/mock-users';
-import { User } from '../../../../models/user.model';
-import {Router} from '@angular/router';
+import { MOCK_USERS, MOCK_USER_RELATIONSHIPS, RELATIONSHIP_COLORS } from '../../../../mock/mock-users';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { VolunteerService } from '../../../../services/api/volunteer.service';
+import { RelationshipDTO } from '../../../../models/relationship.model';
+import { User } from '../../../../models/user.model';
 
 @Component({
   selector: 'app-friends-graph',
@@ -97,12 +100,20 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule]
 })
 
-export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
+export class FriendsGraphComponent implements AfterViewInit, OnDestroy, OnChanges {
   @ViewChild('cyContainer', { static: true }) cyContainer!: ElementRef;
-  constructor(private router: Router) {}
+  @Input() userId = 1;
 
+  private cy!: cytoscape.Core;
+  private activeLayout?: cytoscape.Layouts;
   private animationRunning = false;
   private nodeAnimations = new Map<string, boolean>();
+  private router = inject(Router);
+  private volunteerService = inject(VolunteerService);
+
+  private loadedUsers: User[] = [];
+  private loadedRelationships: RelationshipDTO[] = [];
+
   public relationshipLegend: { type: string; color: string }[] = Object.entries(RELATIONSHIP_COLORS).map(
     ([type, color]) => ({ type, color })
   );
@@ -131,66 +142,108 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.initWhenVisible();
+    });
+  }
 
-    //
-    // --- Convert MOCK_USERS -> Cytoscape Nodes ---
-    //
-    const nodes = MOCK_USERS.map(user => ({
-      data: {
-        id: `u${user.id}`,
-        userId: user.id,
-        label: user.name,
-        avatar: user.profilePicture
-      }
-    }));
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['userId'] && !changes['userId'].firstChange) {
+      this.rebuildGraph();
+    }
+  }
 
-    // Collect pair scores + relationship types
-    const pairMap = new Map<string, { scores: number[], types: string[] }>();
+  private initWhenVisible(): void {
+    const el = this.cyContainer.nativeElement;
 
-    for (const rel of MOCK_USER_RELATIONSHIPS) {
-      for (const f of rel.friends) {
-
-        const a = Math.min(rel.userId, f.friendId);
-        const b = Math.max(rel.userId, f.friendId);
-        const key = `${a}-${b}`;
-
-        if (!pairMap.has(key)) {
-          pairMap.set(key, { scores: [], types: [] });
-        }
-
-        pairMap.get(key)!.scores.push(f.likeScore);
-        pairMap.get(key)!.types.push(f.type);
-      }
+    const rect = el.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      setTimeout(() => this.initWhenVisible(), 100);
+      return;
     }
 
-    const edges = Array.from(pairMap.entries()).map(([key, data]) => {
-      const [a, b] = key.split('-').map(Number);
+    this.initGraph();
+  }
 
-      // Average score
-      const avgScore = data.scores.reduce((s, v) => s + v, 0) / data.scores.length;
+  private initGraph(): void {
+    forkJoin({
+      users: this.volunteerService.getAllVolunteers(),
+      relationships: this.volunteerService.getUserRelationships(this.userId)
+    }).subscribe({
+      next: ({ users, relationships }) => {
+        this.loadedUsers = users;
+        this.loadedRelationships = relationships;
+        const elements = this.getGraphElements();
+        this.createCytoscapeGraph(elements);
+      },
+      error: (err) => {
+        console.warn('Failed to load relationships from API, falling back to mock data', err);
+        this.loadedUsers = MOCK_USERS;
+        this.loadedRelationships = this.getMockRelationshipsAsDTO();
+        const elements = this.getGraphElements();
+        this.createCytoscapeGraph(elements);
+      }
+    });
+  }
 
-      // Pick the dominant relationship type (max score)
-      const strongestIndex = data.scores.indexOf(Math.max(...data.scores));
-      const dominantType = data.types[strongestIndex];
+  private rebuildGraph(): void {
+    if (!this.cy) return;
 
-      return {
-        data: {
-          source: `u${a}`,
-          target: `u${b}`,
-          likeScore: avgScore,
-          type: dominantType,
-          color: RELATIONSHIP_COLORS[dominantType]
-        }
-      };
+    forkJoin({
+      users: this.volunteerService.getAllVolunteers(),
+      relationships: this.volunteerService.getUserRelationships(this.userId)
+    }).subscribe({
+      next: ({ users, relationships }) => {
+        this.loadedUsers = users;
+        this.loadedRelationships = relationships;
+        this.rebuildCytoscapeElements();
+      },
+      error: (err) => {
+        console.warn('Failed to load relationships from API, falling back to mock data', err);
+        this.loadedUsers = MOCK_USERS;
+        this.loadedRelationships = this.getMockRelationshipsAsDTO();
+        this.rebuildCytoscapeElements();
+      }
+    });
+  }
+
+  private rebuildCytoscapeElements(): void {
+    if (this.activeLayout) {
+      this.activeLayout.stop();
+    }
+    this.cy.stop();
+
+    this.cy.nodes().forEach((node) => {
+      node.removeData('basePosition');
+      const nodeId = node.id();
+      this.nodeAnimations.set(nodeId, false);
+      node.stop();
     });
 
-    const cy = cytoscape({
+    const elements = this.getGraphElements();
+
+    this.cy.remove('edge');
+    this.cy.remove('node');
+
+    this.cy.add(elements);
+
+    this.activeLayout = this.cy.layout({
+      name: 'cose',
+      animate: true,
+    });
+    this.activeLayout.run();
+
+    setTimeout(() => {
+      if (this.animationRunning) {
+        this.startIdleAnimation(this.cy);
+      }
+    }, 1000);
+  }
+
+  private createCytoscapeGraph(elements: cytoscape.ElementDefinition[]): void {
+    this.cy = cytoscape({
       container: this.cyContainer.nativeElement,
-      elements: [...nodes, ...edges],
-      layout: {
-        name: 'cose',
-        animate: true,
-      },
+      elements: elements,
       style: [
         //
         // --- NODE STYLE ---
@@ -243,25 +296,36 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
         }
       ]
     });
+
+    setTimeout(() => {
+      this.cy.resize();
+      this.cy.fit();
+    }, 100);
+
+    // Save initial layout reference
+    this.activeLayout = this.cy.layout({
+      name: 'cose',
+      animate: true,
+    });
+    this.activeLayout.run();
+
     // ----- Icon  logic -----
-    cy.on('tap', 'node', (event) => {
+    this.cy.on('tap', 'node', (event) => {
       const node = event.target;
-
       const userId = node.data('userId');
-
       this.router.navigate(['/profile', userId]);
     });
 
     // ----- Animation logic -----
 
-    cy.on('grab', 'node', (event: any) => {
+    this.cy.on('grab', 'node', (event) => {
       const node = event.target;
       const nodeId = node.id();
       this.nodeAnimations.set(nodeId, false);
       node.stop();
     });
 
-    cy.on('dragfree', 'node', (event: any) => {
+    this.cy.on('dragfree', 'node', (event) => {
       const node = event.target;
       const nodeId = node.id();
       const newPosition = node.position();
@@ -273,21 +337,122 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
       }, 500);
     });
 
-    cy.ready(() => {
+    this.cy.ready(() => {
       setTimeout(() => {
         this.animationRunning = true;
-        this.startIdleAnimation(cy);
+        this.startIdleAnimation(this.cy);
       }, 1000);
     });
+  }
+
+  private getGraphElements(): cytoscape.ElementDefinition[] {
+    const currentUserId = this.userId;
+    
+    const includedUserIds = new Set<number>();
+    includedUserIds.add(currentUserId);
+    
+    for (const rel of this.loadedRelationships) {
+      if (rel.fromUserId === currentUserId) {
+        includedUserIds.add(rel.toUserId);
+      } else if (rel.toUserId === currentUserId) {
+        includedUserIds.add(rel.fromUserId);
+      }
+    }
+
+    const nodes = this.loadedUsers
+      .filter(user => includedUserIds.has(user.id))
+      .map(user => ({
+        data: {
+          id: `u${user.id}`,
+          userId: user.id,
+          label: user.name,
+          avatar: user.profilePicture
+        }
+      }));
+
+    const pairMap = new Map<string, { scores: number[], types: string[] }>();
+
+    for (const rel of this.loadedRelationships) {
+      if (!includedUserIds.has(rel.fromUserId) || !includedUserIds.has(rel.toUserId)) {
+        continue;
+      }
+
+      const a = Math.min(rel.fromUserId, rel.toUserId);
+      const b = Math.max(rel.fromUserId, rel.toUserId);
+      const key = `${a}-${b}`;
+
+      if (!pairMap.has(key)) {
+        pairMap.set(key, { scores: [], types: [] });
+      }
+
+      pairMap.get(key)!.scores.push(rel.likeScore);
+      pairMap.get(key)!.types.push(rel.type);
+    }
+
+    const edges = Array.from(pairMap.entries()).map(([key, data]) => {
+      const [a, b] = key.split('-').map(Number);
+
+      const avgScore = data.scores.reduce((s, v) => s + v, 0) / data.scores.length;
+
+      const strongestIndex = data.scores.indexOf(Math.max(...data.scores));
+      const dominantType = data.types[strongestIndex].toUpperCase();
+
+      const relationshipColorsNormalized: Record<string, string> = {};
+      for (const [k, v] of Object.entries(RELATIONSHIP_COLORS)) {
+        relationshipColorsNormalized[k.toUpperCase()] = v;
+      }
+      const color = relationshipColorsNormalized[dominantType] || '#ccc';
+
+      return {
+        data: {
+          id: `e_${a}_${b}`,
+          source: `u${a}`,
+          target: `u${b}`,
+          likeScore: avgScore,
+          type: dominantType,
+          color: color
+        }
+      };
+    });
+
+    return [...nodes, ...edges];
+  }
+
+  private getMockRelationshipsAsDTO(): RelationshipDTO[] {
+    const list: RelationshipDTO[] = [];
+    let idCounter = 1;
+    for (const rel of MOCK_USER_RELATIONSHIPS) {
+      const fromUserObj = MOCK_USERS.find(u => u.id === rel.userId);
+      for (const f of rel.friends) {
+        const toUserObj = MOCK_USERS.find(u => u.id === f.friendId);
+        list.push({
+          id: idCounter++,
+          fromUserId: rel.userId,
+          fromUserName: fromUserObj ? fromUserObj.name : `User ${rel.userId}`,
+          toUserId: f.friendId,
+          toUserName: toUserObj ? toUserObj.name : `User ${f.friendId}`,
+          type: f.type.toString().toUpperCase(),
+          likeScore: f.likeScore
+        });
+      }
+    }
+    return list;
   }
 
   ngOnDestroy(): void {
     this.animationRunning = false;
     this.nodeAnimations.clear();
+    if (this.activeLayout) {
+      this.activeLayout.stop();
+    }
+    if (this.cy) {
+      this.cy.stop();
+      this.cy.destroy();
+    }
   }
 
-  private startIdleAnimation(cy: any): void {
-    cy.nodes().forEach((node: any, index: number) => {
+  private startIdleAnimation(cy: cytoscape.Core): void {
+    cy.nodes().forEach((node: cytoscape.NodeSingular, index: number) => {
       const nodeId = node.id();
       this.nodeAnimations.set(nodeId, true);
 
@@ -299,7 +464,7 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  private startSingleNodeAnimation(node: any): void {
+  private startSingleNodeAnimation(node: cytoscape.NodeSingular): void {
     const nodeId = node.id();
 
     const loopNodeAnimation = () => {
@@ -317,7 +482,14 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy {
 
       const newPos = { x: basePos.x + offsetX, y: basePos.y + offsetY };
 
-      node.animation({ position: newPos }, {
+      (node as unknown as {
+        animation(options: {
+          position: cytoscape.Position;
+          duration: number;
+          easing: string;
+        }): { play(): { promise(type: string): Promise<void> } }
+      }).animation({
+        position: newPos,
         duration: 2000 + Math.random() * 2000,
         easing: 'ease-in-out'
       }).play().promise('complete').then(() => {

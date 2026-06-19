@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { User } from '../../models/user.model';
 import { Organisation } from '../../models/organisation.model';
 import { Activity } from '../../models/activity.model';
+import { RelationshipDTO } from '../../models/relationship.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -39,6 +40,13 @@ export class VolunteerService {
    */
   getFriends(id: number) {
     return this.http.get<User[]>(`${this.apiUrl}/${id}/friends`);
+  }
+
+  /**
+   * Returns relationship graph data of a volunteer by their ID
+   */
+  getUserRelationships(id: number) {
+    return this.http.get<RelationshipDTO[]>(`${this.apiUrl}/${id}/relationships`);
   }
 
   /**

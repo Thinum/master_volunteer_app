@@ -35,6 +35,7 @@ export class FriendsComponent implements OnInit {
   friends: User[] = [];
   activitiesOfFriends: Activity[] = [];
   activeTab = 0;
+  currentUserId = 1;
 
   private destroyRef = inject(DestroyRef);
 
@@ -45,11 +46,26 @@ export class FriendsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // TODO: replace with real auth user id
-    const userId = 1;
+    this.volunteerService.getCurrentUser()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (user) => {
+          if (user && user.id) {
+            this.currentUserId = user.id;
+          }
+          this.loadDataForUser(this.currentUserId);
+        },
+        error: () => {
+          this.currentUserId = 1;
+          this.loadDataForUser(this.currentUserId);
+        }
+      });
+  }
 
-
-    this.volunteerService.getAllVolunteers().subscribe(users => { this.friends = users; });
+  private loadDataForUser(userId: number): void {
+    this.volunteerService.getAllVolunteers()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(users => { this.friends = users; });
 
     this.activityService
       .getActivitiesByUserParticipation(userId)
