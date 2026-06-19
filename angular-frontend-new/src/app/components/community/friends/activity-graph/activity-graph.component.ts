@@ -347,6 +347,7 @@ export class ActivityGraphComponent implements AfterViewInit, OnDestroy, OnChang
     if (this.activeLayout) {
       this.activeLayout.stop();
     }
+    if (!this.cy) return;
     this.cy.stop();
 
     this.cy.nodes().forEach((node) => {
