@@ -1,5 +1,14 @@
 <mat-toolbar class="toolbarTop"><span class="title">{{title}}</span>
-  @if (shouldDisplayNotifications()) {
-    <app-notification-bar class="notifications"/>
-  }
+  <div class="header-buttons">
+    @if (shouldDisplayNotifications()) {
+      <app-notification-bar class="notifications"/>
+    }
+    <button
+      type="button"
+      class="logout-button"
+      aria-label="Logout"
+      (click)="clickLogout()">
+      <mat-icon class="material-icons">logout</mat-icon>
+    </button>
+  </div>
 </mat-toolbar>

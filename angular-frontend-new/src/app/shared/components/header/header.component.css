@@ -18,6 +18,14 @@
   border-bottom: 1px solid rgba(175, 178, 187, 0.15);
 }
 
+.header-buttons {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
 .title {
   font-family: 'Manrope', sans-serif;
   font-weight: 800;
@@ -30,6 +38,24 @@
 
 .notifications {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 1rem;
+}
+
+.logout-button {
+  background-color: transparent;
+  color: #46608a;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logout-button:hover {
+  color: #39547d;
 }
