@@ -4,12 +4,14 @@ import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {filter, map} from 'rxjs';
 import {NotificationBarComponent} from '../notification-bar/notification-bar.component';
 import {AuthService} from '../../../services/authservice/auth.service';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-header',
   imports: [
     MatToolbar,
-    NotificationBarComponent
+    NotificationBarComponent,
+    MatIcon
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
@@ -45,5 +47,9 @@ export class HeaderComponent implements OnInit{
 
   public shouldDisplayNotifications(): boolean{
     return this.authService.isAuthenticated()
+  }
+
+  public clickLogout(): void {
+    this.authService.logout();
   }
 }
