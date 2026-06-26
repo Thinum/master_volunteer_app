@@ -14,6 +14,7 @@ import { CreateOrganisationComponent } from './components/organisations/create-o
 import {NotificationsListComponent} from './components/notifications/notifications-list/notifications-list.component';
 import { RegisterComponent } from './components/register/register.component';
 import { CommunityGoalsComponent } from './components/community/community-goals/community-goals.component';
+import { ReportsComponent } from './components/reports/reports.component';
 
 export const routes: Routes = [
   {path: '', component: LoginComponent, data: {title: 'Login'}},
@@ -30,6 +31,7 @@ export const routes: Routes = [
   {path: 'createActivity', component: CreateActivityComponent, data: {title: 'Create Activities'}, canActivate: [authGuard] },
   {path: 'createOrganisation', component: CreateOrganisationComponent, data: {title: 'Create Organisation'}, canActivate: [authGuard] },
   {path: 'notifications', component: NotificationsListComponent, data: {title: 'Notifications List'}, canActivate: [authGuard]},
+  {path: 'reports', component: ReportsComponent, data: {title: 'Reports'}, canActivate: [authGuard]},
   {path: 'register', component: RegisterComponent, data: {title: 'Register'}},
   {path: 'community-goals', component: CommunityGoalsComponent}
 ]

@@ -1,0 +1,252 @@
+.reports-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-bottom: 1rem;
+}
+
+.reports-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.segmented-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 0.75rem;
+  background: var(--surface-container-lowest);
+  border: 1px solid rgba(175, 178, 187, 0.3);
+  box-shadow: var(--shadow-ambient);
+}
+
+.segmented-control button {
+  min-width: 4.75rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  color: var(--on-surface-variant);
+}
+
+.segmented-control button.active {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.segmented-control.small {
+  box-shadow: none;
+  width: fit-content;
+}
+
+.segmented-control.small button {
+  min-width: 5.25rem;
+  height: 2.25rem;
+}
+
+.user-select {
+  width: min(100%, 240px);
+}
+
+.category-filter {
+  width: fit-content;
+  border-radius: 0.5rem;
+  color: var(--primary);
+}
+
+.category-filter mat-icon {
+  margin-right: 0.25rem;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.metric-tile,
+.chart-panel,
+.activity-strip {
+  background: var(--surface-container-lowest);
+  border: 1px solid rgba(175, 178, 187, 0.2);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-ambient);
+}
+
+.metric-tile {
+  min-height: 6.25rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.metric-tile span,
+.panel-heading p,
+.activity-strip span,
+.user-summary span {
+  margin: 0;
+  color: var(--on-surface-variant);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.metric-tile strong {
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--on-surface);
+}
+
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.chart-panel {
+  min-width: 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.chart-panel.wide {
+  grid-column: span 2;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.panel-heading h2 {
+  margin: 0.15rem 0 0;
+  font-size: 1.2rem;
+  line-height: 1.25;
+  color: var(--on-surface);
+}
+
+.panel-heading mat-icon {
+  color: var(--primary);
+}
+
+.chart-frame {
+  position: relative;
+  height: 320px;
+  min-height: 320px;
+}
+
+.chart-frame.compact {
+  height: 280px;
+  min-height: 280px;
+}
+
+.chart-frame.contribution {
+  height: 300px;
+  min-height: 300px;
+}
+
+.user-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--surface-container-low);
+}
+
+.user-summary img {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-summary div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.user-summary strong {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.activity-strip {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.activity-strip div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.activity-strip strong {
+  overflow-wrap: anywhere;
+  color: var(--on-surface);
+}
+
+@media (max-width: 860px) {
+  .metric-grid,
+  .reports-grid,
+  .activity-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-panel.wide {
+    grid-column: span 1;
+  }
+
+  .reports-toolbar,
+  .segmented-control {
+    width: 100%;
+  }
+
+  .segmented-control {
+    justify-content: space-between;
+  }
+
+  .segmented-control button {
+    min-width: 0;
+    flex: 1;
+    padding-inline: 0.35rem;
+  }
+
+  .user-select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .chart-panel,
+  .metric-tile,
+  .activity-strip {
+    padding: 0.8rem;
+  }
+
+  .chart-frame {
+    height: 280px;
+    min-height: 280px;
+  }
+
+  .chart-frame.compact,
+  .chart-frame.contribution {
+    height: 260px;
+    min-height: 260px;
+  }
+}

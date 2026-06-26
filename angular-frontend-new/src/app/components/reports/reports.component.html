@@ -1,0 +1,139 @@
+<section class="reports-page">
+  <div class="reports-toolbar">
+    <div class="segmented-control" aria-label="Report status filter">
+      @for (filter of statusFilters; track filter.value) {
+        <button
+          type="button"
+          mat-button
+          [class.active]="selectedStatus === filter.value"
+          (click)="setStatusFilter(filter.value)">
+          {{ filter.label }}
+        </button>
+      }
+    </div>
+
+    <mat-form-field appearance="outline" class="user-select">
+      <mat-label>Volunteer</mat-label>
+      <mat-select [(ngModel)]="selectedUserId" (selectionChange)="onSelectedUserChange()">
+        @for (user of users; track user.id) {
+          <mat-option [value]="user.id">{{ user.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  @if (selectedCategory) {
+    <button type="button" mat-stroked-button class="category-filter" (click)="clearCategoryFilter()">
+      <mat-icon>filter_alt_off</mat-icon>
+      {{ selectedCategory }}
+    </button>
+  }
+
+  <div class="metric-grid">
+    <article class="metric-tile">
+      <span>Total hours</span>
+      <strong>{{ totalVolunteerHours | number: '1.0-0' }}</strong>
+    </article>
+    <article class="metric-tile">
+      <span>Activities</span>
+      <strong>{{ rows.length }}</strong>
+    </article>
+    <article class="metric-tile">
+      <span>Active volunteers</span>
+      <strong>{{ activeVolunteers }}</strong>
+    </article>
+    <article class="metric-tile">
+      <span>Avg. occupancy</span>
+      <strong>{{ averageOccupancy }}%</strong>
+    </article>
+  </div>
+
+  <div class="reports-grid">
+    <article class="chart-panel wide">
+      <div class="panel-heading">
+        <div>
+          <p>Activity volume</p>
+          <h2>Monthly activity trend</h2>
+        </div>
+        <mat-icon>show_chart</mat-icon>
+      </div>
+      <div class="chart-frame">
+        <canvas #monthlyChart></canvas>
+      </div>
+    </article>
+
+    <article class="chart-panel">
+      <div class="panel-heading">
+        <div>
+          <p>Category mix</p>
+          <h2>Focus areas</h2>
+        </div>
+        <mat-icon>donut_large</mat-icon>
+      </div>
+      <div class="chart-frame compact">
+        <canvas #categoryChart></canvas>
+      </div>
+    </article>
+
+    <article class="chart-panel">
+      <div class="panel-heading">
+        <div>
+          <p>User contribution</p>
+          <h2>{{ selectedContribution.user.name }}</h2>
+        </div>
+        <mat-icon>volunteer_activism</mat-icon>
+      </div>
+
+      <div class="user-summary">
+        <img [src]="selectedContribution.user.profilePicture" [alt]="selectedContribution.user.name">
+        <div>
+          <strong>{{ selectedContribution.hours }}h</strong>
+          <span>{{ selectedContribution.activities }} joined activities</span>
+        </div>
+      </div>
+
+      <div class="segmented-control small" aria-label="Contribution metric">
+        <button type="button" mat-button [class.active]="userMetric === 'hours'" (click)="setUserMetric('hours')">Hours</button>
+        <button type="button" mat-button [class.active]="userMetric === 'activities'" (click)="setUserMetric('activities')">Activities</button>
+      </div>
+
+      <div class="chart-frame contribution">
+        <canvas #contributionChart></canvas>
+      </div>
+    </article>
+
+    <article class="chart-panel wide">
+      <div class="panel-heading">
+        <div>
+          <p>Capacity</p>
+          <h2>Demand by activity</h2>
+        </div>
+        <mat-icon>groups</mat-icon>
+      </div>
+      <div class="chart-frame">
+        <canvas #capacityChart></canvas>
+      </div>
+    </article>
+  </div>
+
+  @if (topActivity) {
+    <section class="activity-strip">
+      <div>
+        <span>Most requested activity</span>
+        <strong>{{ topActivity.activity.title }}</strong>
+      </div>
+      <div>
+        <span>Organisation</span>
+        <strong>{{ topActivity.activity.organisations[0].orgName }}</strong>
+      </div>
+      <div>
+        <span>Date</span>
+        <strong>{{ topActivity.activity.date | date: 'MMM d, y' }}</strong>
+      </div>
+      <div>
+        <span>Occupancy</span>
+        <strong>{{ topActivity.occupancy }}%</strong>
+      </div>
+    </section>
+  }
+</section>
