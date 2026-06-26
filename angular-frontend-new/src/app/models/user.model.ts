@@ -14,6 +14,9 @@ export interface User {
   /** Email address of the user. */
   email: string;
 
+  /** Username used for authentication and display. */
+  username?: string;
+
   /** Optional phone number of the user. */
   phone?: string;
 

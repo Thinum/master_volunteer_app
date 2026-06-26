@@ -1,11 +1,10 @@
 package at.jku.volunteer_app.controller;
 
-import at.jku.volunteer_app.model.Notification;
+import at.jku.volunteer_app.contract.ContractMapper;
+import at.jku.volunteer_app.contract.NotificationDTO;
 import at.jku.volunteer_app.model.UserModelDetails;
 import at.jku.volunteer_app.service.NotificationService;
-import at.jku.volunteer_app.service.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,19 +21,23 @@ public class NotificationController {
     }
 
     @GetMapping("/notifications")
-    public List<Notification> getNotifications(@AuthenticationPrincipal UserModelDetails userDetails) {
-        return notificationService.getNotificationsForUserId(userDetails.getUserId());
+    public List<NotificationDTO> getNotifications(@AuthenticationPrincipal UserModelDetails userDetails) {
+        return ContractMapper.toNotificationDTOList(notificationService.getNotificationsForUserId(userDetails.getUserId()));
     }
 
     @PostMapping("/addNotification")
-    public Notification createNotification(@RequestBody Notification notification,
-                                           @AuthenticationPrincipal UserModelDetails userDetails) {
-        return notificationService.addNotification(userDetails, notification);
+    public NotificationDTO createNotification(@RequestBody NotificationDTO notification,
+                                              @AuthenticationPrincipal UserModelDetails userDetails) {
+        return ContractMapper.toNotificationDTO(
+                notificationService.addNotification(userDetails, ContractMapper.toNotificationEntity(notification))
+        );
     }
 
     @PostMapping("/read")
-    public Notification readNotification(@RequestBody Notification notification,
-                                         @AuthenticationPrincipal UserModelDetails userDetails) {
-        return notificationService.readNotification(userDetails, notification);
+    public NotificationDTO readNotification(@RequestBody NotificationDTO notification,
+                                            @AuthenticationPrincipal UserModelDetails userDetails) {
+        return ContractMapper.toNotificationDTO(
+                notificationService.readNotification(userDetails, ContractMapper.toNotificationEntity(notification))
+        );
     }
 }

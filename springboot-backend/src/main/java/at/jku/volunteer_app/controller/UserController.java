@@ -1,12 +1,14 @@
 package at.jku.volunteer_app.controller;
 
 import at.jku.volunteer_app.contract.AddFriendRequest;
+import at.jku.volunteer_app.contract.ActivityDTO;
+import at.jku.volunteer_app.contract.ContractMapper;
+import at.jku.volunteer_app.contract.OrganisationDTO;
 import at.jku.volunteer_app.model.RelationshipType;
 import at.jku.volunteer_app.service.OrganisationService;
 import at.jku.volunteer_app.service.ActivityService;
 import at.jku.volunteer_app.contract.RelationshipDTO;
-import at.jku.volunteer_app.model.Organisation;
-import at.jku.volunteer_app.model.Activity;
+import at.jku.volunteer_app.contract.UserDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +35,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public User getCurrentUser(Authentication authentication) {
+    public UserDTO getCurrentUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
         }
@@ -42,12 +44,12 @@ public class UserController {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
-        return user;
+        return ContractMapper.toUserDTO(user);
     }
 
     @PostMapping
-    public String addNewUser(@RequestBody User user) {
-        return userService.addUser(user);
+    public String addNewUser(@RequestBody UserDTO user) {
+        return userService.addUser(ContractMapper.toUserEntity(user));
     }
 
     @PostMapping("/addFriend")
@@ -56,18 +58,18 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public List<UserDTO> getAllUsers() {
+        return ContractMapper.toUserDTOList(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable int id) {
-        return userService.getUserById(id);
+    public UserDTO getUserById(@PathVariable int id) {
+        return ContractMapper.toUserDTO(userService.getUserById(id));
     }
 
     @GetMapping("/{id}/friends")
-    public List<User> getFriends(@PathVariable int id) {
-        return userService.getFriends(id);
+    public List<UserDTO> getFriends(@PathVariable int id) {
+        return ContractMapper.toUserDTOList(userService.getFriends(id));
     }
 
     @GetMapping("/{id}/relationships")
@@ -76,34 +78,34 @@ public class UserController {
     }
 
     @GetMapping("/{id}/organisations")
-    public List<Organisation> getOrganisations(@PathVariable int id) {
+    public List<OrganisationDTO> getOrganisations(@PathVariable int id) {
         User user = userService.getUserById(id);
         if (user == null) return List.of();
-        return organisationService.getOrganisationsForUser(user);
+        return ContractMapper.toOrganisationDTOList(organisationService.getOrganisationsForUser(user));
     }
 
     @GetMapping("/{id}/activities")
-    public List<Activity> getActivities(@PathVariable int id) {
+    public List<ActivityDTO> getActivities(@PathVariable int id) {
         User user = userService.getUserById(id);
         if (user == null) return List.of();
-        return activityService.getActivitiesForUser(user);
+        return ContractMapper.toActivityDTOList(activityService.getActivitiesForUser(user));
     }
 
     @GetMapping("/active")
-    public List<User> getActiveUsers() {
-        return userService.getActiveUsers();
+    public List<UserDTO> getActiveUsers() {
+        return ContractMapper.toUserDTOList(userService.getActiveUsers());
     }
 
     @GetMapping("/{id}/relationships/{type}")
-    public List<User> getByType(
+    public List<UserDTO> getByType(
             @PathVariable int id,
             @PathVariable RelationshipType type
     ) {
-        return userService.getRelatedUsers(id, type);
+        return ContractMapper.toUserDTOList(userService.getRelatedUsers(id, type));
     }
 
     @GetMapping("/{id}/connections")
-    public List<User> getAllConnectedUsers(@PathVariable int id) {
-        return userService.getAllConnectedUsers(id);
+    public List<UserDTO> getAllConnectedUsers(@PathVariable int id) {
+        return ContractMapper.toUserDTOList(userService.getAllConnectedUsers(id));
     }
 }

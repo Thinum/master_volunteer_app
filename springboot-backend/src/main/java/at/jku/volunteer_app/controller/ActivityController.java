@@ -1,9 +1,10 @@
 package at.jku.volunteer_app.controller;
 
+import at.jku.volunteer_app.contract.ActivityDTO;
+import at.jku.volunteer_app.contract.ContractMapper;
 import at.jku.volunteer_app.model.UserModelDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import at.jku.volunteer_app.model.Activity;
 import at.jku.volunteer_app.service.ActivityService;
 
 import java.util.List;
@@ -18,25 +19,25 @@ public class ActivityController {
     }
 
     @GetMapping
-    public List<Activity> getAllActivities() {
-        return activityService.getAllActivities();
+    public List<ActivityDTO> getAllActivities() {
+        return ContractMapper.toActivityDTOList(activityService.getAllActivities());
     }
 
     @GetMapping("/{id}")
-    public Activity getActivityById(@PathVariable int id) {
-        return activityService.getActivityById(id);
+    public ActivityDTO getActivityById(@PathVariable int id) {
+        return ContractMapper.toActivityDTO(activityService.getActivityById(id));
     }
 
     @GetMapping("/user/{userId}")
-    public List<Activity> getActivitiesByUserId(@PathVariable int userId) {
-        return activityService.getAllActivities().stream()
+    public List<ActivityDTO> getActivitiesByUserId(@PathVariable int userId) {
+        return ContractMapper.toActivityDTOList(activityService.getAllActivities().stream()
                 .filter(a -> a.getParticipants().stream().anyMatch(u -> u.getId() == userId))
-                .toList();
+                .toList());
     }
 
     @PostMapping
-    public Activity createActivity(@RequestBody Activity activity) {
-        return activityService.addActivity(activity);
+    public ActivityDTO createActivity(@RequestBody ActivityDTO activity) {
+        return ContractMapper.toActivityDTO(activityService.addActivity(ContractMapper.toActivityEntity(activity)));
     }
 
     @DeleteMapping("/{id}")

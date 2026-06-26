@@ -1,11 +1,11 @@
 package at.jku.volunteer_app.controller;
 
-import at.jku.volunteer_app.model.Activity;
+import at.jku.volunteer_app.contract.ActivityDTO;
+import at.jku.volunteer_app.contract.ContractMapper;
+import at.jku.volunteer_app.contract.OrganisationDTO;
 import at.jku.volunteer_app.model.UserModelDetails;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import at.jku.volunteer_app.model.Organisation;
 import at.jku.volunteer_app.service.OrganisationService;
 
 import java.util.List;
@@ -20,23 +20,37 @@ public class OrganisationController {
     }
 
     @GetMapping
-    public List<Organisation> getAllOrganisations() {
-        return organisationService.getAllOrganisations();
+    public List<OrganisationDTO> getAllOrganisations() {
+        return ContractMapper.toOrganisationDTOList(organisationService.getAllOrganisations());
     }
 
     @GetMapping("/{id}")
-    public Organisation getOrganisationById(@PathVariable int id) {
-        return organisationService.getOrganisationById(id);
+    public OrganisationDTO getOrganisationById(@PathVariable int id) {
+        return ContractMapper.toOrganisationDTO(organisationService.getOrganisationById(id));
     }
 
     @PostMapping
-    public Organisation createOrganisation(@RequestBody Organisation organisation) {
-        return organisationService.addOrganisation(organisation);
+    public OrganisationDTO createOrganisation(@RequestBody OrganisationDTO organisation) {
+        return ContractMapper.toOrganisationDTO(organisationService.addOrganisation(ContractMapper.toOrganisationEntity(organisation)));
     }
 
     @PutMapping("/{id}")
-    public Organisation updateOrganisation(@RequestBody Organisation organisation) {
-        return organisationService.updateOrganisation(organisation);
+    public OrganisationDTO updateOrganisation(@PathVariable int id, @RequestBody OrganisationDTO organisation) {
+        OrganisationDTO organisationToUpdate = new OrganisationDTO(
+                id,
+                organisation.orgName(),
+                organisation.location(),
+                organisation.profilePicture(),
+                organisation.createdAt(),
+                organisation.body(),
+                organisation.deactivated(),
+                organisation.reactivationTime(),
+                organisation.category(),
+                organisation.tags(),
+                organisation.orgContacts(),
+                organisation.orgMembers()
+        );
+        return ContractMapper.toOrganisationDTO(organisationService.updateOrganisation(ContractMapper.toOrganisationEntity(organisationToUpdate)));
     }
 
     @DeleteMapping("/{id}")
@@ -50,7 +64,7 @@ public class OrganisationController {
     }
 
     @GetMapping("/{id}/exampleActivities")
-    public List<Activity> getExampleActivities(@PathVariable int id){
-        return this.organisationService.getExampleActivities(id);
+    public List<ActivityDTO> getExampleActivities(@PathVariable int id){
+        return ContractMapper.toActivityDTOList(this.organisationService.getExampleActivities(id));
     }
 }
