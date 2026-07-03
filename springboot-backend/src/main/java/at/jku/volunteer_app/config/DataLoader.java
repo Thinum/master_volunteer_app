@@ -39,6 +39,8 @@ public class DataLoader {
             alice.setPassword(passwordEncoder.encode("password"));
             alice.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=1&size=512");
             alice.setPhone("+43 660 111 0001");
+            alice.setSkills(Arrays.asList("Teamwork", "Communication", "Mentoring"));
+            alice.setInterests(Arrays.asList("Teaching", "Environmental Work", "Event Support"));
             alice.setActive(true);
             alice.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             alice.setUsername("alice");
@@ -49,6 +51,8 @@ public class DataLoader {
             bob.setPassword(passwordEncoder.encode("password"));
             bob.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=8&size=512");
             bob.setPhone("+43 660 111 0002");
+            bob.setSkills(Arrays.asList("Organization", "Physical activity"));
+            bob.setInterests(Arrays.asList("Fundraising", "Event Support"));
             bob.setActive(true);
             bob.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             bob.setUsername("bob");
@@ -59,6 +63,8 @@ public class DataLoader {
             charlie.setPassword(passwordEncoder.encode("password"));
             charlie.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=3&size=512");
             charlie.setPhone("+43 660 111 0003");
+            charlie.setSkills(Arrays.asList("Programming", "Problem-Solving"));
+            charlie.setInterests(Arrays.asList("Teaching", "Social Media"));
             charlie.setActive(true);
             charlie.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             charlie.setUsername("charlie");
@@ -69,6 +75,8 @@ public class DataLoader {
             diana.setPassword(passwordEncoder.encode("password"));
             diana.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=4&size=512");
             diana.setPhone("+43 660 111 2222");
+            diana.setSkills(Arrays.asList("First Aid", "Communication"));
+            diana.setInterests(Arrays.asList("Event Support", "Fundraising"));
             diana.setActive(true);
             diana.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             diana.setUsername("diana");

@@ -49,4 +49,34 @@ export const MOCK_SKILLS: Skill[] = [
     category: 'Educational',
     description: 'Providing guidance, feedback, and support to learners.',
   },
+  {
+    id: 9,
+    name: 'Event Support',
+    category: 'Organizational',
+    description: 'Helping with registration, setup, coordination, and guest support at events.',
+  },
+  {
+    id: 10,
+    name: 'Fundraising',
+    category: 'Community',
+    description: 'Supporting campaigns, donor outreach, and donation collection.',
+  },
+  {
+    id: 11,
+    name: 'First Aid',
+    category: 'Safety',
+    description: 'Basic ability to assist with first aid or emergency response situations.',
+  },
+  {
+    id: 12,
+    name: 'Environmental Work',
+    category: 'Sustainability',
+    description: 'Interest in cleanups, gardening, conservation, or climate-related activities.',
+  },
+  {
+    id: 13,
+    name: 'Social Media',
+    category: 'Communication',
+    description: 'Creating, editing, or publishing content for online community channels.',
+  },
 ];

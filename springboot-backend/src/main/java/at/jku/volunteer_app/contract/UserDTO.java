@@ -11,6 +11,8 @@ public record UserDTO(
         String email,
         String profilePicture,
         String phone,
+        List<String> skills,
+        List<String> interests,
         @JsonProperty("isActive")
         boolean isActive,
         Timestamp joinedAt,

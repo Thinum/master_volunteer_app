@@ -36,15 +36,15 @@ public class UserController {
 
     @GetMapping("/me")
     public UserDTO getCurrentUser(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
-        }
-        String username = authentication.getName();
-        User user = userService.getUserByUsername(username);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        }
+        User user = getAuthenticatedUser(authentication);
         return ContractMapper.toUserDTO(user);
+    }
+
+    @PutMapping("/me")
+    public UserDTO updateCurrentUser(Authentication authentication, @RequestBody UserDTO user) {
+        User currentUser = getAuthenticatedUser(authentication);
+        User updatedUser = userService.updateUserProfile(currentUser.getId(), ContractMapper.toUserEntity(user));
+        return ContractMapper.toUserDTO(updatedUser);
     }
 
     @PostMapping
@@ -107,5 +107,17 @@ public class UserController {
     @GetMapping("/{id}/connections")
     public List<UserDTO> getAllConnectedUsers(@PathVariable int id) {
         return ContractMapper.toUserDTOList(userService.getAllConnectedUsers(id));
+    }
+
+    private User getAuthenticatedUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
+        }
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+        return user;
     }
 }

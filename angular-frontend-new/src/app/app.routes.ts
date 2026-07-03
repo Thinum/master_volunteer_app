@@ -17,6 +17,7 @@ import { CommunityGoalsComponent } from './components/community/community-goals/
 import { ReportsComponent } from './components/reports/reports.component';
 import { ForumDetailComponent } from './components/community/forum/forum-detail/forum-detail.component';
 import { ChatDetailComponent } from './components/community/chat/chat-detail/chat-detail.component';
+import { UserProfileEditComponent } from './components/user/user-profile/user-profile-edit.component';
 
 export const routes: Routes = [
   {path: '', component: LoginComponent, data: {title: 'Login'}},
@@ -28,6 +29,7 @@ export const routes: Routes = [
   {path: 'community/chat/:id', component: ChatDetailComponent, data: {title: 'Chat'}, canActivate: [authGuard]},
   /**TODO change organisations to single organisation just for testing purposes for now */
   {path: 'profile', component: UserProfileComponent, data: {title: 'Profil'}, canActivate: [authGuard]},
+  {path: 'profile/edit', component: UserProfileEditComponent, data: {title: 'Edit Profile'}, canActivate: [authGuard]},
   {path: 'profile/:id', component: UserProfileComponent, data: {title: 'Profil'}, canActivate: [authGuard]},
   {path: 'activities', component: ActivityOverviewComponent, data: {title: 'Activities'}, canActivate: [authGuard]},
   {path: 'activities/:id', component: ActivityDetailComponent, data: {title: 'Activities'}, canActivate: [authGuard]},

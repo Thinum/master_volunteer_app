@@ -23,9 +23,21 @@ public class User {
     private String email;
     @JsonIgnore
     private String password;
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String profilePicture;
     private String phone;
     private boolean isActive = true;
+
+    @ElementCollection
+    @CollectionTable(name = "user_skills", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "skill")
+    private List<String> skills;
+
+    @ElementCollection
+    @CollectionTable(name = "user_interests", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "interest")
+    private List<String> interests;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp joinedAt;

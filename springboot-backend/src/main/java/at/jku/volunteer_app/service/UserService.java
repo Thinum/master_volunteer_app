@@ -184,6 +184,22 @@ public class UserService implements UserDetailsService {
         return repository.findByUsername(username).orElse(null);
     }
 
+    @Transactional
+    public User updateUserProfile(int userId, User updatedUser) {
+        User existingUser = repository.findById(userId)
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "User not found with id: " + userId));
+
+        existingUser.setName(updatedUser.getName());
+        existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setPhone(updatedUser.getPhone());
+        existingUser.setProfilePicture(updatedUser.getProfilePicture());
+        existingUser.setSkills(updatedUser.getSkills() == null ? List.of() : updatedUser.getSkills());
+        existingUser.setInterests(updatedUser.getInterests() == null ? List.of() : updatedUser.getInterests());
+
+        return repository.save(existingUser);
+    }
+
     public List<RelationshipDTO> getRelationshipsForGraph(int userId) {
         User user = repository.findById(userId)
                 .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(

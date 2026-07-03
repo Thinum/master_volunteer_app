@@ -34,6 +34,8 @@ public final class ContractMapper {
                 user.getEmail(),
                 user.getProfilePicture(),
                 user.getPhone(),
+                safeList(user.getSkills()),
+                safeList(user.getInterests()),
                 user.isActive(),
                 user.getJoinedAt(),
                 user.getUsername(),
@@ -52,6 +54,8 @@ public final class ContractMapper {
         user.setEmail(dto.email());
         user.setProfilePicture(dto.profilePicture());
         user.setPhone(dto.phone());
+        user.setSkills(safeList(dto.skills()));
+        user.setInterests(safeList(dto.interests()));
         user.setActive(dto.isActive());
         user.setJoinedAt(dto.joinedAt());
         user.setUsername(dto.username());

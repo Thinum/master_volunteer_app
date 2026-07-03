@@ -112,3 +112,18 @@ mat-card-content {
 .icon-wrapper {
   margin-left: auto;
 }
+
+.edit-profile-button {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.profile-tags {
+  margin: 1.25rem 0;
+}
+
+.profile-tags h3 {
+  margin-bottom: 0.75rem;
+}

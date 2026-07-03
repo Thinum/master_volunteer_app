@@ -1,0 +1,77 @@
+<mat-card class="edit-profile-card">
+  <mat-card-header>
+    <mat-card-title>Edit Profile</mat-card-title>
+    <mat-card-subtitle>Update your contact details, picture, skills, and interests.</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
+      <section class="picture-section">
+        <img class="picture-preview" [src]="profilePicturePreview" alt="Profile preview">
+
+        <div class="picture-actions">
+          <button mat-stroked-button type="button" (click)="pictureInput.click()">
+            <mat-icon>upload</mat-icon>
+            Upload picture
+          </button>
+          <input #pictureInput type="file" accept="image/*" (change)="onPictureSelected($event)" hidden>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Picture URL or uploaded data</mat-label>
+            <input matInput formControlName="profilePicture">
+          </mat-form-field>
+        </div>
+      </section>
+
+      <section class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Phone</mat-label>
+          <input matInput formControlName="phone">
+        </mat-form-field>
+      </section>
+
+      <section class="choice-section">
+        <h3>Skills</h3>
+        <mat-chip-listbox multiple aria-label="Select skills">
+          @for (skill of availableSkills; track skill.id) {
+          <mat-chip-option
+            [selected]="isSkillSelected(skill.name)"
+            (selectionChange)="setSkillSelection(skill.name, $event)">
+            {{ skill.name }}
+          </mat-chip-option>
+          }
+        </mat-chip-listbox>
+      </section>
+
+      <section class="choice-section">
+        <h3>Fields of Interest</h3>
+        <mat-chip-listbox multiple aria-label="Select fields of interest">
+          @for (skill of availableSkills; track skill.id) {
+          <mat-chip-option
+            [selected]="isInterestSelected(skill.name)"
+            (selectionChange)="setInterestSelection(skill.name, $event)">
+            {{ skill.name }}
+          </mat-chip-option>
+          }
+        </mat-chip-listbox>
+      </section>
+
+      <div class="form-actions">
+        <a mat-button routerLink="/profile">Cancel</a>
+        <button mat-raised-button color="primary" type="submit" [disabled]="profileForm.invalid || isSaving">
+          Save profile
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

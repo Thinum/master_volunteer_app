@@ -30,6 +30,13 @@ export class VolunteerService {
   }
 
   /**
+   * Updates the current logged in user's public profile
+   */
+  updateCurrentUser(user: User) {
+    return this.http.put<User>(`${this.apiUrl}/me`, user);
+  }
+
+  /**
    * Returns a single volunteer by their ID
    */
   getVolunteerById(id: number) {

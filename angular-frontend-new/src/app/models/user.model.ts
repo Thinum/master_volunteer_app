@@ -23,6 +23,12 @@ export interface User {
   /** URL or Base64 string for the user's profile picture. */
   profilePicture?: string;
 
+  /** Skills selected from the shared skill catalogue. */
+  skills?: string[];
+
+  /** Fields of interest selected from the shared skill catalogue. */
+  interests?: string[];
+
   /** Timestamp when the user joined. */
   joinedAt: Date;
 

@@ -6,11 +6,12 @@ import { DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { VolunteerService } from '../../../services/api/volunteer.service';
 import {MatIcon} from '@angular/material/icon';
-import {MatFabButton, MatIconButton} from '@angular/material/button';
+import {MatButtonModule, MatIconButton} from '@angular/material/button';
 import {NotificationService} from '../../../services/notification.service';
 import {AppNotification, NotificationType, AppNotificationPayload} from '../../../models/notification.model';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ShareButtonComponent} from '../../../shared/components/share-button/share-button.component';
+import {MatChipsModule} from '@angular/material/chips';
 
 @Component({
   selector: 'app-user-profile',
@@ -24,14 +25,18 @@ import {ShareButtonComponent} from '../../../shared/components/share-button/shar
     DatePipe,
     MatIcon,
     MatIconButton,
+    MatButtonModule,
     CardComponent,
     ShareButtonComponent,
+    MatChipsModule,
+    RouterLink,
   ],
   styleUrl: './user-profile.component.css',
 })
 export class UserProfileComponent implements OnInit {
   user?: User;
   id?: number;
+  isOwnProfile = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -44,10 +49,12 @@ export class UserProfileComponent implements OnInit {
       const idParam = params.get('id');
       if (idParam) {
         this.id = Number(idParam);
+        this.isOwnProfile = false;
         if (!isNaN(this.id)) {
           this.loadUser(this.id);
         }
       } else {
+        this.isOwnProfile = true;
         this.loadCurrentUser();
       }
     });
