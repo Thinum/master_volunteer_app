@@ -1,54 +1,31 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CardComponent } from '../../../shared/components/card/card.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-
-interface ForumEntry {
-  id: string;
-  title: string;
-  lastMessage: string;
-  lastEdited: Date;
-  icon: string;
-  newPosts?: number;
-}
+import { ForumEntry } from '../../../models/forum-entry.model';
+import { ForumService } from '../../../services/api/forum.service';
 
 @Component({
   selector: 'app-forum',
-  standalone: true, // Assuming standalone components; adjust if using NgModule
+  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, CardComponent, MatButtonModule, MatIconModule],
   templateUrl: './forum.component.html',
   styleUrls: ['./forum.component.css']
 })
-export class ForumComponent {
+export class ForumComponent implements OnInit {
   searchTerm: string = '';
-  activities: ForumEntry[] = [ // Mock data; replace with service fetch
-    {
-      id: '1',
-      title: 'Community Garden Project',
-      lastMessage: 'Looking for volunteers to help plant native flowers this weekend!',
-      lastEdited: new Date('2025-10-01'),
-      icon: 'https://api.dicebear.com/9.x/lorelei/svg/seed=4',
-      newPosts: 5
-    },
-    {
-      id: '2',
-      title: 'Local Library Reading Program',
-      lastMessage: 'Does anyone have experience organizing story time for kids aged 6–10?',
-      lastEdited: new Date('2025-09-28'),
-      icon: 'https://api.dicebear.com/9.x/lorelei/svg/seed=5',
-    },
-    {
-      id: '3',
-      title: 'Beach Cleanup Initiative',
-      lastMessage: 'We collected 200kg of waste last month! Next meetup: Saturday at 9 AM.',
-      lastEdited: new Date('2025-10-03'),
-      icon: 'https://api.dicebear.com/9.x/lorelei/svg/seed=6',
-      newPosts: 2
-    }
-  ];
+  activities: ForumEntry[] = [];
+
+  constructor(private forumService: ForumService) {}
+
+  ngOnInit(): void {
+    this.forumService.getForumEntries().subscribe(entries => {
+      this.activities = entries;
+    });
+  }
 
   get filteredForums(): ForumEntry[] {
     if (!this.searchTerm) return this.activities;
@@ -58,6 +35,14 @@ export class ForumComponent {
   }
 
   addNew(): void {
-    console.log('Navigate to create new forum entry'); // Extend: e.g., router.navigate(['/forum/create'])
+    this.forumService.createForumEntry({
+      title: 'New community topic',
+      lastMessage: 'Draft a first message for this topic.',
+      lastEdited: new Date(),
+      icon: 'https://api.dicebear.com/9.x/lorelei/svg/seed=new-topic',
+      newPosts: 1
+    }).subscribe(entry => {
+      this.activities = [entry, ...this.activities];
+    });
   }
 }

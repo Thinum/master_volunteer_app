@@ -1,0 +1,140 @@
+.chat-detail {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f9f9fe;
+  color: #2f323a;
+  padding: 1rem 1rem 6rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  color: #46608a;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.chat-title {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e0e2ec;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(to bottom right, #46608a, #39547d);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.chat-title p,
+.state {
+  margin: 0.25rem 0 0;
+  color: #5c5f68;
+}
+
+.message-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem 0;
+}
+
+.message {
+  align-self: flex-start;
+  max-width: min(34rem, 82%);
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.75rem;
+  background: #ffffff;
+  border: 1px solid #e0e2ec;
+}
+
+.message.mine {
+  align-self: flex-end;
+  background: #46608a;
+  color: #ffffff;
+  border-color: #46608a;
+}
+
+.message p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.message-author {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.8rem;
+}
+
+.mini-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #e0e2ec;
+  flex-shrink: 0;
+}
+
+.mini-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.message-time {
+  display: block;
+  margin-top: 0.35rem;
+  color: #7c808b;
+  font-size: 0.75rem;
+}
+
+.message.mine .message-time {
+  color: #d8deea;
+}
+
+.message-form {
+  display: flex;
+  gap: 0.75rem;
+  position: sticky;
+  bottom: 5.5rem;
+  padding: 0.75rem;
+  background: #f9f9fe;
+  border: 1px solid #e0e2ec;
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(47, 50, 58, 0.12);
+}
+
+input {
+  flex: 1;
+  border: 1px solid #e0e2ec;
+  border-radius: 999px;
+  padding: 0.85rem 1rem;
+  font: inherit;
+}

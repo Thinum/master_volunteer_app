@@ -2,8 +2,12 @@ package at.jku.volunteer_app.contract;
 
 import at.jku.volunteer_app.model.Activity;
 import at.jku.volunteer_app.model.Appointment;
+import at.jku.volunteer_app.model.ChatConversation;
+import at.jku.volunteer_app.model.ChatMessage;
 import at.jku.volunteer_app.model.CommunityGoal;
 import at.jku.volunteer_app.model.Coordinates;
+import at.jku.volunteer_app.model.ForumEntry;
+import at.jku.volunteer_app.model.ForumReply;
 import at.jku.volunteer_app.model.Location;
 import at.jku.volunteer_app.model.Notification;
 import at.jku.volunteer_app.model.NotificationPayload;
@@ -214,6 +218,130 @@ public final class ContractMapper {
         goal.setUpdatedAt(dto.updatedAt());
         goal.setOrganisation(toOrganisationEntity(dto.organisation()));
         return goal;
+    }
+
+    public static ForumEntryDTO toForumEntryDTO(ForumEntry forumEntry) {
+        if (forumEntry == null) {
+            return null;
+        }
+        return new ForumEntryDTO(
+                forumEntry.getId(),
+                forumEntry.getTitle(),
+                forumEntry.getLastMessage(),
+                forumEntry.getLastEdited(),
+                forumEntry.getIcon(),
+                forumEntry.getNewPosts()
+        );
+    }
+
+    public static ForumEntry toForumEntryEntity(ForumEntryDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+        ForumEntry forumEntry = new ForumEntry();
+        forumEntry.setId(dto.id());
+        forumEntry.setTitle(dto.title());
+        forumEntry.setLastMessage(dto.lastMessage());
+        forumEntry.setLastEdited(dto.lastEdited());
+        forumEntry.setIcon(dto.icon());
+        forumEntry.setNewPosts(dto.newPosts());
+        return forumEntry;
+    }
+
+    public static ChatConversationDTO toChatConversationDTO(ChatConversation conversation) {
+        if (conversation == null) {
+            return null;
+        }
+        return new ChatConversationDTO(
+                conversation.getId(),
+                conversation.getOwnerUserId(),
+                conversation.getContactUserId(),
+                conversation.getContact(),
+                conversation.getAvatar(),
+                conversation.getLastMessage(),
+                conversation.getTimestamp(),
+                conversation.getUnreadCount(),
+                conversation.getActive()
+        );
+    }
+
+    public static ChatConversation toChatConversationEntity(ChatConversationDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+        ChatConversation conversation = new ChatConversation();
+        conversation.setId(dto.id());
+        conversation.setOwnerUserId(dto.ownerUserId());
+        conversation.setContactUserId(dto.contactUserId());
+        conversation.setContact(dto.contact());
+        conversation.setAvatar(dto.avatar());
+        conversation.setLastMessage(dto.lastMessage());
+        conversation.setTimestamp(dto.timestamp());
+        conversation.setUnreadCount(dto.unreadCount());
+        conversation.setActive(dto.isActive());
+        return conversation;
+    }
+
+    public static ChatMessageDTO toChatMessageDTO(ChatMessage message) {
+        if (message == null) {
+            return null;
+        }
+        Integer conversationId = message.getConversation() == null ? null : message.getConversation().getId();
+        return new ChatMessageDTO(
+                message.getId(),
+                message.getAuthor(),
+                message.getAuthorUserId(),
+                message.getAuthorName(),
+                message.getAvatar(),
+                message.getOwnMessage(),
+                message.getText(),
+                message.getCreatedAt(),
+                conversationId
+        );
+    }
+
+    public static ChatMessage toChatMessageEntity(ChatMessageDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+        ChatMessage message = new ChatMessage();
+        message.setId(dto.id());
+        message.setAuthor(dto.author());
+        message.setAuthorUserId(dto.authorUserId());
+        message.setAuthorName(dto.authorName());
+        message.setAvatar(dto.avatar());
+        message.setOwnMessage(dto.ownMessage());
+        message.setText(dto.text());
+        message.setCreatedAt(dto.createdAt());
+        return message;
+    }
+
+    public static ForumReplyDTO toForumReplyDTO(ForumReply reply) {
+        if (reply == null) {
+            return null;
+        }
+        Integer forumEntryId = reply.getForumEntry() == null ? null : reply.getForumEntry().getId();
+        return new ForumReplyDTO(
+                reply.getId(),
+                reply.getAuthor(),
+                reply.getAvatar(),
+                reply.getMessage(),
+                reply.getCreatedAt(),
+                forumEntryId
+        );
+    }
+
+    public static ForumReply toForumReplyEntity(ForumReplyDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+        ForumReply reply = new ForumReply();
+        reply.setId(dto.id());
+        reply.setAuthor(dto.author());
+        reply.setAvatar(dto.avatar());
+        reply.setMessage(dto.message());
+        reply.setCreatedAt(dto.createdAt());
+        return reply;
     }
 
     public static NotificationDTO toNotificationDTO(Notification notification) {

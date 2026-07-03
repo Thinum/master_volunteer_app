@@ -15,6 +15,8 @@ import {NotificationsListComponent} from './components/notifications/notificatio
 import { RegisterComponent } from './components/register/register.component';
 import { CommunityGoalsComponent } from './components/community/community-goals/community-goals.component';
 import { ReportsComponent } from './components/reports/reports.component';
+import { ForumDetailComponent } from './components/community/forum/forum-detail/forum-detail.component';
+import { ChatDetailComponent } from './components/community/chat/chat-detail/chat-detail.component';
 
 export const routes: Routes = [
   {path: '', component: LoginComponent, data: {title: 'Login'}},
@@ -22,6 +24,8 @@ export const routes: Routes = [
   {path: 'organisations', component: OrganisationsOverviewComponent, data: {title: 'Organisation Overview'}, canActivate: [authGuard]},
   {path: 'organisations/:id', component: OrganisationDetailComponent, data: {title: 'Organisation'}},
   {path: 'community', component: CommunityComponent, data: {title: 'Community'}, canActivate: [authGuard]},
+  {path: 'community/forum/:id', component: ForumDetailComponent, data: {title: 'Forum Topic'}, canActivate: [authGuard]},
+  {path: 'community/chat/:id', component: ChatDetailComponent, data: {title: 'Chat'}, canActivate: [authGuard]},
   /**TODO change organisations to single organisation just for testing purposes for now */
   {path: 'profile', component: UserProfileComponent, data: {title: 'Profil'}, canActivate: [authGuard]},
   {path: 'profile/:id', component: UserProfileComponent, data: {title: 'Profil'}, canActivate: [authGuard]},

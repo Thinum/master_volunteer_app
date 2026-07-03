@@ -9,11 +9,31 @@
     />
   </div>
 
+  <div *ngIf="showContactPicker" class="contact-picker">
+    <p class="picker-title">Start a chat with</p>
+    <button
+      *ngFor="let friend of friends"
+      type="button"
+      class="contact-option"
+      (click)="startChat(friend)"
+    >
+      <span class="avatar small">
+        <img *ngIf="friend.profilePicture" [src]="friend.profilePicture" [alt]="friend.name">
+        <span *ngIf="!friend.profilePicture">{{ friend.name.charAt(0) }}</span>
+      </span>
+      <span>
+        <strong>{{ friend.name }}</strong>
+        <small>{{ friend.username || friend.email }}</small>
+      </span>
+    </button>
+    <p *ngIf="friends.length === 0" class="empty-picker">No contacts found.</p>
+  </div>
+
   <!-- Scrollable list of 1:1 conversations -->
   <div class="chat-list">
     <app-card
       *ngFor="let convo of filteredConversations"
-      [routerLink]="['/chat', convo.id]"
+      [routerLink]="['/community/chat', convo.id]"
       routerLinkActive="active"
       ariaCurrentWhenActive="page"
       class="conversation-card"

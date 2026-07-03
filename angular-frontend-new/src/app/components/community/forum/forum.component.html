@@ -11,7 +11,7 @@
 <div class="forum-list">
   <app-card
     *ngFor="let forum of filteredForums"
-    [routerLink]="forum.id"
+    [routerLink]="['/community/forum', forum.id]"
     routerLinkActive="active"
     ariaCurrentWhenActive="page"
   >

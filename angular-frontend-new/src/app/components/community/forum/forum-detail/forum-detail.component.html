@@ -1,0 +1,52 @@
+<section class="forum-detail">
+  <a routerLink="/community" class="back-link">
+    <mat-icon>arrow_back</mat-icon>
+    Back to community
+  </a>
+
+  <div *ngIf="isLoading" class="state">Loading forum topic...</div>
+
+  <div *ngIf="!isLoading && !forum" class="state">
+    Forum topic not found.
+  </div>
+
+  <ng-container *ngIf="forum">
+    <header class="topic-header">
+      <img [src]="forum.icon" [alt]="'Icon for ' + forum.title" class="topic-icon" />
+      <div>
+        <p class="eyebrow">Forum Topic</p>
+        <h1>{{ forum.title }}</h1>
+        <p class="meta">
+          Last edited {{ forum.lastEdited | date: 'medium' }}
+          <span *ngIf="forum.newPosts">· {{ forum.newPosts }} new posts</span>
+        </p>
+      </div>
+    </header>
+
+    <div class="reply-list">
+      <article *ngFor="let reply of replies" class="reply">
+        <img [src]="reply.avatar" [alt]="reply.author" class="reply-avatar" />
+        <div class="reply-body">
+          <div class="reply-meta">
+            <strong>{{ reply.author }}</strong>
+            <span>{{ reply.createdAt | date: 'MMM d, HH:mm' }}</span>
+          </div>
+          <p>{{ reply.message }}</p>
+        </div>
+      </article>
+    </div>
+
+    <form class="reply-form" (ngSubmit)="addReply()">
+      <textarea
+        name="reply"
+        [(ngModel)]="newReply"
+        placeholder="Write a reply..."
+        rows="3"
+      ></textarea>
+      <button mat-flat-button color="primary" type="submit">
+        <mat-icon>send</mat-icon>
+        Reply
+      </button>
+    </form>
+  </ng-container>
+</section>

@@ -47,6 +47,8 @@ public class SecurityConfig {
                         .requestMatchers("/activities/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/community-goals/**").permitAll()
+                        .requestMatchers("/forum-entries/**").permitAll()
+                        .requestMatchers("/chat-conversations/**").permitAll()
                         .requestMatchers("/auth/register").permitAll()// .authenticated()
                         .requestMatchers("/auth/admin/**").permitAll()     // .authenticated()
                         .requestMatchers("/auth/formateur/**").permitAll()     // .authenticated()

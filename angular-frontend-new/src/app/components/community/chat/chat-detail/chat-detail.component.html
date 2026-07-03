@@ -1,0 +1,53 @@
+<section class="chat-detail">
+  <a routerLink="/community" class="back-link">
+    <mat-icon>arrow_back</mat-icon>
+    Back to community
+  </a>
+
+  <div *ngIf="isLoading" class="state">Loading conversation...</div>
+
+  <div *ngIf="!isLoading && !conversation" class="state">
+    Conversation not found.
+  </div>
+
+  <ng-container *ngIf="conversation">
+    <header class="chat-title">
+      <span class="avatar">
+        <img *ngIf="conversation.avatar" [src]="conversation.avatar" [alt]="conversation.contact" />
+        <span *ngIf="!conversation.avatar">{{ conversation.contact.charAt(0) }}</span>
+      </span>
+      <div>
+        <h1>{{ conversation.contact }}</h1>
+        <p>{{ conversation.isActive ? 'Online' : 'Offline' }}</p>
+      </div>
+    </header>
+
+    <div class="message-list">
+      <article
+        *ngFor="let message of messages"
+        class="message"
+        [class.mine]="message.ownMessage"
+      >
+        <div class="message-author">
+          <span class="mini-avatar" *ngIf="message.avatar">
+            <img [src]="message.avatar" [alt]="message.authorName || message.author" />
+          </span>
+          <strong>{{ message.authorName || message.author }}</strong>
+        </div>
+        <p>{{ message.text }}</p>
+        <span class="message-time">{{ message.createdAt | date: 'HH:mm' }}</span>
+      </article>
+    </div>
+
+    <form class="message-form" (ngSubmit)="sendMessage()">
+      <input
+        name="message"
+        [(ngModel)]="newMessage"
+        placeholder="Type a message..."
+      />
+      <button mat-fab color="primary" type="submit" aria-label="Send message">
+        <mat-icon>send</mat-icon>
+      </button>
+    </form>
+  </ng-container>
+</section>

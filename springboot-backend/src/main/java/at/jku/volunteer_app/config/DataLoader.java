@@ -21,9 +21,14 @@ public class DataLoader {
                                    OrganisationRepository organisationRepository,
                                    ActivityRepository activityRepository,
                                    UserRelationshipRepository relationshipRepository,
+                                   ForumEntryRepository forumEntryRepository,
+                                   ForumReplyRepository forumReplyRepository,
+                                   ChatConversationRepository chatConversationRepository,
+                                   ChatMessageRepository chatMessageRepository,
                                    PasswordEncoder passwordEncoder) {
         return args -> {
             if (userRepository.count() > 0) {
+                seedCommunityData(forumEntryRepository, forumReplyRepository, chatConversationRepository, chatMessageRepository);
                 return; // Data already loaded
             }
 
@@ -604,6 +609,8 @@ public class DataLoader {
             activityRepository.save(animalCare);
             activityRepository.save(fireTraining);
 
+            seedCommunityData(forumEntryRepository, forumReplyRepository, chatConversationRepository, chatMessageRepository);
+
             System.out.println("Database seeded successfully!");
         };
     }
@@ -638,5 +645,91 @@ public class DataLoader {
         }
         organisation.setOrgMembers(organisationMembers);
         return organisation;
+    }
+
+    private void seedCommunityData(ForumEntryRepository forumEntryRepository,
+                                   ForumReplyRepository forumReplyRepository,
+                                   ChatConversationRepository chatConversationRepository,
+                                   ChatMessageRepository chatMessageRepository) {
+        if (forumEntryRepository.count() == 0) {
+            ForumEntry garden = new ForumEntry(
+                    0,
+                    "Community Garden Project",
+                    "Looking for volunteers to help plant native flowers this weekend!",
+                    Timestamp.valueOf("2025-10-01 10:00:00"),
+                    "https://api.dicebear.com/9.x/lorelei/svg/seed=4",
+                    5
+            );
+            ForumEntry library = new ForumEntry(
+                    0,
+                    "Local Library Reading Program",
+                    "Does anyone have experience organizing story time for kids aged 6-10?",
+                    Timestamp.valueOf("2025-09-28 12:00:00"),
+                    "https://api.dicebear.com/9.x/lorelei/svg/seed=5",
+                    0
+            );
+            ForumEntry beach = new ForumEntry(
+                    0,
+                    "Beach Cleanup Initiative",
+                    "We collected 200kg of waste last month! Next meetup: Saturday at 9 AM.",
+                    Timestamp.valueOf("2025-10-03 09:00:00"),
+                    "https://api.dicebear.com/9.x/lorelei/svg/seed=6",
+                    2
+            );
+
+            forumEntryRepository.saveAll(List.of(garden, library, beach));
+            forumReplyRepository.saveAll(List.of(
+                    new ForumReply(0, "Community Team", garden.getIcon(), garden.getLastMessage(), garden.getLastEdited(), garden),
+                    new ForumReply(0, "Mia", "https://api.dicebear.com/9.x/lorelei/svg/seed=mia", "I can help coordinate volunteers and keep the checklist updated.", Timestamp.valueOf("2025-10-01 10:35:00"), garden),
+                    new ForumReply(0, "Lukas", "https://api.dicebear.com/9.x/lorelei/svg/seed=lukas", "Please share the meeting point and any equipment people should bring.", Timestamp.valueOf("2025-10-01 11:20:00"), garden),
+                    new ForumReply(0, "Community Team", library.getIcon(), library.getLastMessage(), library.getLastEdited(), library),
+                    new ForumReply(0, "Community Team", beach.getIcon(), beach.getLastMessage(), beach.getLastEdited(), beach)
+            ));
+        }
+
+        if (chatConversationRepository.findByOwnerUserIdOrderByTimestampDesc(1).isEmpty()) {
+            ChatConversation alice = new ChatConversation(
+                    0,
+                    1,
+                    2,
+                    "Bob",
+                    "https://api.dicebear.com/9.x/lorelei/svg/seed=8&size=512",
+                    "Let us catch up later-free this weekend?",
+                    Timestamp.valueOf("2025-10-04 14:00:00"),
+                    2,
+                    true
+            );
+            ChatConversation bob = new ChatConversation(
+                    0,
+                    1,
+                    3,
+                    "Charlie",
+                    "https://api.dicebear.com/9.x/lorelei/svg/seed=3&size=512",
+                    "Thanks for the code review tips!",
+                    Timestamp.valueOf("2025-10-04 12:30:00"),
+                    0,
+                    true
+            );
+            ChatConversation charlie = new ChatConversation(
+                    0,
+                    2,
+                    1,
+                    "Alice",
+                    "https://api.dicebear.com/9.x/lorelei/svg/seed=1&size=512",
+                    "Thanks for the update. I will check the details and get back to you.",
+                    Timestamp.valueOf("2025-10-03 16:45:00"),
+                    1,
+                    true
+            );
+
+            chatConversationRepository.saveAll(List.of(alice, bob, charlie));
+            chatMessageRepository.saveAll(List.of(
+                    new ChatMessage(0, "contact", 2, "Bob", alice.getAvatar(), false, alice.getLastMessage(), alice.getTimestamp(), alice),
+                    new ChatMessage(0, "me", 1, "Alice", "https://api.dicebear.com/9.x/lorelei/svg/seed=1&size=512", true, "Thanks for the update. I will check the details and get back to you.", Timestamp.valueOf("2025-10-04 14:12:00"), alice),
+                    new ChatMessage(0, "contact", 2, "Bob", alice.getAvatar(), false, "Perfect, that helps a lot.", Timestamp.valueOf("2025-10-04 14:24:00"), alice),
+                    new ChatMessage(0, "contact", 3, "Charlie", bob.getAvatar(), false, bob.getLastMessage(), bob.getTimestamp(), bob),
+                    new ChatMessage(0, "contact", 1, "Alice", charlie.getAvatar(), false, charlie.getLastMessage(), charlie.getTimestamp(), charlie)
+            ));
+        }
     }
 }
