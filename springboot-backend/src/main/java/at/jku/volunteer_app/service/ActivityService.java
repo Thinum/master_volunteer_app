@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import at.jku.volunteer_app.model.Activity;
 import at.jku.volunteer_app.repository.ActivityRepository;
 
+import java.security.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,4 +64,23 @@ public class ActivityService {
         activityRepository.save(activity);
         return true;
     }
+
+//    public List<Activity> getCompletedActivitiesForOrganisation(
+//            int organisationId,
+//            Timestamp start,
+//            Timestamp end
+//    ) {
+//        //Timestamp now = new Timestamp(System.currentTimeMillis());
+//
+//        List<Activity> activities =
+//                activityRepository.findByOrganisationAndDateRange(
+//                        organisationId,
+//                        start,
+//                        end
+//                );
+//
+//        return activities.stream()
+//                .filter(a -> a.getDate() != null && a.getDate().before(now))
+//                .toList();
+//    }
 }
