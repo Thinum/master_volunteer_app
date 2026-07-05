@@ -67,6 +67,27 @@
   color: #46608a;
 }
 
+.location-attribution {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.625rem;
+  line-height: 1.2;
+  text-align: right;
+  color: #7a7d86;
+}
+
+.organisation-map {
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+.organisation-map google-map {
+  display: block;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(175, 178, 187, 0.25);
+}
+
 .goals-card {
   margin-bottom: 0;
   background-color: #ffffff;

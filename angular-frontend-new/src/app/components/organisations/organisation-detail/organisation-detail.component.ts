@@ -16,9 +16,6 @@ import { CommunityGoalService } from '../../../services/api/community-goal.servi
 import { CommunityGoal } from '../../../models/community-goal.model';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {Organisation} from '../../../models/organisation.model';
-import {Activity} from '../../../models/activity.model';
-import {Project} from '../../../models/project.model';
-import {ProjectService} from '../../../services/api/project.service';
 
 @Component({
   selector: 'app-organisation-detail',
@@ -43,9 +40,6 @@ detailedOrganisation?: Organisation;
 id?: number | null;
 friends: User[] = [];
 goals: CommunityGoal[] = [];
-activities: Activity[] = [];
-projects: Project[] = [];
-visibleActivitiesCount = 2;
 hasJoined: boolean = false;
 
 constructor(
@@ -53,8 +47,7 @@ constructor(
     private organisationService: OrganisationService,
     private volunteerService: VolunteerService,
     private router: Router,
-    private communityGoalService: CommunityGoalService,
-    private projectService: ProjectService
+    private communityGoalService: CommunityGoalService
   ) {}
 
   ngOnInit(): void {
@@ -72,17 +65,6 @@ constructor(
 
       this.communityGoalService.getGoalsForOrganisation(this.id)
         .subscribe(goals => this.goals = goals);
-
-      this.organisationService.getExampleActivitiesForOrganisation(this.id)
-        .subscribe({
-          next: activities => this.activities = activities || [],
-          error: err => console.error('Could not load organisation activities', err)
-        });
-
-      this.projectService.getAllProjects()
-        .subscribe(projects => {
-          this.projects = this.getMockProjectsForOrganisation(projects || []);
-        });
 
    }
 
@@ -109,56 +91,6 @@ constructor(
       return 0;
     }
     return (current / target) * 100;
-  }
-
-  getSpotsTaken(activity: Activity): number {
-    return activity.participants?.length ?? activity.spotsTaken ?? 0;
-  }
-
-  getProjectStatus(project: Project): string {
-    return project.closed ? 'Abgeschlossen' : 'Aktiv';
-  }
-
-  get visibleActivities(): Activity[] {
-    return this.activities.slice(0, this.visibleActivitiesCount);
-  }
-
-  get hasMoreActivities(): boolean {
-    return this.activities.length > this.visibleActivitiesCount;
-  }
-
-  showMoreActivities(): void {
-    this.visibleActivitiesCount += 2;
-  }
-
-  private getMockProjectsForOrganisation(projects: Project[]): Project[] {
-    if (!projects.length || !this.id) {
-      return projects;
-    }
-
-    return projects.map((project, index) => ({
-      ...project,
-      title: this.getProjectTitle(project, index),
-      description: this.getProjectDescription(project, index)
-    }));
-  }
-
-  private getProjectTitle(project: Project, index: number): string {
-    const fallbackTitles = [
-      'Community Outreach',
-      'Volunteer Training',
-      'Local Support Hub'
-    ];
-    return project.title?.startsWith('Example') ? fallbackTitles[index % fallbackTitles.length] : project.title;
-  }
-
-  private getProjectDescription(project: Project, index: number): string {
-    const fallbackDescriptions = [
-      'Koordiniert lokale Einsaetze und verbindet Freiwillige mit konkreten Aufgaben.',
-      'Bereitet neue Mitglieder mit Workshops, Materialien und Mentoring auf Einsaetze vor.',
-      'Buendelt Ressourcen, Termine und Ansprechpartner fuer laufende Hilfsangebote.'
-    ];
-    return project.description?.startsWith('Description Project') ? fallbackDescriptions[index % fallbackDescriptions.length] : project.description;
   }
 
   joinOrganisation(){
