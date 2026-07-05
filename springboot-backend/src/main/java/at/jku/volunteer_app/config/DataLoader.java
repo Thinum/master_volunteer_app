@@ -28,6 +28,7 @@ public class DataLoader {
                                    PasswordEncoder passwordEncoder) {
         return args -> {
             if (userRepository.count() > 0) {
+                ensureDemoFriendships(userRepository, relationshipRepository);
                 seedCommunityData(forumEntryRepository, forumReplyRepository, chatConversationRepository, chatMessageRepository);
                 return; // Data already loaded
             }
@@ -220,6 +221,7 @@ public class DataLoader {
             relationshipRepository.save(new UserRelationship(null, diana, alice, RelationshipType.PARENT, 90));
             // CHILD
             relationshipRepository.save(new UserRelationship(null, alice, diana, RelationshipType.CHILD, 90));
+            ensureDemoFriendships(userRepository, relationshipRepository);
 
             // 3. Create Organisations
             Organisation techAid = createOrganisation(
@@ -653,6 +655,20 @@ public class DataLoader {
         }
         organisation.setOrgMembers(organisationMembers);
         return organisation;
+    }
+
+    private void ensureDemoFriendships(UserRepository userRepository,
+                                       UserRelationshipRepository relationshipRepository) {
+        userRepository.findByUsername("admin").ifPresent(admin -> {
+            List.of("alice", "bob", "charlie", "diana").forEach(username ->
+                    userRepository.findByUsername(username).ifPresent(friend -> {
+                        if (!relationshipRepository.existsFriendship(admin, friend, RelationshipType.FRIEND)) {
+                            relationshipRepository.save(new UserRelationship(null, admin, friend, RelationshipType.FRIEND, 90));
+                            relationshipRepository.save(new UserRelationship(null, friend, admin, RelationshipType.FRIEND, 90));
+                        }
+                    })
+            );
+        });
     }
 
     private void seedCommunityData(ForumEntryRepository forumEntryRepository,

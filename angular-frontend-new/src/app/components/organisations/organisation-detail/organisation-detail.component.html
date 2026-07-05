@@ -57,7 +57,7 @@
       </ng-container>
 
       <ng-template #noGoals>
-        <p>No goals yet for this organisation.</p>
+        <p>No goals yet for this organization.</p>
       </ng-template>
     </mat-card-content>
   </mat-card>
@@ -90,7 +90,7 @@
         </div>
 
         <ng-template #noProjects>
-          <p class="empty-text">Noch keine Projekte vorhanden.</p>
+          <p class="empty-text">No projects yet.</p>
         </ng-template>
       </mat-card-content>
     </mat-card>
@@ -122,7 +122,7 @@
               <div class="activity-meta">
                 <span>
                   <mat-icon>place</mat-icon>
-                  {{ activity.location || 'Kein Ort angegeben' }}
+                  {{ activity.location || 'No location provided' }}
                 </span>
                 <span *ngIf="activity.capacity">
                   <mat-icon>group</mat-icon>
@@ -142,14 +142,14 @@
         </div>
 
         <div class="show-more-row" *ngIf="hasMoreActivities">
-          <span>{{ visibleActivities.length }} von {{ activities.length }} Activities angezeigt</span>
+          <span>{{ visibleActivities.length }} of {{ activities.length }} activities shown</span>
           <button mat-button type="button" (click)="showMoreActivities()">
-            Mehr anzeigen
+            Show more
           </button>
         </div>
 
         <ng-template #noActivities>
-          <p class="empty-text">Noch keine Activities vorhanden.</p>
+          <p class="empty-text">No activities yet.</p>
         </ng-template>
       </mat-card-content>
     </mat-card>

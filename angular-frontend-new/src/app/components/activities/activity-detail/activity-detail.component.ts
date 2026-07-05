@@ -46,6 +46,7 @@ export class ActivityDetailComponent implements OnInit {
   activity!: Activity | undefined;
   hasJoined: boolean = false;
   currentUser: User | null = null;
+  private friendIds = new Set<number>();
 
   constructor(private route: ActivatedRoute, private volunteerService: VolunteerService,
               private activityService: ActivityService) {}
@@ -63,6 +64,10 @@ export class ActivityDetailComponent implements OnInit {
     this.volunteerService.getCurrentUser().subscribe(user => {
       this.currentUser = user;
       this.updateJoinState();
+      this.volunteerService.getFriends(user.id).subscribe({
+        next: friends => this.friendIds = new Set((friends || []).map(friend => friend.id)),
+        error: err => console.error('Could not load friends', err)
+      });
     });
   }
 
@@ -87,6 +92,14 @@ export class ActivityDetailComponent implements OnInit {
 
   get isFull(): boolean {
     return this.hasParticipantLimit && this.availableSlots === 0;
+  }
+
+  get allParticipants(): User[] {
+    return this.activity?.participants || [];
+  }
+
+  get friendParticipants(): User[] {
+    return this.allParticipants.filter(participant => this.friendIds.has(participant.id));
   }
 
   private updateJoinState(): void {

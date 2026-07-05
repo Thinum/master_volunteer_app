@@ -1,4 +1,4 @@
-<mat-card class="detail-card">
+﻿<mat-card class="detail-card">
 
   <!-- Heading -->
   <h1 class="activity-title">{{ activity?.title }}</h1>
@@ -10,7 +10,7 @@
   </div>
   <div class="info-row">
     <mat-icon>schedule</mat-icon>
-    <span>{{ activity?.date | date:'fullDate' }} – {{ activity?.date | date:'shortTime' }}</span>
+    <span>{{ activity?.date | date:'fullDate' }} - {{ activity?.date | date:'shortTime' }}</span>
   </div>
 
   <div class="info-row">
@@ -35,7 +35,7 @@
   </div>
 
   <div class="section">
-    <h3><mat-icon>event</mat-icon> Organisations</h3>
+    <h3><mat-icon>event</mat-icon> Organizations</h3>
     @for (org of activity?.organisations; track org.id) {
       <mat-list-item>
         <a class="organisation-list-element" [routerLink]="['/organisations', org.id]" routerLinkActive="active" ariaCurrentWhenActive="page">
@@ -51,14 +51,37 @@
   </div>
 
   <div class="section">
-    <h3><mat-icon>group</mat-icon> Your Friends</h3>
-    <div class="friends">
-      <!-- TODO: Use friends that are part of participants-->
-    <span *ngFor="let friend of activity?.participants" class="friend-avatar" matTooltip="{{ friend.name }}">
-      <img *ngIf="friend.profilePicture" [src]="friend.profilePicture" [alt]="friend.name">
-      <span *ngIf="!friend.profilePicture" class="initials">{{ friend.name }}</span>
-    </span>
+    <h3><mat-icon>group</mat-icon> My friends joining</h3>
+    <div class="friends" *ngIf="friendParticipants.length > 0; else noFriendParticipants">
+      <a
+        *ngFor="let friend of friendParticipants"
+        class="friend-avatar"
+        [routerLink]="['/profile', friend.id]"
+        matTooltip="{{ friend.name }}">
+        <img *ngIf="friend.profilePicture" [src]="friend.profilePicture" [alt]="friend.name">
+        <span *ngIf="!friend.profilePicture" class="initials">{{ friend.name }}</span>
+      </a>
     </div>
+    <ng-template #noFriendParticipants>
+      <p>No friends have joined this activity yet.</p>
+    </ng-template>
+  </div>
+
+  <div class="section">
+    <h3><mat-icon>groups</mat-icon> All participants</h3>
+    <div class="friends" *ngIf="allParticipants.length > 0; else noParticipants">
+      <a
+        *ngFor="let participant of allParticipants"
+        class="friend-avatar"
+        [routerLink]="['/profile', participant.id]"
+        matTooltip="{{ participant.name }}">
+        <img *ngIf="participant.profilePicture" [src]="participant.profilePicture" [alt]="participant.name">
+        <span *ngIf="!participant.profilePicture" class="initials">{{ participant.name }}</span>
+      </a>
+    </div>
+    <ng-template #noParticipants>
+      <p>No participants yet.</p>
+    </ng-template>
   </div>
 
   <!-- Expansion Panels -->
@@ -69,7 +92,7 @@
         <mat-expansion-panel-header>
           <mat-panel-title>Time & Date</mat-panel-title>
         </mat-expansion-panel-header>
-        <p>{{ activity?.date | date:'fullDate' }} – {{ activity?.date | date:'shortTime' }}</p>
+        <p>{{ activity?.date | date:'fullDate' }} - {{ activity?.date | date:'shortTime' }}</p>
       </mat-expansion-panel>
 
       <mat-expansion-panel>

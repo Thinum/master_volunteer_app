@@ -1,30 +1,30 @@
 <div class="organisations-page">
   <section class="overview-header">
     <div>
-      <span class="eyebrow">Organisationen</span>
-      <h1>Finde passende Organisationen</h1>
-      <p>Entdecke Teams, Projekte und Initiativen, bei denen deine Hilfe gut ankommt.</p>
+      <span class="eyebrow">Organizations</span>
+      <h1>Find organizations that fit you</h1>
+      <p>Discover teams, projects and initiatives where your help can make a difference.</p>
     </div>
 
     <div class="overview-stats">
       <div class="stat-item">
         <span class="stat-value">{{ organisations.length }}</span>
-        <span class="stat-label">gesamt</span>
+        <span class="stat-label">total</span>
       </div>
       <div class="stat-item">
         <span class="stat-value">{{ joinedOrganisations.length }}</span>
-        <span class="stat-label">beigetreten</span>
+        <span class="stat-label">joined</span>
       </div>
       <div class="stat-item">
         <span class="stat-value">{{ categories.length }}</span>
-        <span class="stat-label">Kategorien</span>
+        <span class="stat-label">categories</span>
       </div>
     </div>
   </section>
 
   <section class="search-panel">
     <mat-form-field appearance="outline" class="search-bar" subscriptSizing="dynamic">
-      <mat-label>Suchen</mat-label>
+      <mat-label>Search</mat-label>
       <input
         matInput
         type="text"
@@ -51,15 +51,15 @@
     <div class="filter-header">
       <div>
         <h3>Filter</h3>
-        <p>Grenze die Liste nach Kategorie und Tags ein.</p>
+        <p>Narrow the list by category and tags.</p>
       </div>
       <button mat-button type="button" (click)="clearFilters()" *ngIf="activeFilterCount || searchTerm">
-        Zuruecksetzen
+        Reset
       </button>
     </div>
 
     <div class="filter-group" *ngIf="categories.length">
-      <h4>Kategorien</h4>
+      <h4>Categories</h4>
       <mat-chip-listbox>
         <mat-chip-option
           *ngFor="let cat of categories"
@@ -85,17 +85,17 @@
 
   <app-organisation-list
     [organisationsList]="joinedOrganisations"
-    [sectionTitle]="'Beigetreten'">
+    [sectionTitle]="'Joined'">
   </app-organisation-list>
 
   <app-organisation-list
     [organisationsList]="recommendedOrganisations"
-    [sectionTitle]="'Empfohlen'">
+    [sectionTitle]="'Recommended'">
   </app-organisation-list>
 
   <app-organisation-list
     [organisationsList]="organisationsFiltered"
-    [sectionTitle]="'Alle Organisationen'">
+    [sectionTitle]="'All organizations'">
   </app-organisation-list>
 </div>
 

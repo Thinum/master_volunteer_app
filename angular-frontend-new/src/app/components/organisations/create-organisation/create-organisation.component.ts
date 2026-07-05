@@ -121,8 +121,8 @@ export class CreateOrganisationComponent {
       }),
     };
 
-    console.log('Organisation payload:', payload);
-    alert('Organisation created! Check console for payload.');
+    console.log('Organization payload:', payload);
+    alert('Organization created! Check console for payload.');
     this.orgForm.reset();
     this.marker = null;
     this.selectedUserRoles = [];

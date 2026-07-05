@@ -130,8 +130,8 @@ export class HomeComponent implements OnInit {
       next: (notifications) => {
         this.requests = (notifications || []).map(notif => ({
           id: notif.id,
-          organisation: notif.title || 'Benachrichtigung',
-          title: notif.text || 'Neue Anfrage erhalten',
+          organisation: notif.title || 'Notification',
+          title: notif.text || 'New request received',
           hours: notif.id ? (notif.id * 4) % 12 + 1 : 4,
           user: {
             name: notif.user?.name || 'System',

@@ -2,7 +2,7 @@
   <div class="section-header">
     <div>
       <h3 class="section-title">{{ sectionTitle }}</h3>
-      <p>{{ organisationsList?.length || 0 }} Organisationen</p>
+      <p>{{ organisationsList?.length || 0 }} organizations</p>
     </div>
   </div>
 
@@ -25,7 +25,7 @@
           <span class="category-pill" *ngIf="org.category">{{ org.category }}</span>
         </div>
 
-        <p class="description">{{ org.body || 'Keine Beschreibung vorhanden.' }}</p>
+        <p class="description">{{ org.body || 'No description available.' }}</p>
 
         <div class="tag-row" *ngIf="org.tags && org.tags.length > 0">
           <span class="tag" *ngFor="let tag of org.tags | slice:0:3">{{ tag }}</span>
@@ -34,7 +34,7 @@
         <div class="card-footer">
           <span class="meta-item">
             <mat-icon>group</mat-icon>
-            {{ getMemberCount(org) }} Mitglieder
+            {{ getMemberCount(org) }} members
           </span>
           <mat-icon class="arrow">chevron_right</mat-icon>
         </div>
@@ -46,6 +46,6 @@
 <ng-template #emptyState>
   <div class="empty-state">
     <mat-icon>search_off</mat-icon>
-    <p>Keine Organisationen gefunden.</p>
+    <p>No organizations found.</p>
   </div>
 </ng-template>

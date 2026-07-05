@@ -13,9 +13,9 @@ public interface OrganisationRepository extends JpaRepository<Organisation, Inte
     @EntityGraph(attributePaths = {"tags", "orgContacts"})
     List<Organisation> findAll();
 
-    @EntityGraph(attributePaths = {"tags", "orgContacts"})
+    @EntityGraph(attributePaths = {"tags", "orgContacts", "orgMembers", "orgMembers.user"})
     Optional<Organisation> findById(int id);
 
-    @EntityGraph(attributePaths = {"tags", "orgContacts"})
-    List<Organisation> findAllByOrgContactsContains(at.jku.volunteer_app.model.User user);
+    @EntityGraph(attributePaths = {"tags", "orgContacts", "orgMembers", "orgMembers.user"})
+    List<Organisation> findAllByOrgMembers_User(at.jku.volunteer_app.model.User user);
 }

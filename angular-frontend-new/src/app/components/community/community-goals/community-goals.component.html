@@ -1,4 +1,4 @@
-<div class="container" *ngIf="isCreateMode; else goalsList">
+﻿<div class="container" *ngIf="isCreateMode; else goalsList">
   <mat-card class="card">
     <h2 class="title">Create Goal</h2>
 
@@ -73,7 +73,7 @@
 
 <!-- LIST -->
 <ng-template #goalsList>
-  <h2>Community Goals für Organisation {{ organisationId }}</h2>
+  <h2>Community goals for organization {{ organisationId }}</h2>
 
   <div *ngIf="loading">Loading...</div>
   <div *ngIf="errorMessage">{{ errorMessage }}</div>
@@ -85,7 +85,7 @@
   <ul *ngIf="goals.length > 0">
     <li *ngFor="let goal of goals">
       <strong>{{ goal.title }}</strong>
-      – Target: {{ goal.targetValue }}
+      - Target: {{ goal.targetValue }}
       <span *ngIf="goal.currentValue !== undefined">
         , Current: {{ goal.currentValue }}
       </span>

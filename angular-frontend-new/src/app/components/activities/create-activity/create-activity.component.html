@@ -25,7 +25,7 @@
           <!-- User-selected marker -->
           <map-marker *ngIf="markerPosition" [position]="markerPosition!"></map-marker>
 
-          <!-- Organisation markers -->
+          <!-- Organization markers -->
           <map-marker
             *ngFor="let m of orgMarkers"
             [position]="m.position"

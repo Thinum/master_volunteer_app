@@ -16,7 +16,9 @@ import at.jku.volunteer_app.model.UserModelDetails;
 import at.jku.volunteer_app.repository.UserRepository;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -118,6 +120,9 @@ public class UserService implements UserDetailsService {
         boolean hasFriendRelationship = relationshipRepository.existsFriendship(user, friend, RelationshipType.FRIEND)
                 || relationshipRepository.existsFriendship(friend, user, RelationshipType.FRIEND);
 
+        if (hasFriendRelationship) {
+            return false;
+        }
 
         UserRelationship rel1 = new UserRelationship();
         rel1.setFromUser(user);
@@ -173,7 +178,16 @@ public class UserService implements UserDetailsService {
     }
 
     public List<User> getFriends(int userId) {
-        return getRelatedUsers(userId, RelationshipType.FRIEND);
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+
+        Map<Integer, User> friends = new LinkedHashMap<>();
+        relationshipRepository.findAllByFromUserAndType(user, RelationshipType.FRIEND)
+                .forEach(rel -> friends.put(rel.getToUser().getId(), rel.getToUser()));
+        relationshipRepository.findAllByToUserAndType(user, RelationshipType.FRIEND)
+                .forEach(rel -> friends.put(rel.getFromUser().getId(), rel.getFromUser()));
+
+        return List.copyOf(friends.values());
     }
 
     public List<User> getActiveUsers() {
