@@ -8,6 +8,7 @@ import at.jku.volunteer_app.model.CommunityGoal;
 import at.jku.volunteer_app.model.Coordinates;
 import at.jku.volunteer_app.model.ForumEntry;
 import at.jku.volunteer_app.model.ForumReply;
+import at.jku.volunteer_app.model.Interest;
 import at.jku.volunteer_app.model.Location;
 import at.jku.volunteer_app.model.Notification;
 import at.jku.volunteer_app.model.NotificationPayload;
@@ -16,6 +17,7 @@ import at.jku.volunteer_app.model.OrganisationMember;
 import at.jku.volunteer_app.model.User;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,7 +37,7 @@ public final class ContractMapper {
                 user.getProfilePicture(),
                 user.getPhone(),
                 safeList(user.getSkills()),
-                safeList(user.getInterests()),
+                normalizeInterestNames(user.getInterests()),
                 user.isActive(),
                 user.getJoinedAt(),
                 user.getUsername(),
@@ -55,7 +57,7 @@ public final class ContractMapper {
         user.setProfilePicture(dto.profilePicture());
         user.setPhone(dto.phone());
         user.setSkills(safeList(dto.skills()));
-        user.setInterests(safeList(dto.interests()));
+        user.setInterests(normalizeInterestNames(dto.interests()));
         user.setActive(dto.isActive());
         user.setJoinedAt(dto.joinedAt());
         user.setUsername(dto.username());
@@ -196,6 +198,8 @@ public final class ContractMapper {
                 goal.getDescription(),
                 goal.getTargetValue(),
                 goal.getCurrentValue(),
+                toInterestNameList(goal.getActivityInterests()),
+                List.of(),
                 goal.getStartDate(),
                 goal.getEndDate(),
                 goal.getStatus(),
@@ -215,6 +219,7 @@ public final class ContractMapper {
         goal.setDescription(dto.description());
         goal.setTargetValue(dto.targetValue());
         goal.setCurrentValue(dto.currentValue());
+        goal.setActivityTags(safeList(dto.activityTags()));
         goal.setStartDate(dto.startDate());
         goal.setEndDate(dto.endDate());
         goal.setStatus(dto.status());
@@ -502,6 +507,38 @@ public final class ContractMapper {
 
     private static <T> List<T> safeList(List<T> values) {
         return values == null ? List.of() : values;
+    }
+
+    private static List<String> normalizeInterestNames(List<String> values) {
+        if (values == null) {
+            return List.of();
+        }
+        return values.stream()
+                .map(ContractMapper::normalizeInterestName)
+                .filter(value -> value != null)
+                .distinct()
+                .toList();
+    }
+
+    private static List<String> toInterestNameList(List<Interest> interests) {
+        if (interests == null) {
+            return List.of();
+        }
+        return interests.stream()
+                .map(Interest::getName)
+                .map(ContractMapper::normalizeInterestName)
+                .filter(value -> value != null)
+                .distinct()
+                .toList();
+    }
+
+    private static String normalizeInterestName(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        String trimmed = value.trim().replaceAll("\\s+", " ");
+        return trimmed.substring(0, 1).toUpperCase(Locale.ROOT)
+                + trimmed.substring(1).toLowerCase(Locale.ROOT);
     }
 
     private static <T> Set<T> safeSet(Set<T> values) {

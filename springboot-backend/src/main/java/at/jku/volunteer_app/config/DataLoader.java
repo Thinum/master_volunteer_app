@@ -4,6 +4,7 @@ import at.jku.volunteer_app.model.*;
 import at.jku.volunteer_app.repository.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -11,6 +12,7 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 @Configuration
@@ -20,15 +22,23 @@ public class DataLoader {
     CommandLineRunner initDatabase(UserRepository userRepository,
                                    OrganisationRepository organisationRepository,
                                    ActivityRepository activityRepository,
+                                   CommunityGoalRepository communityGoalRepository,
+                                   InterestRepository interestRepository,
                                    UserRelationshipRepository relationshipRepository,
                                    ForumEntryRepository forumEntryRepository,
                                    ForumReplyRepository forumReplyRepository,
                                    ChatConversationRepository chatConversationRepository,
                                    ChatMessageRepository chatMessageRepository,
+                                   JdbcTemplate jdbcTemplate,
                                    PasswordEncoder passwordEncoder) {
         return args -> {
+            dropLegacyInterestNormalizedNameColumn(jdbcTemplate);
+            migrateLegacyCommunityGoalActivityTags(jdbcTemplate, interestRepository);
+
             if (userRepository.count() > 0) {
                 seedCommunityData(forumEntryRepository, forumReplyRepository, chatConversationRepository, chatMessageRepository);
+                seedGoalDemoData(userRepository, organisationRepository, activityRepository, communityGoalRepository, interestRepository);
+                seedInterestCatalog(userRepository, organisationRepository, activityRepository, communityGoalRepository, interestRepository);
                 return; // Data already loaded
             }
 
@@ -333,7 +343,8 @@ public class DataLoader {
             parkCleanup.setSpotsTaken(8);
             parkCleanup.setDifficulty("easy");
             parkCleanup.setPublic(true);
-            parkCleanup.setStatus(ActivityStatus.open);
+            parkCleanup.setTags(Arrays.asList("environment", "cleanup", "community"));
+            parkCleanup.setStatus(ActivityStatus.finished);
             parkCleanup.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             parkCleanup.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             parkCleanup.setParticipants(Arrays.asList(alice, bob, charlie, diana));
@@ -356,7 +367,8 @@ public class DataLoader {
             codingWorkshop.setSpotsTaken(5);
             codingWorkshop.setDifficulty("medium");
             codingWorkshop.setPublic(true);
-            codingWorkshop.setStatus(ActivityStatus.upcoming);
+            codingWorkshop.setTags(Arrays.asList("education", "coding", "kids"));
+            codingWorkshop.setStatus(ActivityStatus.finished);
             codingWorkshop.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             codingWorkshop.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             codingWorkshop.setParticipants(Arrays.asList(charlie, alice));
@@ -384,6 +396,7 @@ public class DataLoader {
             charityConcert.setSpotsTaken(18);
             charityConcert.setDifficulty("medium");
             charityConcert.setPublic(true);
+            charityConcert.setTags(Arrays.asList("fundraising", "event", "community"));
             charityConcert.setStatus(ActivityStatus.open);
             charityConcert.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             charityConcert.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
@@ -417,7 +430,8 @@ public class DataLoader {
             winterSupport.setSpotsTaken(12);
             winterSupport.setDifficulty("easy");
             winterSupport.setPublic(true);
-            winterSupport.setStatus(ActivityStatus.open);
+            winterSupport.setTags(Arrays.asList("food", "winter", "community"));
+            winterSupport.setStatus(ActivityStatus.finished);
             winterSupport.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             winterSupport.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             winterSupport.setParticipants(Arrays.asList(
@@ -450,6 +464,7 @@ public class DataLoader {
             tutoringSession.setSpotsTaken(7);
             tutoringSession.setDifficulty("medium");
             tutoringSession.setPublic(true);
+            tutoringSession.setTags(Arrays.asList("education", "tutoring", "students"));
             tutoringSession.setStatus(ActivityStatus.open);
             tutoringSession.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             tutoringSession.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
@@ -482,6 +497,7 @@ public class DataLoader {
             animalCare.setSpotsTaken(6);
             animalCare.setDifficulty("easy");
             animalCare.setPublic(true);
+            animalCare.setTags(Arrays.asList("animals", "shelter", "care"));
             animalCare.setStatus(ActivityStatus.open);
             animalCare.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             animalCare.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
@@ -514,6 +530,7 @@ public class DataLoader {
             fireTraining.setSpotsTaken(8);
             fireTraining.setDifficulty("hard");
             fireTraining.setPublic(true);
+            fireTraining.setTags(Arrays.asList("emergency", "training", "rescue"));
             fireTraining.setStatus(ActivityStatus.open);
             fireTraining.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             fireTraining.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
@@ -542,7 +559,8 @@ public class DataLoader {
             foodBank.setSpotsTaken(2);
             foodBank.setDifficulty("easy");
             foodBank.setPublic(true);
-            foodBank.setStatus(ActivityStatus.open);
+            foodBank.setTags(Arrays.asList("food", "families", "community"));
+            foodBank.setStatus(ActivityStatus.finished);
             foodBank.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             foodBank.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             foodBank.setParticipants(Arrays.asList(ethan, fiona));
@@ -566,7 +584,8 @@ public class DataLoader {
             reforestation.setSpotsTaken(12);
             reforestation.setDifficulty("hard");
             reforestation.setPublic(true);
-            reforestation.setStatus(ActivityStatus.upcoming);
+            reforestation.setTags(Arrays.asList("environment", "trees", "outdoors"));
+            reforestation.setStatus(ActivityStatus.finished);
             reforestation.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             reforestation.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             reforestation.setParticipants(Arrays.asList(alice, george, bob));
@@ -618,6 +637,8 @@ public class DataLoader {
             activityRepository.save(fireTraining);
 
             seedCommunityData(forumEntryRepository, forumReplyRepository, chatConversationRepository, chatMessageRepository);
+            seedGoalDemoData(userRepository, organisationRepository, activityRepository, communityGoalRepository, interestRepository);
+            seedInterestCatalog(userRepository, organisationRepository, activityRepository, communityGoalRepository, interestRepository);
 
             System.out.println("Database seeded successfully!");
         };
@@ -653,6 +674,374 @@ public class DataLoader {
         }
         organisation.setOrgMembers(organisationMembers);
         return organisation;
+    }
+
+    private void seedGoalDemoData(UserRepository userRepository,
+                                  OrganisationRepository organisationRepository,
+                                  ActivityRepository activityRepository,
+                                  CommunityGoalRepository communityGoalRepository,
+                                  InterestRepository interestRepository) {
+        List<Activity> activities = activityRepository.findAll();
+
+        updateActivityForGoalDemo(
+                activities,
+                activityRepository,
+                "Community Park Cleanup",
+                Arrays.asList("environment", "cleanup", "community"),
+                ActivityStatus.finished
+        );
+        updateActivityForGoalDemo(
+                activities,
+                activityRepository,
+                "Mountain Reforestation Project",
+                Arrays.asList("environment", "trees", "outdoors"),
+                ActivityStatus.finished
+        );
+        updateActivityForGoalDemo(
+                activities,
+                activityRepository,
+                "Coding Workshop for Kids",
+                Arrays.asList("education", "coding", "kids"),
+                ActivityStatus.finished
+        );
+        updateActivityForGoalDemo(
+                activities,
+                activityRepository,
+                "Local Food Bank Assistance",
+                Arrays.asList("food", "families", "community"),
+                ActivityStatus.finished
+        );
+        updateActivityForGoalDemo(
+                activities,
+                activityRepository,
+                "Winter Support Initiative - Food Distribution",
+                Arrays.asList("food", "winter", "community"),
+                ActivityStatus.finished
+        );
+        updateActivityForGoalDemo(
+                activities,
+                activityRepository,
+                "Setting up a Charity Concert for Trauma Recovery",
+                Arrays.asList("fundraising", "event", "community"),
+                ActivityStatus.open
+        );
+        updateActivityForGoalDemo(
+                activities,
+                activityRepository,
+                "Math Tutoring Session",
+                Arrays.asList("education", "tutoring", "students"),
+                ActivityStatus.open
+        );
+        updateActivityForGoalDemo(
+                activities,
+                activityRepository,
+                "Animal Shelter Care Day",
+                Arrays.asList("animals", "shelter", "care"),
+                ActivityStatus.open
+        );
+        updateActivityForGoalDemo(
+                activities,
+                activityRepository,
+                "Volunteer Firefighter Training",
+                Arrays.asList("emergency", "training", "rescue"),
+                ActivityStatus.open
+        );
+
+        List<Organisation> organisations = organisationRepository.findAll();
+        Organisation greenFuture = findOrganisationByName(organisations, "Green Future Org");
+        ensureGreenFutureGoalActivities(userRepository, activityRepository, greenFuture);
+
+        List<CommunityGoal> existingGoals = communityGoalRepository.findAll();
+
+        createGoalIfMissing(
+                existingGoals,
+                communityGoalRepository,
+                greenFuture,
+                "Complete 7 environmental activities",
+                "Counts finished activities with the environment interest for Green Future Org.",
+                7,
+                7,
+                Arrays.asList("environment"),
+                interestRepository,
+                Timestamp.valueOf("2025-01-01 00:00:00"),
+                Timestamp.valueOf("2025-12-31 23:59:59")
+        );
+        createGoalIfMissing(
+                existingGoals,
+                communityGoalRepository,
+                findOrganisationByName(organisations, "Tech Aid Association"),
+                "Run a coding activity",
+                "Counts finished activities with the coding interest for Tech Aid Association.",
+                1,
+                1,
+                Arrays.asList("coding"),
+                interestRepository,
+                Timestamp.valueOf("2025-01-01 00:00:00"),
+                Timestamp.valueOf("2025-12-31 23:59:59")
+        );
+        createGoalIfMissing(
+                existingGoals,
+                communityGoalRepository,
+                findOrganisationByName(organisations, "Community Connect"),
+                "Support families with food",
+                "Counts finished activities with the food or families interest for Community Connect.",
+                2,
+                1,
+                Arrays.asList("food", "families"),
+                interestRepository,
+                Timestamp.valueOf("2025-01-01 00:00:00"),
+                Timestamp.valueOf("2025-12-31 23:59:59")
+        );
+        createGoalIfMissing(
+                existingGoals,
+                communityGoalRepository,
+                findOrganisationByName(organisations, "Herz für Menschen"),
+                "Winter community support",
+                "Counts finished activities with the winter or food interest for Herz für Menschen.",
+                2,
+                1,
+                Arrays.asList("winter", "food"),
+                interestRepository,
+                Timestamp.valueOf("2025-01-01 00:00:00"),
+                Timestamp.valueOf("2025-12-31 23:59:59")
+        );
+    }
+
+    private void ensureGreenFutureGoalActivities(UserRepository userRepository,
+                                                 ActivityRepository activityRepository,
+                                                 Organisation greenFuture) {
+        if (greenFuture == null) {
+            return;
+        }
+
+        List<Activity> greenFutureActivities = activityRepository.findAllByOrganisations_Id(greenFuture.getId());
+        List<User> contributors = List.of(
+                findUserByUsername(userRepository, "alice"),
+                findUserByUsername(userRepository, "bob"),
+                findUserByUsername(userRepository, "charlie"),
+                findUserByUsername(userRepository, "diana"),
+                findUserByUsername(userRepository, "george")
+        ).stream()
+                .filter(java.util.Objects::nonNull)
+                .toList();
+
+        createActivityIfMissing(
+                greenFutureActivities,
+                activityRepository,
+                greenFuture,
+                "Riverbank Waste Audit",
+                "Document and clear waste along the riverbank.",
+                Timestamp.valueOf("2025-06-07 09:00:00"),
+                pickContributor(contributors, 0)
+        );
+        createActivityIfMissing(
+                greenFutureActivities,
+                activityRepository,
+                greenFuture,
+                "Community Compost Build",
+                "Build compost stations for local garden projects.",
+                Timestamp.valueOf("2025-07-03 10:00:00"),
+                pickContributor(contributors, 1)
+        );
+        createActivityIfMissing(
+                greenFutureActivities,
+                activityRepository,
+                greenFuture,
+                "Native Flower Planting",
+                "Plant native flowers to support pollinators.",
+                Timestamp.valueOf("2025-08-11 08:30:00"),
+                pickContributor(contributors, 2)
+        );
+        createActivityIfMissing(
+                greenFutureActivities,
+                activityRepository,
+                greenFuture,
+                "Trail Litter Survey",
+                "Survey and remove litter along the public trail.",
+                Timestamp.valueOf("2025-09-06 09:30:00"),
+                pickContributor(contributors, 3)
+        );
+        createActivityIfMissing(
+                greenFutureActivities,
+                activityRepository,
+                greenFuture,
+                "School Sustainability Booth",
+                "Run an information booth about everyday climate actions.",
+                Timestamp.valueOf("2025-11-04 13:00:00"),
+                pickContributor(contributors, 4)
+        );
+    }
+
+    private User pickContributor(List<User> contributors, int index) {
+        if (contributors.isEmpty()) {
+            return null;
+        }
+        return contributors.get(index % contributors.size());
+    }
+
+    private User findUserByUsername(UserRepository userRepository, String username) {
+        return userRepository.findByUsername(username)
+                .orElse(null);
+    }
+
+    private void createActivityIfMissing(List<Activity> existingActivities,
+                                         ActivityRepository activityRepository,
+                                         Organisation organisation,
+                                         String title,
+                                         String description,
+                                         Timestamp date,
+                                         User contributor) {
+        if (existingActivities.stream().anyMatch(activity -> title.equals(activity.getTitle()))) {
+            return;
+        }
+
+        Activity activity = new Activity();
+        activity.setTitle(title);
+        activity.setBody(description);
+        activity.setDescription(description);
+        activity.setOrganisations(List.of(organisation));
+        activity.setDate(date);
+        activity.setStartTime("09:00");
+        activity.setEndTime("12:00");
+        activity.setDuration("3 hours");
+        activity.setExpiresAt(Timestamp.valueOf("2025-12-31 23:59:59"));
+        activity.setLocation("Green Future Community Site");
+        activity.setCoordinates(new Coordinates(48.3069, 14.2858));
+        activity.setCreatedBy(contributor);
+        activity.setSkills(Arrays.asList("Teamwork", "Organization", "Physical activity"));
+        activity.setCapacity(20);
+        activity.setSpotsTaken(contributor == null ? 0 : 1);
+        activity.setDifficulty("easy");
+        activity.setPublic(true);
+        activity.setTags(Arrays.asList("environment", "community", "outdoors"));
+        activity.setStatus(ActivityStatus.finished);
+        activity.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        activity.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+        activity.setParticipants(contributor == null ? List.of() : List.of(contributor));
+
+        activityRepository.save(activity);
+        existingActivities.add(activity);
+    }
+
+    private void updateActivityForGoalDemo(List<Activity> activities,
+                                           ActivityRepository activityRepository,
+                                           String title,
+                                           List<String> tags,
+                                           ActivityStatus status) {
+        activities.stream()
+                .filter(activity -> title.equals(activity.getTitle()))
+                .findFirst()
+                .ifPresent(activity -> {
+                    activity.setTags(tags);
+                    activity.setStatus(status);
+                    activity.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+                    activityRepository.save(activity);
+                });
+    }
+
+    private Organisation findOrganisationByName(List<Organisation> organisations, String name) {
+        return organisations.stream()
+                .filter(organisation -> name.equals(organisation.getOrgName()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void createGoalIfMissing(List<CommunityGoal> existingGoals,
+                                     CommunityGoalRepository communityGoalRepository,
+                                     Organisation organisation,
+                                     String title,
+                                     String description,
+                                     int targetValue,
+                                     int currentValue,
+                                     List<String> activityTags,
+                                     InterestRepository interestRepository,
+                                     Timestamp startDate,
+                                     Timestamp endDate) {
+        if (organisation == null) {
+            return;
+        }
+
+        CommunityGoal existingGoal = existingGoals.stream()
+                .filter(goal -> title.equals(goal.getTitle()) || isSameGoalSeed(goal, organisation, activityTags))
+                .findFirst()
+                .orElse(null);
+
+        if (existingGoal != null) {
+            existingGoal.setTitle(title);
+            existingGoal.setDescription(description);
+            existingGoal.setTargetValue(targetValue);
+            existingGoal.setCurrentValue(currentValue);
+            existingGoal.setActivityInterests(resolveSeedInterests(interestRepository, activityTags));
+            existingGoal.setStartDate(startDate);
+            existingGoal.setEndDate(endDate);
+            existingGoal.setStatus("ACTIVE");
+            existingGoal.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+            communityGoalRepository.save(existingGoal);
+            return;
+        }
+
+        CommunityGoal goal = new CommunityGoal();
+        goal.setTitle(title);
+        goal.setDescription(description);
+        goal.setTargetValue(targetValue);
+        goal.setCurrentValue(currentValue);
+        goal.setActivityInterests(resolveSeedInterests(interestRepository, activityTags));
+        goal.setStartDate(startDate);
+        goal.setEndDate(endDate);
+        goal.setStatus("ACTIVE");
+        goal.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        goal.setOrganisation(organisation);
+        communityGoalRepository.save(goal);
+        existingGoals.add(goal);
+    }
+
+    private List<Interest> resolveSeedInterests(InterestRepository interestRepository, List<String> interestNames) {
+        List<Interest> existingInterests = interestRepository.findAll();
+        List<Interest> resolvedInterests = new java.util.ArrayList<>();
+
+        safeInterestNames(interestNames).forEach(name -> {
+            Interest existingInterest = existingInterests.stream()
+                    .filter(interest -> sameInterestName(interest.getName(), name))
+                    .findFirst()
+                    .orElse(null);
+
+            if (existingInterest != null) {
+                if (!name.equals(existingInterest.getName())) {
+                    existingInterest.setName(name);
+                    interestRepository.save(existingInterest);
+                }
+                resolvedInterests.add(existingInterest);
+                return;
+            }
+
+            Interest interest = new Interest();
+            interest.setName(name);
+            Interest savedInterest = interestRepository.save(interest);
+            existingInterests.add(savedInterest);
+            resolvedInterests.add(savedInterest);
+        });
+
+        return resolvedInterests;
+    }
+
+    private List<String> safeInterestNames(List<String> interestNames) {
+        if (interestNames == null) {
+            return List.of();
+        }
+        return interestNames.stream()
+                .map(this::normalizeInterestName)
+                .filter(java.util.Objects::nonNull)
+                .distinct()
+                .toList();
+    }
+
+    private boolean isSameGoalSeed(CommunityGoal goal, Organisation organisation, List<String> activityTags) {
+        return goal.getOrganisation() != null
+                && goal.getOrganisation().getId() == organisation.getId()
+                && (
+                "Complete 2 environmental activities".equals(goal.getTitle())
+                        || "Complete 7 environmental activities".equals(goal.getTitle())
+        );
     }
 
     private void seedCommunityData(ForumEntryRepository forumEntryRepository,
@@ -738,6 +1127,184 @@ public class DataLoader {
                     new ChatMessage(0, "contact", 3, "Charlie", bob.getAvatar(), false, bob.getLastMessage(), bob.getTimestamp(), bob),
                     new ChatMessage(0, "contact", 1, "Alice", charlie.getAvatar(), false, charlie.getLastMessage(), charlie.getTimestamp(), charlie)
             ));
+        }
+    }
+
+    private void seedInterestCatalog(UserRepository userRepository,
+                                     OrganisationRepository organisationRepository,
+                                     ActivityRepository activityRepository,
+                                     CommunityGoalRepository communityGoalRepository,
+                                     InterestRepository interestRepository) {
+        Set<String> interestNames = new HashSet<>();
+
+        addAllInterestNames(interestNames, Arrays.asList(
+                "Teamwork",
+                "Organization",
+                "Physical activity",
+                "Programming",
+                "Communication",
+                "Teaching",
+                "Problem-Solving",
+                "Mentoring",
+                "Event Support",
+                "Fundraising",
+                "First Aid",
+                "Environmental Work",
+                "Social Media"
+        ));
+
+        userRepository.findAll().forEach(user -> addAllInterestNames(interestNames, user.getInterests()));
+        organisationRepository.findAll().forEach(organisation -> addAllInterestNames(interestNames, organisation.getTags()));
+        activityRepository.findAll().forEach(activity -> addAllInterestNames(interestNames, activity.getTags()));
+        communityGoalRepository.findAll().forEach(goal ->
+                addAllInterestNames(
+                        interestNames,
+                        goal.getActivityInterests() == null
+                                ? List.of()
+                                : goal.getActivityInterests().stream().map(Interest::getName).toList()
+                )
+        );
+
+        List<Interest> existingInterests = interestRepository.findAll();
+
+        interestNames.forEach(name -> {
+            String normalizedName = normalizeInterestName(name);
+            if (normalizedName == null) {
+                return;
+            }
+
+            Interest existingInterest = existingInterests.stream()
+                    .filter(interest -> sameInterestName(interest.getName(), normalizedName))
+                    .findFirst()
+                    .orElse(null);
+
+            if (existingInterest != null) {
+                if (!normalizedName.equals(existingInterest.getName())) {
+                    existingInterest.setName(normalizedName);
+                    interestRepository.save(existingInterest);
+                }
+                return;
+            }
+
+            Interest interest = new Interest();
+            interest.setName(normalizedName);
+            interestRepository.save(interest);
+            existingInterests.add(interest);
+        });
+    }
+
+    private void addAllInterestNames(Set<String> target, Iterable<String> values) {
+        if (values == null) {
+            return;
+        }
+
+        for (String value : values) {
+            String normalizedName = normalizeInterestName(value);
+            if (normalizedName != null) {
+                target.add(normalizedName);
+            }
+        }
+    }
+
+    private String normalizeInterestName(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        String trimmed = value.trim().replaceAll("\\s+", " ");
+        return trimmed.substring(0, 1).toUpperCase(Locale.ROOT)
+                + trimmed.substring(1).toLowerCase(Locale.ROOT);
+    }
+
+    private boolean sameInterestName(String first, String second) {
+        return normalizeInterestName(first) != null
+                && normalizeInterestName(first).equals(normalizeInterestName(second));
+    }
+
+    private void dropLegacyInterestNormalizedNameColumn(JdbcTemplate jdbcTemplate) {
+        try {
+            Integer columnCount = jdbcTemplate.queryForObject(
+                    """
+                            SELECT COUNT(*)
+                            FROM information_schema.columns
+                            WHERE table_schema = DATABASE()
+                              AND table_name = 'interest'
+                              AND column_name = 'normalized_name'
+                            """,
+                    Integer.class
+            );
+
+            if (columnCount != null && columnCount > 0) {
+                jdbcTemplate.execute("ALTER TABLE interest DROP COLUMN normalized_name");
+            }
+        } catch (Exception ignored) {
+            // Schema cleanup is best-effort for local dev databases.
+        }
+    }
+
+    private void migrateLegacyCommunityGoalActivityTags(JdbcTemplate jdbcTemplate, InterestRepository interestRepository) {
+        try {
+            Integer tableCount = jdbcTemplate.queryForObject(
+                    """
+                            SELECT COUNT(*)
+                            FROM information_schema.tables
+                            WHERE table_schema = DATABASE()
+                              AND table_name = 'community_goal_activity_tags'
+                            """,
+                    Integer.class
+            );
+
+            if (tableCount == null || tableCount == 0) {
+                return;
+            }
+
+            List<java.util.Map<String, Object>> legacyRows = jdbcTemplate.queryForList(
+                    "SELECT community_goal_id, activity_tags FROM community_goal_activity_tags"
+            );
+
+            for (java.util.Map<String, Object> row : legacyRows) {
+                Object goalIdValue = row.get("community_goal_id");
+                Object interestNameValue = row.get("activity_tags");
+                if (!(goalIdValue instanceof Number) || interestNameValue == null) {
+                    continue;
+                }
+
+                String interestName = normalizeInterestName(String.valueOf(interestNameValue));
+                if (interestName == null) {
+                    continue;
+                }
+
+                Interest interest = interestRepository.findAll().stream()
+                        .filter(existingInterest -> sameInterestName(existingInterest.getName(), interestName))
+                        .findFirst()
+                        .orElseGet(() -> {
+                            Interest newInterest = new Interest();
+                            newInterest.setName(interestName);
+                            return interestRepository.save(newInterest);
+                        });
+
+                int goalId = ((Number) goalIdValue).intValue();
+                Integer relationCount = jdbcTemplate.queryForObject(
+                        """
+                                SELECT COUNT(*)
+                                FROM community_goal_activity_interests
+                                WHERE community_goal_id = ?
+                                  AND interest_id = ?
+                                """,
+                        Integer.class,
+                        goalId,
+                        interest.getId()
+                );
+
+                if (relationCount == null || relationCount == 0) {
+                    jdbcTemplate.update(
+                            "INSERT INTO community_goal_activity_interests (community_goal_id, interest_id) VALUES (?, ?)",
+                            goalId,
+                            interest.getId()
+                    );
+                }
+            }
+        } catch (Exception ignored) {
+            // Legacy migration is best-effort for local dev databases.
         }
     }
 }

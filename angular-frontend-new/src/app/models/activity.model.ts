@@ -37,7 +37,7 @@ export interface Activity {
   tags?: string[];
   difficulty?: 'easy' | 'medium' | 'hard';
   isPublic?: boolean;
-  status?: 'open' | 'upcoming' | 'closed' | 'cancelled';
+  status?: 'open' | 'upcoming' | 'finished' | 'canceled';
 
   // skills & requirements
   skills: string[];

@@ -25,8 +25,7 @@
       <button
         mat-icon-button
         class="goals-add-btn"
-        [routerLink]="['/community-goals']"
-        [queryParams]="{ organisationId: id, mode: 'create' }"
+        (click)="goToCreateGoal()"
         aria-label="Add goal">
         <mat-icon>add</mat-icon>
       </button>
@@ -34,14 +33,37 @@
     </mat-card-header>
 
     <mat-card-content>
+      <div class="goals-overview-link">
+        <a
+          mat-button
+          [routerLink]="['/community-goals']"
+          [queryParams]="{ organisationId: id }">
+          View goal overview
+        </a>
+      </div>
+
       <ng-container *ngIf="goals.length > 0; else noGoals">
-        <div *ngFor="let goal of goals" class="goal-item">
-          <p>{{ goal.title }}</p>
+        <mat-card *ngFor="let goal of goals" class="goal-item">
+          <div class="goal-summary">
+            <div>
+              <p>{{ goal.title }}</p>
+              <div class="goal-tags" *ngIf="goal.activityTags?.length">
+                <span *ngFor="let tag of goal.activityTags">{{ tag }}</span>
+              </div>
+            </div>
+            <div class="goal-actions">
+              <button mat-icon-button type="button" aria-label="Edit goal" (click)="goToEditGoal(goal)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <span class="goal-amount">{{ goal.currentValue || 0 }} / {{ goal.targetValue }}</span>
+            </div>
+          </div>
+
           <mat-progress-bar
             mode="determinate"
             [value]="getGoalProgress(goal)">
           </mat-progress-bar>
-        </div>
+        </mat-card>
       </ng-container>
 
       <ng-template #noGoals>

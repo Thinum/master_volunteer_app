@@ -170,7 +170,7 @@ export const MOCK_ACTIVITIES: Activity[] = [
     tags: ['community', 'food', 'families'],
     difficulty: 'easy',
     isPublic: true,
-    status: 'closed',
+    status: 'finished',
     createdAt: new Date('2025-08-28T10:00:00Z'),
     updatedAt: new Date('2025-09-18T21:00:00Z'),
   },

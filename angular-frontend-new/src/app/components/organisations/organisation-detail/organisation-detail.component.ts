@@ -8,6 +8,7 @@ import { VolunteerService } from '../../../services/api/volunteer.service';
 import { NgIf } from '@angular/common';
 import { CardComponent } from '../../../shared/components/card/card.component';
 import { MatCardModule } from '@angular/material/card';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { CommonModule } from '@angular/common';
 import { DatePipe } from '@angular/common';
 import { User } from '../../../models/user.model'
@@ -24,6 +25,7 @@ import {Organisation} from '../../../models/organisation.model';
     MatProgressBar,
     MatListModule,
     MatCardModule,
+    MatExpansionModule,
     DatePipe,
     CommonModule,
     NgIf,
@@ -84,6 +86,37 @@ constructor(
     });
   }
 
+  goToCreateGoal(): void {
+    if (!this.id) {
+      return;
+    }
+
+    this.router.navigate(['/community-goals'], {
+      queryParams: { organisationId: this.id, mode: 'create' }
+    });
+  }
+
+  goToEditGoal(goal: CommunityGoal): void {
+    if (!this.id || !goal.id) {
+      return;
+    }
+
+    this.router.navigate(['/community-goals'], {
+      queryParams: { organisationId: this.id, mode: 'edit', goalId: goal.id }
+    });
+  }
+
+  goToUserProfile(event: Event, userId: number): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!userId) {
+      return;
+    }
+
+    this.router.navigate(['/profile', userId]);
+  }
+
   getGoalProgress(goal: CommunityGoal): number {
     const current = goal.currentValue ?? 0;
     const target = goal.targetValue ?? 0;
@@ -91,6 +124,43 @@ constructor(
       return 0;
     }
     return (current / target) * 100;
+  }
+
+  getActivityContributionGroups(goal: CommunityGoal): {
+    title: string;
+    date?: Date;
+    members: { id: number; name: string; profilePicture?: string }[];
+  }[] {
+    const activitiesById = new Map<
+      number,
+      { title: string; date?: Date; members: { id: number; name: string; profilePicture?: string }[] }
+    >();
+
+    (goal.contributions ?? []).forEach(contribution => {
+      const memberName =
+        contribution.member.name || contribution.member.username || contribution.member.email || 'Unknown member';
+      const member = {
+        id: contribution.member.id,
+        name: memberName,
+        profilePicture: contribution.member.profilePicture
+      };
+
+      contribution.activities.forEach(activity => {
+        const existing = activitiesById.get(activity.id) ?? {
+          title: activity.title,
+          date: activity.date,
+          members: []
+        };
+
+        if (!existing.members.some(existingMember => existingMember.id === member.id)) {
+          existing.members.push(member);
+        }
+
+        activitiesById.set(activity.id, existing);
+      });
+    });
+
+    return Array.from(activitiesById.values());
   }
 
   joinOrganisation(){

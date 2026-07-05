@@ -1,4 +1,11 @@
 import { Organisation } from './organisation.model';
+import { Activity } from './activity.model';
+import { User } from './user.model';
+
+export interface CommunityGoalContribution {
+member: User;
+activities: Activity[];
+}
 
 export interface CommunityGoal {
 id?: number;
@@ -10,6 +17,8 @@ description?: string;
 // goal metrics
 targetValue: number;
 currentValue?: number;
+activityTags?: string[];
+contributions?: CommunityGoalContribution[];
 
 // timeframe
 startDate?: Date;

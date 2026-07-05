@@ -20,13 +20,23 @@ public class CommunityGoalController {
     @GetMapping
     public List<CommunityGoalDTO> getGoalsByOrganisation(@RequestParam("organisationId") int organisationId) {
         return communityGoalService.getGoalsForOrganisation(organisationId).stream()
-                .map(ContractMapper::toCommunityGoalDTO)
+                .map(communityGoalService::toGoalDTOWithProgress)
                 .toList();
+    }
+
+    @GetMapping("/activity-tags")
+    public List<String> getActivityTagsByOrganisation(@RequestParam("organisationId") int organisationId) {
+        return communityGoalService.getActivityTagsForOrganisation(organisationId);
+    }
+
+    @GetMapping("/activity-interests")
+    public List<String> getActivityInterestsByOrganisation(@RequestParam("organisationId") int organisationId) {
+        return communityGoalService.getActivityTagsForOrganisation(organisationId);
     }
 
     @GetMapping("/{id}")
     public CommunityGoalDTO getGoalById(@PathVariable int id) {
-        return ContractMapper.toCommunityGoalDTO(communityGoalService.getGoalById(id));
+        return communityGoalService.toGoalDTOWithProgress(communityGoalService.getGoalById(id));
     }
 
     @PostMapping
@@ -46,14 +56,18 @@ public class CommunityGoalController {
                 goal.description(),
                 goal.targetValue(),
                 goal.currentValue(),
+                goal.activityTags(),
+                goal.contributions(),
                 goal.startDate(),
                 goal.endDate(),
                 goal.status(),
                 goal.createdAt(),
                 goal.updatedAt(),
-                goal.organisation()
+                null
         );
-        return ContractMapper.toCommunityGoalDTO(communityGoalService.updateGoal(ContractMapper.toCommunityGoalEntity(goalToUpdate)));
+        return communityGoalService.toGoalDTOWithProgress(
+                communityGoalService.updateGoal(ContractMapper.toCommunityGoalEntity(goalToUpdate))
+        );
     }
 
     @DeleteMapping("/{id}")

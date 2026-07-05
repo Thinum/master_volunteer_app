@@ -56,11 +56,11 @@
       <section class="choice-section">
         <h3>Fields of Interest</h3>
         <mat-chip-listbox multiple aria-label="Select fields of interest">
-          @for (skill of availableSkills; track skill.id) {
+          @for (interest of availableInterests; track interest) {
           <mat-chip-option
-            [selected]="isInterestSelected(skill.name)"
-            (selectionChange)="setInterestSelection(skill.name, $event)">
-            {{ skill.name }}
+            [selected]="isInterestSelected(interest)"
+            (selectionChange)="setInterestSelection(interest, $event)">
+            {{ interest }}
           </mat-chip-option>
           }
         </mat-chip-listbox>

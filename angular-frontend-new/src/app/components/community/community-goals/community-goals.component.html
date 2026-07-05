@@ -1,6 +1,6 @@
-<div class="container" *ngIf="isCreateMode; else goalsList">
+<div class="container" *ngIf="isCreateMode || isEditMode; else goalsList">
   <mat-card class="card">
-    <h2 class="title">Create Goal</h2>
+    <h2 class="title">{{ isEditMode ? 'Edit Goal' : 'Create Goal' }}</h2>
 
     <form [formGroup]="goalForm" (ngSubmit)="onCreateGoal()">
 
@@ -28,6 +28,23 @@
         <mat-error *ngIf="goalForm.get('targetValue')?.touched || formSubmitted">
           Target value is required
         </mat-error>
+      </mat-form-field>
+
+      <!-- ACTIVITY INTERESTS -->
+      <mat-form-field appearance="fill">
+        <mat-label>Activity Interests</mat-label>
+        <mat-select formControlName="activityTags" multiple>
+          <mat-option *ngFor="let tag of activityTagOptions" [value]="tag">
+            {{ tag }}
+          </mat-option>
+        </mat-select>
+
+        <mat-hint *ngIf="activityTagOptions.length === 0">
+          No activity interests available yet.
+        </mat-hint>
+        <mat-hint *ngIf="activityTagOptions.length > 0">
+          Leave empty to count all finished activities in the goal timeframe.
+        </mat-hint>
       </mat-form-field>
 
       <!-- START -->
@@ -60,7 +77,7 @@
 
       <!-- BUTTON -->
       <button mat-raised-button class="submit-btn" type="submit">
-        Create Goal
+        {{ isEditMode ? 'Save Goal' : 'Create Goal' }}
       </button>
 
       <mat-error *ngIf="goalForm.hasError('endBeforeStart')">
@@ -73,25 +90,91 @@
 
 <!-- LIST -->
 <ng-template #goalsList>
-  <h2>Community Goals für Organisation {{ organisationId }}</h2>
+  <div class="overview-container">
+    <mat-card class="overview-card">
+      <mat-card-header class="overview-header">
+        <mat-card-title>Goals</mat-card-title>
+        <button
+          mat-icon-button
+          class="goals-add-btn"
+          (click)="goToCreateGoal()"
+          aria-label="Add goal">
+          <mat-icon>add</mat-icon>
+        </button>
+      </mat-card-header>
 
-  <div *ngIf="loading">Loading...</div>
-  <div *ngIf="errorMessage">{{ errorMessage }}</div>
+      <mat-card-content>
+        <div *ngIf="loading">Loading...</div>
+        <div *ngIf="errorMessage">{{ errorMessage }}</div>
 
-  <ul *ngIf="!loading && !errorMessage && goals.length === 0">
-    <li>No goals found.</li>
-  </ul>
+        <p *ngIf="!loading && !errorMessage && goals.length === 0">
+          No goals found.
+        </p>
 
-  <ul *ngIf="goals.length > 0">
-    <li *ngFor="let goal of goals">
-      <strong>{{ goal.title }}</strong>
-      – Target: {{ goal.targetValue }}
-      <span *ngIf="goal.currentValue !== undefined">
-        , Current: {{ goal.currentValue }}
-      </span>
-      <span *ngIf="goal.status">
-        (Status: {{ goal.status }})
-      </span>
-    </li>
-  </ul>
+        <mat-card *ngFor="let goal of goals" class="goal-item">
+          <div class="goal-summary">
+            <div>
+              <p>{{ goal.title }}</p>
+              <div class="goal-tags" *ngIf="goal.activityTags?.length">
+                <span *ngFor="let tag of goal.activityTags">{{ tag }}</span>
+              </div>
+            </div>
+            <div class="goal-actions">
+              <button mat-icon-button type="button" aria-label="Edit goal" (click)="goToEditGoal(goal)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <span class="goal-amount">{{ goal.currentValue || 0 }} / {{ goal.targetValue }}</span>
+            </div>
+          </div>
+
+          <mat-progress-bar
+            mode="determinate"
+            [value]="getGoalProgress(goal)">
+          </mat-progress-bar>
+
+          <p class="goal-description" *ngIf="goal.description">{{ goal.description }}</p>
+
+          <mat-expansion-panel class="goal-contributors">
+            <mat-expansion-panel-header>
+              <mat-panel-title>Activities</mat-panel-title>
+              <mat-panel-description>
+                {{ getActivityContributionGroups(goal).length }} completed
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <p *ngIf="!getActivityContributionGroups(goal).length" class="empty-contributors">
+              No activities contributed to this goal yet.
+            </p>
+
+            <div class="contribution-list" *ngIf="getActivityContributionGroups(goal).length">
+              <div class="contribution-group" *ngFor="let activityGroup of getActivityContributionGroups(goal)">
+                <div class="contribution-member">
+                  <strong>{{ activityGroup.title }}</strong>
+                  <span *ngIf="activityGroup.date">{{ activityGroup.date | date:'mediumDate' }}</span>
+                </div>
+
+                <div class="member-chip-list">
+                  <a
+                    class="member-chip"
+                    *ngFor="let member of activityGroup.members"
+                    [attr.href]="'/profile/' + member.id"
+                    (pointerdown)="goToUserProfile($event, member.id)"
+                    (click)="$event.preventDefault(); $event.stopPropagation()">
+                    <img
+                      *ngIf="member.profilePicture"
+                      [src]="member.profilePicture"
+                      [alt]="member.name + ' profile picture'">
+                    <span class="member-initial" *ngIf="!member.profilePicture">
+                      {{ member.name.charAt(0) }}
+                    </span>
+                    <span>{{ member.name }}</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-card>
+      </mat-card-content>
+    </mat-card>
+  </div>
 </ng-template>

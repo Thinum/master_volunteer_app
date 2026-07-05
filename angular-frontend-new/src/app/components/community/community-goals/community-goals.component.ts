@@ -18,8 +18,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSelectModule } from '@angular/material/select';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { CommunityGoalService } from '../../../services/api/community-goal.service';
+import { CommunityGoal } from '../../../models/community-goal.model';
+import { InterestService } from '../../../services/api/interest.service';
+import { MOCK_SKILLS } from '../../../mock/mock-skills';
 
 /* ---------------- Validators ---------------- */
 
@@ -60,26 +67,36 @@ const endAfterStartValidator: ValidatorFn = (group: AbstractControl) => {
     MatCardModule,
     MatButtonModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatSelectModule,
+    MatExpansionModule,
+    MatIconModule,
+    MatProgressBarModule
   ],
   templateUrl: './community-goals.component.html',
   styleUrl: './community-goals.component.css',
 })
 export class CommunityGoalsComponent {
+  private readonly fallbackInterests = MOCK_SKILLS.map(skill => this.normalizeInterestName(skill.name));
+
   organisationId!: number | null;
   isCreateMode = false;
+  isEditMode = false;
+  goalId!: number | null;
 
   goalForm!: FormGroup;
   formSubmitted = false;
 
   loading = false;
   errorMessage = '';
-  goals: any[] = [];
+  goals: CommunityGoal[] = [];
+  activityTagOptions: string[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private communityGoalService: CommunityGoalService,
+    private interestService: InterestService,
     private router: Router,
     private snackBar: MatSnackBar
   ) {}
@@ -88,6 +105,17 @@ export class CommunityGoalsComponent {
     this.route.queryParamMap.subscribe(params => {
       this.organisationId = Number(params.get('organisationId')) || null;
       this.isCreateMode = params.get('mode') === 'create';
+      this.isEditMode = params.get('mode') === 'edit';
+      this.goalId = Number(params.get('goalId')) || null;
+
+      if (this.organisationId) {
+        this.loadActivityTags();
+        if (this.isEditMode && this.goalId) {
+          this.loadGoalForEdit(this.goalId);
+        } else if (!this.isCreateMode) {
+          this.loadGoals();
+        }
+      }
     });
 
     const today = new Date();
@@ -100,7 +128,8 @@ export class CommunityGoalsComponent {
         description: [''],
         targetValue: [null, Validators.required],
         currentValue: [0],
-        startDate: [today, [Validators.required, futureOrTodayValidator()]],
+        activityTags: [[]],
+        startDate: [today, [Validators.required]],
         endDate: [null, Validators.required],
       },
       {
@@ -123,6 +152,26 @@ export class CommunityGoalsComponent {
 
     const payload = this.goalForm.value;
 
+    if (this.isEditMode && this.goalId) {
+      this.communityGoalService.updateGoal(this.goalId, payload).subscribe({
+        next: () => {
+          this.snackBar.open('Goal updated successfully!', 'Close', {
+            duration: 3000
+          });
+
+          this.router.navigate(['/community-goals'], {
+            queryParams: { organisationId: this.organisationId }
+          });
+        },
+        error: () => {
+          this.snackBar.open('Failed to update goal.', 'Close', {
+            duration: 4000
+          });
+        }
+      });
+      return;
+    }
+
     this.communityGoalService.createGoal(this.organisationId, payload).subscribe({
       next: () => {
         this.snackBar.open('Goal created successfully!', 'Close', {
@@ -138,4 +187,142 @@ export class CommunityGoalsComponent {
       }
     });
   }
+
+  loadGoalForEdit(goalId: number): void {
+    this.loading = true;
+    this.communityGoalService.getGoalById(goalId).subscribe({
+      next: goal => {
+        this.goalForm.patchValue({
+          title: goal.title,
+          description: goal.description ?? '',
+          targetValue: goal.targetValue,
+          currentValue: goal.currentValue ?? 0,
+          activityTags: goal.activityTags ?? [],
+          startDate: goal.startDate ? new Date(goal.startDate) : null,
+          endDate: goal.endDate ? new Date(goal.endDate) : null
+        });
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        this.snackBar.open('Failed to load goal.', 'Close', {
+          duration: 4000
+        });
+      }
+    });
+  }
+
+  loadGoals(): void {
+    if (!this.organisationId) return;
+
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.communityGoalService.getGoalsForOrganisation(this.organisationId).subscribe({
+      next: goals => {
+        this.goals = goals;
+        this.loading = false;
+      },
+      error: () => {
+        this.errorMessage = 'Failed to load goals.';
+        this.loading = false;
+      }
+    });
+  }
+
+  loadActivityTags(): void {
+    this.interestService.getAllInterests().subscribe({
+      next: interests => {
+        this.activityTagOptions = interests.length
+          ? interests.map(interest => this.normalizeInterestName(interest))
+          : this.fallbackInterests;
+      },
+      error: () => {
+        this.activityTagOptions = this.fallbackInterests;
+      }
+    });
+  }
+
+  requiresActivityTags(): boolean {
+    return false;
+  }
+
+  private normalizeInterestName(value: string): string {
+    const trimmed = value.trim().replace(/\s+/g, ' ');
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
+  }
+
+  getGoalProgress(goal: CommunityGoal): number {
+    const current = goal.currentValue ?? 0;
+    const target = goal.targetValue ?? 0;
+    if (!target || target <= 0) {
+      return 0;
+    }
+    return Math.min(100, Math.max(0, (current / target) * 100));
+  }
+
+  getActivityContributionGroups(goal: CommunityGoal): {
+    title: string;
+    date?: Date;
+    members: { id: number; name: string; profilePicture?: string }[];
+  }[] {
+    const activitiesById = new Map<
+      number,
+      { title: string; date?: Date; members: { id: number; name: string; profilePicture?: string }[] }
+    >();
+
+    (goal.contributions ?? []).forEach(contribution => {
+      const memberName =
+        contribution.member.name || contribution.member.username || contribution.member.email || 'Unknown member';
+      const member = {
+        id: contribution.member.id,
+        name: memberName,
+        profilePicture: contribution.member.profilePicture
+      };
+
+      contribution.activities.forEach(activity => {
+        const existing = activitiesById.get(activity.id) ?? {
+          title: activity.title,
+          date: activity.date,
+          members: []
+        };
+
+        if (!existing.members.some(existingMember => existingMember.id === member.id)) {
+          existing.members.push(member);
+        }
+
+        activitiesById.set(activity.id, existing);
+      });
+    });
+
+    return Array.from(activitiesById.values());
+  }
+
+  goToCreateGoal(): void {
+    this.router.navigate(['/community-goals'], {
+      queryParams: { organisationId: this.organisationId, mode: 'create' }
+    });
+  }
+
+  goToEditGoal(goal: CommunityGoal): void {
+    if (!this.organisationId || !goal.id) {
+      return;
+    }
+
+    this.router.navigate(['/community-goals'], {
+      queryParams: { organisationId: this.organisationId, mode: 'edit', goalId: goal.id }
+    });
+  }
+
+  goToUserProfile(event: Event, userId: number): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!userId) {
+      return;
+    }
+
+    this.router.navigate(['/profile', userId]);
+  }
+
 }

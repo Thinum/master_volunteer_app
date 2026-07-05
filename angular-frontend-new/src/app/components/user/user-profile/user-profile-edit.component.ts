@@ -13,6 +13,7 @@ import { MOCK_SKILLS } from '../../../mock/mock-skills';
 import { Skill } from '../../../models/skill.model';
 import { User } from '../../../models/user.model';
 import { VolunteerService } from '../../../services/api/volunteer.service';
+import { InterestService } from '../../../services/api/interest.service';
 
 @Component({
   selector: 'app-user-profile-edit',
@@ -34,10 +35,12 @@ import { VolunteerService } from '../../../services/api/volunteer.service';
 export class UserProfileEditComponent implements OnInit {
   private fb = inject(FormBuilder);
   private volunteerService = inject(VolunteerService);
+  private interestService = inject(InterestService);
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
 
   protected readonly availableSkills: Skill[] = MOCK_SKILLS;
+  protected availableInterests: string[] = MOCK_SKILLS.map(skill => this.normalizeInterestName(skill.name));
   protected currentUser?: User;
   protected selectedSkills: string[] = [];
   protected selectedInterests: string[] = [];
@@ -51,10 +54,21 @@ export class UserProfileEditComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.interestService.getAllInterests().subscribe({
+      next: interests => {
+        this.availableInterests = interests.length
+          ? interests.map(interest => this.normalizeInterestName(interest))
+          : this.availableInterests;
+      },
+      error: () => {
+        this.availableInterests = MOCK_SKILLS.map(skill => this.normalizeInterestName(skill.name));
+      }
+    });
+
     this.volunteerService.getCurrentUser().subscribe(user => {
       this.currentUser = user;
       this.selectedSkills = [...(user.skills ?? [])];
-      this.selectedInterests = [...(user.interests ?? [])];
+      this.selectedInterests = (user.interests ?? []).map(interest => this.normalizeInterestName(interest));
       this.profileForm.patchValue({
         name: user.name,
         email: user.email,
@@ -73,7 +87,11 @@ export class UserProfileEditComponent implements OnInit {
   }
 
   protected setInterestSelection(skillName: string, event: MatChipSelectionChange): void {
-    this.selectedInterests = this.setSelection(this.selectedInterests, skillName, event.selected);
+    this.selectedInterests = this.setSelection(
+      this.selectedInterests,
+      this.normalizeInterestName(skillName),
+      event.selected
+    );
   }
 
   protected isSkillSelected(skillName: string): boolean {
@@ -81,7 +99,7 @@ export class UserProfileEditComponent implements OnInit {
   }
 
   protected isInterestSelected(skillName: string): boolean {
-    return this.selectedInterests.includes(skillName);
+    return this.selectedInterests.includes(this.normalizeInterestName(skillName));
   }
 
   protected onPictureSelected(event: Event): void {
@@ -137,5 +155,10 @@ export class UserProfileEditComponent implements OnInit {
     }
 
     return values;
+  }
+
+  private normalizeInterestName(value: string): string {
+    const trimmed = value.trim().replace(/\s+/g, ' ');
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
   }
 }

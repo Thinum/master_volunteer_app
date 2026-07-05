@@ -50,6 +50,6 @@ export interface Organisation {
   /** General Category of the organisation */
   category: OrganisationCategory;
 
-  /** Tags that can be matched with the user interests etc */
+  /** Interests that can be matched with the user interests etc. Kept as tags for API compatibility. */
   tags: string[];
 }

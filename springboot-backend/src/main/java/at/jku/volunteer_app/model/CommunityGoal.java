@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -28,6 +29,17 @@ public class CommunityGoal {
 
     // optional:
     private int currentValue;
+
+    @ManyToMany
+    @JoinTable(
+            name = "community_goal_activity_interests",
+            joinColumns = @JoinColumn(name = "community_goal_id"),
+            inverseJoinColumns = @JoinColumn(name = "interest_id")
+    )
+    private List<Interest> activityInterests;
+
+    @Transient
+    private List<String> activityTags;
 
     private Timestamp startDate;
     private Timestamp endDate;

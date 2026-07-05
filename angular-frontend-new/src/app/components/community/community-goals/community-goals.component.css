@@ -66,3 +66,237 @@ form {
 mat-chip {
   margin: 0.25rem;
 }
+
+.overview-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.overview-card {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
+  padding: 1.5rem;
+}
+
+.overview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.goals-add-btn .mat-icon {
+  color: #005cbb;
+}
+
+.goal-item {
+  margin-bottom: 1rem;
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(70, 96, 138, 0.08);
+}
+
+.goal-summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.goal-summary p {
+  margin: 0;
+}
+
+.goal-amount {
+  color: #5c5f68;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.goal-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.goal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.goal-tags span {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid #afb2bb;
+  border-radius: 0.5rem;
+  color: #2f323a;
+  font-weight: 600;
+  font-size: 0.875rem;
+  background: #ffffff;
+}
+
+.goal-description {
+  color: #5c5f68;
+  margin: 1rem 0 0;
+}
+
+.goal-contributors {
+  margin-top: 1rem;
+  border: 1px solid rgba(175, 178, 187, 0.3);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.goal-contributors-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.875rem 1rem;
+  background: #f8f8fc;
+  border-bottom: 1px solid rgba(175, 178, 187, 0.3);
+}
+
+.goal-contributors-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #0f172a;
+}
+
+.goal-contributors-header span {
+  color: #2f323a;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.empty-contributors {
+  margin: 0;
+  padding: 1rem;
+  color: #5c5f68;
+}
+
+.contribution-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.contribution-group {
+  border-bottom: 1px solid rgba(175, 178, 187, 0.2);
+}
+
+.contribution-group:last-child {
+  border-bottom: none;
+}
+
+.contribution-member {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1rem 0.5rem;
+  color: #0f172a;
+}
+
+.contribution-member span {
+  color: #5c5f68;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.member-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0 1rem 0.875rem;
+  position: relative;
+  z-index: 2;
+}
+
+.member-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.7rem 0.25rem 0.3rem;
+  border-radius: 999px;
+  background: #eef2f8;
+  color: #2f323a;
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
+  text-decoration: none;
+}
+
+.member-chip:hover {
+  background: #e1e8f4;
+}
+
+.member-chip img,
+.member-initial {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.member-chip img {
+  object-fit: cover;
+}
+
+.member-initial {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #46608a;
+  color: #ffffff;
+  font-size: 0.75rem;
+}
+
+.contribution-activity {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  color: #2f323a;
+}
+
+.contribution-activity + .contribution-activity {
+  border-top: 1px solid rgba(175, 178, 187, 0.16);
+}
+
+.contribution-activity span {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.contribution-activity time {
+  color: #5c5f68;
+  white-space: nowrap;
+}
+
+@media (max-width: 599px) {
+  .overview-container {
+    padding: 1rem;
+  }
+
+  .goal-summary,
+  .goal-contributors-header,
+  .contribution-member,
+  .contribution-activity {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .contribution-activity span {
+    white-space: normal;
+  }
+}
