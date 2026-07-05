@@ -1,7 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {MatIcon} from "@angular/material/icon";
-import {MatList, MatListItem} from "@angular/material/list";
-import {NgForOf, NgIf} from "@angular/common";
+import {NgForOf, NgIf, SlicePipe} from "@angular/common";
 import {RouterLink, RouterLinkActive} from "@angular/router";
 import {Organisation} from '../../../../models/organisation.model';
 
@@ -9,12 +8,11 @@ import {Organisation} from '../../../../models/organisation.model';
   selector: 'app-organisation-list',
   imports: [
     MatIcon,
-    MatList,
-    MatListItem,
     NgForOf,
     RouterLink,
     RouterLinkActive,
-    NgIf
+    NgIf,
+    SlicePipe
   ],
   templateUrl: './organisation-list.component.html',
   styleUrl: './organisation-list.component.css'
@@ -22,4 +20,8 @@ import {Organisation} from '../../../../models/organisation.model';
 export class OrganisationListComponent {
     @Input() organisationsList?: Organisation[];
     @Input() sectionTitle?: string;
+
+    getMemberCount(org: Organisation): number {
+      return org.orgMembers?.length ?? 0;
+    }
 }

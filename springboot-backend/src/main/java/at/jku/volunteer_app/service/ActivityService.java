@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import at.jku.volunteer_app.model.Activity;
 import at.jku.volunteer_app.repository.ActivityRepository;
 
-import java.security.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,10 +30,12 @@ public class ActivityService {
     }
 
     public Activity addActivity(Activity activity) {
+        syncSpotsTaken(activity);
         return activityRepository.save(activity);
     }
 
     public Activity updateActivity(Activity activity) {
+        syncSpotsTaken(activity);
         return activityRepository.save(activity);
     }
 
@@ -57,12 +59,25 @@ public class ActivityService {
         }
         Activity activity = optionalActivity.get();
         User user = optionalUser.get();
+        if (activity.getParticipants() == null) {
+            activity.setParticipants(new ArrayList<>());
+        }
         if (activity.getParticipants().stream().anyMatch(user1 -> user1.getId() == userId)) {
             return false;
         }
+        if (activity.getCapacity() > 0 && activity.getParticipants().size() >= activity.getCapacity()) {
+            return false;
+        }
         activity.getParticipants().add(user);
+        activity.setSpotsTaken(activity.getParticipants().size());
         activityRepository.save(activity);
         return true;
+    }
+
+    private void syncSpotsTaken(Activity activity) {
+        if (activity != null && activity.getParticipants() != null) {
+            activity.setSpotsTaken(activity.getParticipants().size());
+        }
     }
 
 //    public List<Activity> getCompletedActivitiesForOrganisation(

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
 import { CardComponent } from '../../shared/components/card/card.component';
 import { User } from '../../models/user.model';
 import { Activity } from '../../models/activity.model';
@@ -21,6 +22,7 @@ import { CommunityGoalService } from '../../services/api/community-goal.service'
     MatCardModule,
     MatIconModule,
     MatButtonModule,
+    RouterLink,
     CardComponent
   ],
   templateUrl: './home.component.html',
@@ -147,7 +149,20 @@ export class HomeComponent implements OnInit {
     return Math.min(100, Math.max(0, progress));
   }
 
+  getSpotsTaken(activity: Activity): number {
+    return activity.spotsTaken ?? activity.participants?.length ?? 0;
+  }
+
+  isActivityFull(activity: Activity): boolean {
+    return !!activity.capacity && this.getSpotsTaken(activity) >= activity.capacity;
+  }
+
   joinActivity(activityId: number): void {
+    const activity = this.recommendedActivities.find(act => act.id === activityId);
+    if (activity && this.isActivityFull(activity)) {
+      return;
+    }
+
     this.activityService.joinActivity(activityId).subscribe({
       next: (success) => {
         if (success) {

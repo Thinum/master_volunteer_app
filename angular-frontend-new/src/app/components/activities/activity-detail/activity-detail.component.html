@@ -14,7 +14,18 @@
   </div>
 
   <div class="info-row">
-    <button matButton="filled" [disabled]="hasJoined" (click)="joinActivity()">{{hasJoined ? "Joined" : "Join"}}</button>
+    <button matButton="filled" [disabled]="hasJoined || isFull" (click)="joinActivity()">
+      {{ hasJoined ? "Joined" : (isFull ? "Full" : "Join") }}
+    </button>
+  </div>
+
+  <div class="slots-row" *ngIf="hasParticipantLimit">
+    <mat-icon>group</mat-icon>
+    <div>
+      <strong>{{ spotsTaken }} / {{ capacity }}</strong> participants
+      <span *ngIf="!isFull">({{ availableSlots }} slots left)</span>
+      <span *ngIf="isFull">(full)</span>
+    </div>
   </div>
 
   <!-- Description -->
@@ -93,6 +104,14 @@
         <ul>
           <li *ngFor="let p of activity?.prerequisites">{{ p }}</li>
         </ul>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Slots</mat-panel-title>
+        </mat-expansion-panel-header>
+        <p *ngIf="hasParticipantLimit">{{ spotsTaken }} of {{ capacity }} slots are taken.</p>
+        <p *ngIf="!hasParticipantLimit">No participant limit set.</p>
       </mat-expansion-panel>
 
       <mat-expansion-panel>

@@ -1,14 +1,51 @@
-<div class="section">
-  <h3 class="section-title">{{sectionTitle}}</h3>
-  <mat-list>
-    <mat-list-item *ngFor="let org of organisationsList">
-      <a class="organisation-list-element" [routerLink]="['/organisations', org.id]" routerLinkActive="active" ariaCurrentWhenActive="page">
-        <img [src]="org.profilePicture" [alt]="org.orgName + ' profile'"  class="avatar">
-        <mat-icon *ngIf="!org.profilePicture" class="avatar-placeholder">groups</mat-icon>
-        <span class="link-text">{{ org.orgName }}</span>
-        <span class="spacer"></span>
-        <mat-icon color="primary">check</mat-icon>
-      </a>
-    </mat-list-item>
-  </mat-list>
-</div>
+<section class="section">
+  <div class="section-header">
+    <div>
+      <h3 class="section-title">{{ sectionTitle }}</h3>
+      <p>{{ organisationsList?.length || 0 }} Organisationen</p>
+    </div>
+  </div>
+
+  <div class="organisation-grid" *ngIf="organisationsList && organisationsList.length > 0; else emptyState">
+    <a
+      class="organisation-card"
+      *ngFor="let org of organisationsList"
+      [routerLink]="['/organisations', org.id]"
+      routerLinkActive="active"
+      ariaCurrentWhenActive="page">
+
+      <div class="avatar-frame">
+        <img *ngIf="org.profilePicture" [src]="org.profilePicture" [alt]="org.orgName + ' profile'" class="avatar">
+        <mat-icon *ngIf="!org.profilePicture" class="avatar-placeholder">business</mat-icon>
+      </div>
+
+      <div class="card-content">
+        <div class="card-heading">
+          <h4>{{ org.orgName }}</h4>
+          <span class="category-pill" *ngIf="org.category">{{ org.category }}</span>
+        </div>
+
+        <p class="description">{{ org.body || 'Keine Beschreibung vorhanden.' }}</p>
+
+        <div class="tag-row" *ngIf="org.tags && org.tags.length > 0">
+          <span class="tag" *ngFor="let tag of org.tags | slice:0:3">{{ tag }}</span>
+        </div>
+
+        <div class="card-footer">
+          <span class="meta-item">
+            <mat-icon>group</mat-icon>
+            {{ getMemberCount(org) }} Mitglieder
+          </span>
+          <mat-icon class="arrow">chevron_right</mat-icon>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<ng-template #emptyState>
+  <div class="empty-state">
+    <mat-icon>search_off</mat-icon>
+    <p>Keine Organisationen gefunden.</p>
+  </div>
+</ng-template>

@@ -36,7 +36,7 @@
       <h4>Deine neuesten Highlights</h4>
 
       <!-- Last Activity Joined -->
-      <app-card size="compact" class="highlight-card" *ngIf="lastActivity">
+      <app-card size="compact" class="highlight-card clickable-card" *ngIf="lastActivity" [routerLink]="['/activities', lastActivity.id]">
         <div card-left>
           <div class="highlight-icon green">
             <mat-icon>event_available</mat-icon>
@@ -119,7 +119,7 @@
   <div class="recommended-section" *ngIf="recommendedActivities && recommendedActivities.length > 0">
     <h4>Empfohlene Aktivitäten für Dich</h4>
     <div class="recommended-grid">
-      <app-card size="compact" *ngFor="let act of recommendedActivities" class="rec-card">
+      <app-card size="compact" *ngFor="let act of recommendedActivities" class="rec-card clickable-card" [routerLink]="['/activities', act.id]">
         <div card-left>
           <div class="rec-badge">
             <mat-icon>explore</mat-icon>
@@ -132,11 +132,14 @@
             <div class="skills-tags" *ngIf="act.skills && act.skills.length > 0">
               <span class="skill-tag" *ngFor="let skill of act.skills">{{ skill }}</span>
             </div>
+            <p class="slots-info" *ngIf="act.capacity">
+              {{ getSpotsTaken(act) }} / {{ act.capacity }} Pl&auml;tze belegt
+            </p>
           </div>
         </div>
         <div card-right>
-          <button mat-raised-button color="primary" class="join-button" (click)="joinActivity(act.id)">
-            Teilnehmen
+          <button mat-raised-button color="primary" class="join-button" [disabled]="isActivityFull(act)" (click)="joinActivity(act.id); $event.stopPropagation()">
+            {{ isActivityFull(act) ? 'Voll' : 'Teilnehmen' }}
           </button>
         </div>
       </app-card>

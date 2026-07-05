@@ -35,6 +35,6 @@ export class ProjectService {
   }
 
   getProjectById(id: number): Observable<Project> {
-    return of(this.projects[id]);
+    return of(this.projects.find(project => project.id === id) ?? this.projects[0]);
   }
 }

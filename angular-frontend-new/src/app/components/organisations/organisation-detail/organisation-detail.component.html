@@ -51,35 +51,94 @@
   </mat-card>
 
   <div class="middle-row">
-    <mat-card class="list-card">
+    <mat-card class="list-card projects-card">
       <mat-card-header>
         <mat-card-title>Projects</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <mat-nav-list role="list">
-          <a mat-list-item routerLink="../../projects/0" routerLinkActive="active" ariaCurrentWhenActive="page">
-            Project 1
+        <div class="project-grid" *ngIf="projects.length > 0; else noProjects">
+          <a
+            class="project-card"
+            *ngFor="let project of projects"
+            [routerLink]="['/projects', project.id]"
+            routerLinkActive="active"
+            ariaCurrentWhenActive="page">
+            <div class="card-icon">
+              <mat-icon>{{ project.closed ? 'task_alt' : 'work_outline' }}</mat-icon>
+            </div>
+            <div class="item-content">
+              <div class="item-heading">
+                <h4>{{ project.title }}</h4>
+                <span class="status-pill" [class.closed]="project.closed">{{ getProjectStatus(project) }}</span>
+              </div>
+              <p>{{ project.description }}</p>
+            </div>
+            <mat-icon class="item-arrow">chevron_right</mat-icon>
           </a>
-          <a mat-list-item routerLink="../../projects/1" routerLinkActive="active" ariaCurrentWhenActive="page">
-            Project 2
-          </a>
-          <a mat-list-item routerLink="../../projects/2" routerLinkActive="active" ariaCurrentWhenActive="page">
-            Project 3
-          </a>
-        </mat-nav-list>
+        </div>
+
+        <ng-template #noProjects>
+          <p class="empty-text">Noch keine Projekte vorhanden.</p>
+        </ng-template>
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="list-card">
+    <mat-card class="list-card activities-card">
       <mat-card-header>
         <mat-card-title>Activities</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <mat-list role="list">
-          <mat-list-item>Activity 1</mat-list-item>
-          <mat-list-item>Activity 2</mat-list-item>
-          <mat-list-item>Activity 3</mat-list-item>
-        </mat-list>
+        <div class="activity-grid" *ngIf="activities.length > 0; else noActivities">
+          <a
+            class="activity-card"
+            *ngFor="let activity of visibleActivities"
+            [routerLink]="['/activities', activity.id]"
+            routerLinkActive="active"
+            ariaCurrentWhenActive="page">
+            <div class="activity-date">
+              <span class="day">{{ activity.date | date:'d' }}</span>
+              <span class="month">{{ activity.date | date:'MMM' }}</span>
+            </div>
+
+            <div class="item-content">
+              <div class="item-heading">
+                <h4>{{ activity.title }}</h4>
+                <span class="status-pill">{{ activity.status || 'open' }}</span>
+              </div>
+              <p>{{ activity.description || activity.body }}</p>
+
+              <div class="activity-meta">
+                <span>
+                  <mat-icon>place</mat-icon>
+                  {{ activity.location || 'Kein Ort angegeben' }}
+                </span>
+                <span *ngIf="activity.capacity">
+                  <mat-icon>group</mat-icon>
+                  {{ getSpotsTaken(activity) }} / {{ activity.capacity }}
+                </span>
+              </div>
+
+              <div class="participant-row" *ngIf="activity.participants && activity.participants.length > 0">
+                <span *ngFor="let participant of activity.participants | slice:0:4" class="participant-avatar">
+                  <img *ngIf="participant.profilePicture" [src]="participant.profilePicture" [alt]="participant.name">
+                  <span *ngIf="!participant.profilePicture">{{ participant.name.charAt(0) }}</span>
+                </span>
+              </div>
+            </div>
+            <mat-icon class="item-arrow">chevron_right</mat-icon>
+          </a>
+        </div>
+
+        <div class="show-more-row" *ngIf="hasMoreActivities">
+          <span>{{ visibleActivities.length }} von {{ activities.length }} Activities angezeigt</span>
+          <button mat-button type="button" (click)="showMoreActivities()">
+            Mehr anzeigen
+          </button>
+        </div>
+
+        <ng-template #noActivities>
+          <p class="empty-text">Noch keine Activities vorhanden.</p>
+        </ng-template>
       </mat-card-content>
     </mat-card>
   </div>
