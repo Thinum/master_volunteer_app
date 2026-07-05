@@ -7,12 +7,24 @@
       <mat-card-title>{{ detailedOrganisation.orgName }}</mat-card-title>
       <mat-card-subtitle>{{ detailedOrganisation.body }}</mat-card-subtitle>
       <mat-card-subtitle class="additional-info">
-        <mat-icon>location_on</mat-icon> Location: {{ detailedOrganisation.location.lat.toFixed(4) }}, {{ detailedOrganisation.location.lon.toFixed(4) }}
+        <mat-icon>location_on</mat-icon> Location: {{ locationLabel }}
       </mat-card-subtitle>
       <mat-card-subtitle class="additional-info">
         <mat-icon>calendar_today</mat-icon> Created: {{ detailedOrganisation.createdAt | date:'mediumDate' }}
       </mat-card-subtitle>
     </mat-card-header>
+
+    <div class="organisation-map" *ngIf="mapMarker">
+      <google-map
+        height="180px"
+        width="100%"
+        [center]="mapCenter"
+        [zoom]="15">
+        <map-marker [position]="mapMarker"></map-marker>
+      </google-map>
+      <span class="location-attribution">Address data &copy; OpenStreetMap contributors</span>
+    </div>
+
     <mat-card-actions>
       <button matButton="filled" [disabled]="hasJoined" (click)="joinOrganisation()">{{hasJoined ? "Joined" : "Join"}}</button>
     </mat-card-actions>
