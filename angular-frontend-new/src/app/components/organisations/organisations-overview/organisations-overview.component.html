@@ -1,65 +1,103 @@
-<div class="search-container">
+<div class="organisations-page">
+  <section class="overview-header">
+    <div>
+      <span class="eyebrow">Organizations</span>
+      <h1>Find organizations that fit you</h1>
+      <p>Discover teams, projects and initiatives where your help can make a difference.</p>
+    </div>
 
-  <mat-form-field appearance="outline" class="search-bar">
-    <mat-label>Search</mat-label>
-    <input
-      matInput
-      type="text"
-      (input)="searchTerm = $any($event.target).value; applyFilters()">
+    <div class="overview-stats">
+      <div class="stat-item">
+        <span class="stat-value">{{ organisations.length }}</span>
+        <span class="stat-label">total</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ joinedOrganisations.length }}</span>
+        <span class="stat-label">joined</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ categories.length }}</span>
+        <span class="stat-label">categories</span>
+      </div>
+    </div>
+  </section>
 
-    <button mat-icon-button matSuffix>
-      <mat-icon>search</mat-icon>
+  <section class="search-panel">
+    <mat-form-field appearance="outline" class="search-bar" subscriptSizing="dynamic">
+      <mat-label>Search</mat-label>
+      <input
+        matInput
+        type="text"
+        [value]="searchTerm"
+        (input)="searchTerm = $any($event.target).value; applyFilters()">
+
+      <button mat-icon-button matSuffix type="button">
+        <mat-icon>search</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <button
+      mat-stroked-button
+      type="button"
+      class="filter-button"
+      (click)="showFilters = !showFilters">
+      <mat-icon>tune</mat-icon>
+      Filter
+      <span *ngIf="activeFilterCount" class="filter-count">{{ activeFilterCount }}</span>
     </button>
-  </mat-form-field>
+  </section>
 
-  <button
-    mat-mini-fab
-    color="primary"
-    (click)="showFilters = !showFilters">
-    <mat-icon>filter_alt</mat-icon>
-  </button>
+  <section *ngIf="showFilters" class="filter-panel">
+    <div class="filter-header">
+      <div>
+        <h3>Filter</h3>
+        <p>Narrow the list by category and tags.</p>
+      </div>
+      <button mat-button type="button" (click)="clearFilters()" *ngIf="activeFilterCount || searchTerm">
+        Reset
+      </button>
+    </div>
 
+    <div class="filter-group" *ngIf="categories.length">
+      <h4>Categories</h4>
+      <mat-chip-listbox>
+        <mat-chip-option
+          *ngFor="let cat of categories"
+          [selected]="selectedCategory === cat"
+          (selectionChange)="toggleCategory(cat)">
+          {{ cat }}
+        </mat-chip-option>
+      </mat-chip-listbox>
+    </div>
+
+    <div class="filter-group" *ngIf="tags.length">
+      <h4>Interests</h4>
+      <mat-chip-listbox multiple>
+        <mat-chip-option
+          *ngFor="let tag of tags"
+          [selected]="selectedTags.includes(tag)"
+          (selectionChange)="toggleTag(tag)">
+          {{ tag }}
+        </mat-chip-option>
+      </mat-chip-listbox>
+    </div>
+  </section>
+
+  <app-organisation-list
+    [organisationsList]="joinedOrganisations"
+    [sectionTitle]="'Joined'">
+  </app-organisation-list>
+
+  <app-organisation-list
+    [organisationsList]="recommendedOrganisations"
+    [sectionTitle]="'Recommended'">
+  </app-organisation-list>
+
+  <app-organisation-list
+    [organisationsList]="organisationsFiltered"
+    [sectionTitle]="'All organizations'">
+  </app-organisation-list>
 </div>
-
-<!-- FILTER PANEL -->
-<div *ngIf="showFilters" class="filter-panel">
-
-  <h4>Categories</h4>
-  <mat-chip-listbox>
-    <mat-chip-option
-      *ngFor="let cat of categories"
-      [selected]="selectedCategory === cat"
-      (selectionChange)="toggleCategory(cat)">
-      {{ cat }}
-    </mat-chip-option>
-  </mat-chip-listbox>
-
-  <h4>Interests</h4>
-  <mat-chip-listbox multiple>
-    <mat-chip-option
-      *ngFor="let tag of tags"
-      [selected]="selectedTags.includes(tag)"
-      (selectionChange)="toggleTag(tag)">
-      {{ tag }}
-    </mat-chip-option>
-  </mat-chip-listbox>
-
-</div>
-
-<app-organisation-list
-  [organisationsList]="organisationsFiltered"
-  [sectionTitle]="'All Organisations'">
-</app-organisation-list>
-
-<app-organisation-list
-  [organisationsList]="joinedOrganisations"
-  [sectionTitle]="'Joined'">
-</app-organisation-list>
-
-<app-organisation-list
-  [organisationsList]="recommendedOrganisations"
-  [sectionTitle]="'Recommended'">
-</app-organisation-list>
 
 <button
   routerLink="/createOrganisation"

@@ -114,6 +114,14 @@
   width: 100%;
 }
 
+.clickable-card {
+  cursor: pointer;
+}
+
+.clickable-card:hover {
+  transform: translateY(-1px);
+}
+
 .highlight-icon {
   display: flex;
   align-items: center;
@@ -297,6 +305,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
+}
+
+.slots-info {
+  margin: 0.65rem 0 0;
+  color: #5c5f68;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .skill-tag {

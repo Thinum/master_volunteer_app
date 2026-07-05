@@ -25,7 +25,7 @@
           <!-- User-selected marker -->
           <map-marker *ngIf="markerPosition" [position]="markerPosition!"></map-marker>
 
-          <!-- Organisation markers -->
+          <!-- Organization markers -->
           <map-marker
             *ngFor="let m of orgMarkers"
             [position]="m.position"
@@ -48,6 +48,17 @@
       <mat-form-field appearance="outline">
         <mat-label>Duration</mat-label>
         <input matInput formControlName="duration" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Maximum participants</mat-label>
+        <input matInput type="number" min="1" formControlName="capacity" required />
+        <mat-error *ngIf="activityForm.get('capacity')?.hasError('required')">
+          Please enter a maximum number of participants.
+        </mat-error>
+        <mat-error *ngIf="activityForm.get('capacity')?.hasError('min')">
+          The maximum must be at least 1.
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">

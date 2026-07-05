@@ -1,8 +1,8 @@
-<div class="container">
+﻿<div class="container">
   <form [formGroup]="orgForm" (ngSubmit)="onSubmit()" class="p-4">
-    <!-- Organisation Name -->
+    <!-- Organization Name -->
     <mat-form-field appearance="fill" class="w-full mb-3">
-      <mat-label>Organisation Name</mat-label>
+      <mat-label>Organization Name</mat-label>
       <input matInput formControlName="orgName"/>
     </mat-form-field>
 
@@ -75,7 +75,7 @@
         selected
         (removed)="removeEntry(i)"
       >
-        {{ getUserName(entry.userId) }} — {{ entry.role }}
+        {{ getUserName(entry.userId) }} - {{ entry.role }}
         <button matChipRemove>
           <mat-icon>close</mat-icon>
         </button>
@@ -85,7 +85,7 @@
     <br/>
     <!-- Submit -->
     <button mat-raised-button color="accent" class="mt-4 w-full">
-      Create Organisation
+      Create Organization
     </button>
   </form>
 </div>

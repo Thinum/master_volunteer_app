@@ -4,39 +4,39 @@
     <div class="user-info">
       <img class="profile-pic" [src]="currentUser.profilePicture || 'https://i.pravatar.cc/40?img=3'" alt="Profile Picture">
       <div>
-        <h3>Willkommen zurück, {{ currentUser.name }}!</h3>
-        <p class="role">Dabei seit: {{ currentUser.joinedAt | date:'mediumDate' }}</p>
+        <h3>Welcome back, {{ currentUser.name }}!</h3>
+        <p class="role">Member since: {{ currentUser.joinedAt | date:'mediumDate' }}</p>
       </div>
     </div>
     <div class="stats">
       <div class="stat">
         <span class="value">{{ friendsCount }}</span>
-        <span class="label">Freunde</span>
+        <span class="label">Friends</span>
       </div>
       <div class="stat">
         <span class="value">{{ organisationsCount }}</span>
-        <span class="label">Organisationen</span>
+        <span class="label">Organizations</span>
       </div>
       <div class="stat">
         <span class="value">{{ activitiesCount }}</span>
-        <span class="label">Aktivitäten</span>
+        <span class="label">Activities</span>
       </div>
     </div>
   </div>
 
   <!-- Notification -->
   <div class="notification" *ngIf="requests && requests.length > 0">
-    Sie haben <b>{{ requests.length }}</b> neue Nachweisanfragen, bitte geben Sie diese frei.
+    You have <b>{{ requests.length }}</b> new verification requests to review.
   </div>
 
   <!-- Dynamic Content Layout Grid -->
   <div class="home-grid">
     <!-- Left Column: Highlights (Last Joined, Last Friend) -->
     <div class="grid-section">
-      <h4>Deine neuesten Highlights</h4>
+      <h4>Your latest highlights</h4>
 
       <!-- Last Activity Joined -->
-      <app-card size="compact" class="highlight-card" *ngIf="lastActivity">
+      <app-card size="compact" class="highlight-card clickable-card" *ngIf="lastActivity" [routerLink]="['/activities', lastActivity.id]">
         <div card-left>
           <div class="highlight-icon green">
             <mat-icon>event_available</mat-icon>
@@ -44,14 +44,14 @@
         </div>
         <div card-body>
           <div class="highlight-info">
-            <span class="category-tag">Letzte beigetretene Aktivität</span>
+            <span class="category-tag">Last joined activity</span>
             <h5>{{ lastActivity.title }}</h5>
-            <p>{{ lastActivity.location || 'Online / Kein fester Ort' }}</p>
+            <p>{{ lastActivity.location || 'Online / No fixed location' }}</p>
           </div>
         </div>
       </app-card>
       <br/>
-      <!-- Last Organisation Joined -->
+      <!-- Last Organization Joined -->
       <app-card size="compact" class="highlight-card" *ngIf="lastOrganisation">
         <div card-left>
           <div class="highlight-icon blue">
@@ -60,9 +60,9 @@
         </div>
         <div card-body>
           <div class="highlight-info">
-            <span class="category-tag">Letzte beigetretene Organisation</span>
+            <span class="category-tag">Last joined organization</span>
             <h5>{{ lastOrganisation.orgName }}</h5>
-            <p>Bereich: {{ lastOrganisation.category }}</p>
+            <p>Category: {{ lastOrganisation.category }}</p>
           </div>
         </div>
       </app-card>
@@ -75,9 +75,9 @@
         </div>
         <div card-body>
           <div class="highlight-info">
-            <span class="category-tag">Neuester Freund</span>
+            <span class="category-tag">Newest friend</span>
             <h5>{{ lastFriend.name }}</h5>
-            <p>E-Mail: {{ lastFriend.email }}</p>
+            <p>Email: {{ lastFriend.email }}</p>
           </div>
         </div>
       </app-card>
@@ -85,13 +85,13 @@
       <!-- If everything is empty (Fallback) -->
       <div class="empty-highlights" *ngIf="!lastActivity && !lastOrganisation && !lastFriend">
         <mat-icon class="empty-icon">spa</mat-icon>
-        <p>Noch keine Aktivitäten vorhanden. Tritt einer Organisation bei oder lade Freunde ein, um hier deine persönlichen Highlights zu sehen!</p>
+        <p>No activities yet. Join an organization or invite friends to see your personal highlights here.</p>
       </div>
     </div>
 
-    <!-- Right Column: Community Goals of Last Organisation -->
+    <!-- Right Column: Community Goals of Last Organization -->
     <div class="grid-section" *ngIf="lastOrganisation">
-      <h4>Community-Ziele: {{ lastOrganisation.orgName }}</h4>
+      <h4>Community goals: {{ lastOrganisation.orgName }}</h4>
 
       <div class="goals-container" *ngIf="communityGoals && communityGoals.length > 0; else noGoals">
         <div class="goal-item" *ngFor="let goal of communityGoals">
@@ -109,7 +109,7 @@
       <ng-template #noGoals>
         <div class="empty-goals">
           <mat-icon class="empty-icon">insights</mat-icon>
-          <p>Für diese Organisation sind zurzeit keine aktiven Community-Ziele definiert.</p>
+          <p>No active community goals are defined for this organization yet.</p>
         </div>
       </ng-template>
     </div>
@@ -117,9 +117,9 @@
 
   <!-- Recommended Activities Section -->
   <div class="recommended-section" *ngIf="recommendedActivities && recommendedActivities.length > 0">
-    <h4>Empfohlene Aktivitäten für Dich</h4>
+    <h4>Recommended activities for you</h4>
     <div class="recommended-grid">
-      <app-card size="compact" *ngFor="let act of recommendedActivities" class="rec-card">
+      <app-card size="compact" *ngFor="let act of recommendedActivities" class="rec-card clickable-card" [routerLink]="['/activities', act.id]">
         <div card-left>
           <div class="rec-badge">
             <mat-icon>explore</mat-icon>
@@ -132,11 +132,14 @@
             <div class="skills-tags" *ngIf="act.skills && act.skills.length > 0">
               <span class="skill-tag" *ngFor="let skill of act.skills">{{ skill }}</span>
             </div>
+            <p class="slots-info" *ngIf="act.capacity">
+              {{ getSpotsTaken(act) }} / {{ act.capacity }} spots taken
+            </p>
           </div>
         </div>
         <div card-right>
-          <button mat-raised-button color="primary" class="join-button" (click)="joinActivity(act.id)">
-            Teilnehmen
+          <button mat-raised-button color="primary" class="join-button" [disabled]="isActivityFull(act)" (click)="joinActivity(act.id); $event.stopPropagation()">
+            {{ isActivityFull(act) ? 'Full' : 'Join' }}
           </button>
         </div>
       </app-card>
@@ -145,12 +148,12 @@
 
   <!-- Requests list -->
   <div class="requests" *ngIf="requests && requests.length > 0">
-    <h4>Anfragen Nachweise</h4>
+    <h4>Verification requests</h4>
     <app-card size="compact" *ngFor="let req of requests" class="request-card">
       <div card-left>
         <div class="hours">
           <span class="value">{{ req.hours }}</span>
-          <span class="label"> Stunden</span>
+          <span class="label"> hours</span>
         </div>
       </div>
       <div card-body>

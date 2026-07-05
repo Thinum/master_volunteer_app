@@ -60,7 +60,7 @@ export const MOCK_ACTIVITIES: Activity[] = [
 
     // logistics
     capacity: 25,
-    spotsTaken: 8,
+    spotsTaken: 4,
     equipmentProvided: ['Gloves', 'Trash bags', 'Grabbers'],
 
     // meta
@@ -130,7 +130,7 @@ export const MOCK_ACTIVITIES: Activity[] = [
 
     // logistics
     capacity: 15,
-    spotsTaken: 5,
+    spotsTaken: 3,
     equipmentProvided: ['Computers', 'Learning materials'],
 
     // meta
@@ -165,7 +165,7 @@ export const MOCK_ACTIVITIES: Activity[] = [
     qualifications: ['None required'],
     prerequisites: ['Able to lift light boxes'],
     capacity: 18,
-    spotsTaken: 14,
+    spotsTaken: 4,
     equipmentProvided: ['Sorting labels', 'Gloves', 'Refreshments'],
     tags: ['community', 'food', 'families'],
     difficulty: 'easy',
@@ -197,7 +197,7 @@ export const MOCK_ACTIVITIES: Activity[] = [
     qualifications: ['Outdoor work experience helpful'],
     prerequisites: ['Weather-safe clothing'],
     capacity: 30,
-    spotsTaken: 21,
+    spotsTaken: 5,
     equipmentProvided: ['Saplings', 'Shovels', 'Water tanks'],
     tags: ['environment', 'trees', 'outdoors'],
     difficulty: 'medium',
@@ -229,7 +229,7 @@ export const MOCK_ACTIVITIES: Activity[] = [
     qualifications: ['Patient communication'],
     prerequisites: ['Basic smartphone and email knowledge'],
     capacity: 12,
-    spotsTaken: 9,
+    spotsTaken: 3,
     equipmentProvided: ['Tablets', 'Printed guides'],
     tags: ['education', 'technology', 'seniors'],
     difficulty: 'medium',
@@ -261,7 +261,7 @@ export const MOCK_ACTIVITIES: Activity[] = [
     qualifications: ['Friendly guest support'],
     prerequisites: ['Comfortable standing for longer periods'],
     capacity: 20,
-    spotsTaken: 11,
+    spotsTaken: 4,
     equipmentProvided: ['Name tags', 'Information sheets', 'Water'],
     tags: ['health', 'wellness', 'community'],
     difficulty: 'easy',

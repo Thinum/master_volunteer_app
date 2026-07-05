@@ -37,6 +37,7 @@ interface ActivityDetail {
   skills: string[];
   qualifications: string[];
   prerequisites: string[];
+  capacity: number;
   organization: string;
   createdAt: Date;
   expiresAt: Date;
@@ -76,6 +77,7 @@ export class CreateActivityComponent {
       location: [''],
       description: [''],
       duration: [''],
+      capacity: [1, [Validators.required, Validators.min(1)]],
       skills: this.fb.array([]),
       qualifications: this.fb.array([]),
       prerequisites: this.fb.array([]),

@@ -35,7 +35,7 @@ public class OrganisationService {
     }
 
     public List<Organisation> getOrganisationsForUser(at.jku.volunteer_app.model.User user) {
-        return organisationRepository.findAllByOrgContactsContains(user);
+        return organisationRepository.findAllByOrgMembers_User(user);
     }
 
     public Organisation addOrganisation(Organisation organisation) {

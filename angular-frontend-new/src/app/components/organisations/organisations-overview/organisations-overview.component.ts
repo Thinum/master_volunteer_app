@@ -98,7 +98,7 @@ export class OrganisationsOverviewComponent implements OnInit {
       const matchesSearch =
         !search ||
         org.orgName.toLowerCase().includes(search) ||
-        org.body.toLowerCase().includes(search) ||
+        (org.body ?? '').toLowerCase().includes(search) ||
         (org.tags ?? []).some(tag =>
           tag.toLowerCase().includes(search)
         );
@@ -130,6 +130,17 @@ export class OrganisationsOverviewComponent implements OnInit {
     this.selectedCategory =
       this.selectedCategory === category ? null : category;
     this.applyFilters();
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.selectedCategory = null;
+    this.selectedTags = [];
+    this.organisationsFiltered = [...this.organisations];
+  }
+
+  get activeFilterCount(): number {
+    return (this.selectedCategory ? 1 : 0) + this.selectedTags.length;
   }
 
   addNew(): void {}

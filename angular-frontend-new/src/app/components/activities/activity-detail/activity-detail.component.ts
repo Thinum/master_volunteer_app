@@ -7,8 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { NgFor, NgIf, DatePipe } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MOCK_ACTIVITIES } from '../../../mock/mock-activities';
 import { Activity} from '../../../models/activity.model';
+import { User } from '../../../models/user.model';
 import {VolunteerService} from '../../../services/api/volunteer.service';
 import {ActivityService} from '../../../services/api/activity.service';
 import {MatListItem} from '@angular/material/list';
@@ -45,16 +45,65 @@ export class ActivityDetailComponent implements OnInit {
   activityId!: number;
   activity!: Activity | undefined;
   hasJoined: boolean = false;
+  currentUser: User | null = null;
+  private friendIds = new Set<number>();
 
   constructor(private route: ActivatedRoute, private volunteerService: VolunteerService,
               private activityService: ActivityService) {}
 
   ngOnInit(): void {
     this.activityId = Number(this.route.snapshot.paramMap.get('id'));
-    this.activity = MOCK_ACTIVITIES.find(a => a.id === this.activityId);
-    this.volunteerService.getCurrentUser().subscribe(user => {
-      this.hasJoined = this.activity?.participants?.some((usr) => usr.id === user.id) ?? false;
+    this.activityService.getActivityById(this.activityId).subscribe({
+      next: activity => {
+        this.activity = activity;
+        this.updateJoinState();
+      },
+      error: err => console.error('Could not load activity', err)
     });
+
+    this.volunteerService.getCurrentUser().subscribe(user => {
+      this.currentUser = user;
+      this.updateJoinState();
+      this.volunteerService.getFriends(user.id).subscribe({
+        next: friends => this.friendIds = new Set((friends || []).map(friend => friend.id)),
+        error: err => console.error('Could not load friends', err)
+      });
+    });
+  }
+
+  get spotsTaken(): number {
+    return this.activity?.participants?.length ?? this.activity?.spotsTaken ?? 0;
+  }
+
+  get capacity(): number {
+    return this.activity?.capacity ?? 0;
+  }
+
+  get hasParticipantLimit(): boolean {
+    return this.capacity > 0;
+  }
+
+  get availableSlots(): number {
+    if (!this.hasParticipantLimit) {
+      return Number.POSITIVE_INFINITY;
+    }
+    return Math.max(this.capacity - this.spotsTaken, 0);
+  }
+
+  get isFull(): boolean {
+    return this.hasParticipantLimit && this.availableSlots === 0;
+  }
+
+  get allParticipants(): User[] {
+    return this.activity?.participants || [];
+  }
+
+  get friendParticipants(): User[] {
+    return this.allParticipants.filter(participant => this.friendIds.has(participant.id));
+  }
+
+  private updateJoinState(): void {
+    this.hasJoined = !!this.currentUser && (this.activity?.participants?.some((usr) => usr.id === this.currentUser?.id) ?? false);
   }
 
   onShare() {
@@ -70,11 +119,20 @@ export class ActivityDetailComponent implements OnInit {
   }
 
   joinActivity(){
+    if (this.hasJoined || this.isFull) {
+      return;
+    }
     this.activityService.joinActivity(this.activityId).subscribe({
       next: result => {
         if (result) {
           console.log('Joined activity:', result);
           this.hasJoined = true;
+          if (this.activity) {
+            if (this.currentUser && !this.activity.participants?.some(user => user.id === this.currentUser?.id)) {
+              this.activity.participants = [...(this.activity.participants ?? []), this.currentUser];
+            }
+            this.activity.spotsTaken = this.activity.participants?.length ?? this.spotsTaken + 1;
+          }
         } else {
           console.error('Could not join activity')
         }

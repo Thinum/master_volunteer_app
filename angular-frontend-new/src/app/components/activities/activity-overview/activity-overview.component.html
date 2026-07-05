@@ -1,19 +1,19 @@
 <div class="container">
-  <app-card *ngFor="let activity of activities" routerLink="{{activity.id}}" routerLinkActive="active" ariaCurrentWhenActive="page">
+  <app-card *ngFor="let activity of activities" [routerLink]="['/activities', activity.id]" routerLinkActive="active" ariaCurrentWhenActive="page">
     <div card-left>
       <div class="date">
-        <span class="label">{{ activity.organization}} </span>
+        <span class="label">{{ getOrganisationNames(activity) }}</span>
         <span class="value">{{ activity.date | date: 'd' }}</span>
         <span class="label month">{{ activity.date | date:'MMM' }}</span>
       </div>
     </div>
     <div card-body>
       <div class="card-content" >
-        <p class="organization">{{ activity.organization }}</p>
+        <p class="organization">{{ getOrganisationNames(activity) }}</p>
         <p class="activity-title">{{ activity.title }}</p>
         <p class="activity-description"> {{ activity.description }} </p>
-        <div class="friends">
-        <span *ngFor="let friend of activity.friends" class="friend-avatar">
+        <div class="friends" *ngIf="activity.participants && activity.participants.length > 0">
+        <span *ngFor="let friend of activity.participants" class="friend-avatar">
           <img *ngIf="friend.profilePicture" [src]="friend.profilePicture" alt="{{ friend.name }}">
           <span *ngIf="!friend.profilePicture">{{ friend.name }}</span>
         </span>

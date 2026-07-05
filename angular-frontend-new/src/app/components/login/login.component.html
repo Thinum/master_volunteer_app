@@ -45,7 +45,7 @@
                 <input
                   class="form-input"
                   id="password"
-                  placeholder="••••••••"
+                  placeholder="Password"
                   [type]="hidePw() ? 'password' : 'text'"
                   formControlName="password"
                   [attr.aria-label]="'Password'">
@@ -101,9 +101,9 @@
       </footer>
     </div>
 
-    <!-- Browse Organisations Section -->
+    <!-- Browse Organizations Section -->
     <div class="browse-section">
-      <h2 class="section-title">Browse Organisations</h2>
+      <h2 class="section-title">Browse Organizations</h2>
 
       <!-- Search Container -->
       <div class="search-container">
@@ -151,7 +151,7 @@
         </mat-chip-listbox>
       </div>
 
-      <!-- Organisations List -->
+      <!-- Organizations List -->
       <div class="organisations-list">
         <div *ngIf="organisationsFiltered.length > 0; else noOrganisations" class="list-content">
           <div *ngFor="let org of organisationsFiltered" class="org-item">
