@@ -1,6 +1,15 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import {
+FormBuilder,
+FormGroup,
+Validators,
+ReactiveFormsModule,
+AbstractControl,
+ValidationErrors,
+ValidatorFn
+} from '@angular/forms';
+
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -8,74 +17,125 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
 import { CommunityGoalService } from '../../../services/api/community-goal.service';
-import { Router } from '@angular/router';
+
+/* ---------------- Validators ---------------- */
+
+function futureOrTodayValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) return null;
+
+    const selected = new Date(control.value);
+    selected.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return selected >= today ? null : { pastDate: true };
+  };
+}
+
+/* 🔥 CROSS FIELD VALIDATOR (IMPORTANT) */
+const endAfterStartValidator: ValidatorFn = (group: AbstractControl) => {
+  const start = group.get('startDate')?.value;
+  const end = group.get('endDate')?.value;
+
+  if (!start || !end) return null;
+
+  return new Date(end).getTime() > new Date(start).getTime()
+    ? null
+    : { endBeforeStart: true };
+};
 
 @Component({
-selector: 'app-community-goals',
-standalone: true,
-imports: [
-CommonModule,
-ReactiveFormsModule,
-MatFormFieldModule,
-MatInputModule,
-MatCardModule,
-MatButtonModule,
-MatDatepickerModule,
-MatNativeDateModule,
-],
-templateUrl: './community-goals.component.html',
-styleUrl: './community-goals.component.css',
+  selector: 'app-community-goals',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatCardModule,
+    MatButtonModule,
+    MatDatepickerModule,
+    MatNativeDateModule
+  ],
+  templateUrl: './community-goals.component.html',
+  styleUrl: './community-goals.component.css',
 })
 export class CommunityGoalsComponent {
-organisationId!: number | null;
-isCreateMode = false;
-goalForm!: FormGroup;
+  organisationId!: number | null;
+  isCreateMode = false;
 
-loading = false;
-errorMessage = '';
-goals: any[] = [];
+  goalForm!: FormGroup;
+  formSubmitted = false;
 
-constructor(private route: ActivatedRoute, private fb: FormBuilder,  private communityGoalService: CommunityGoalService, private router: Router) {}
+  loading = false;
+  errorMessage = '';
+  goals: any[] = [];
+
+  constructor(
+    private route: ActivatedRoute,
+    private fb: FormBuilder,
+    private communityGoalService: CommunityGoalService,
+    private router: Router,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(params => {
       this.organisationId = Number(params.get('organisationId')) || null;
       this.isCreateMode = params.get('mode') === 'create';
-      console.log('mode:', params.get('mode'), 'isCreateMode:', this.isCreateMode);
     });
 
-    this.goalForm = this.fb.group({
-      title: ['', Validators.required],
-      description: [''],
-      targetValue: [null, Validators.required],
-      currentValue: [0],
-      targetDate: [null],
-    });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    /* ✅ IMPORTANT: validator is on FormGroup */
+    this.goalForm = this.fb.group(
+      {
+        title: ['', Validators.required],
+        description: [''],
+        targetValue: [null, Validators.required],
+        currentValue: [0],
+        startDate: [today, [Validators.required, futureOrTodayValidator()]],
+        endDate: [null, Validators.required],
+      },
+      {
+        validators: endAfterStartValidator
+      }
+    );
   }
 
   onCreateGoal() {
-  if (this.goalForm.invalid || !this.organisationId) return;
+    this.formSubmitted = true;
 
-  const payload = {
-    title: this.goalForm.value.title,
-    description: this.goalForm.value.description,
-    targetValue: this.goalForm.value.targetValue,
-    currentValue: this.goalForm.value.currentValue,
-    targetDate: this.goalForm.value.targetDate,
-    // defaults
-  };
+    this.goalForm.markAllAsTouched();
 
-  this.communityGoalService.createGoal(this.organisationId, payload as any).subscribe({
-    next: (createdGoal) => {
-      console.log('Created goal from API:', createdGoal);
-      // zurück zur Organisations-Detailseite
-      this.router.navigate(['/organisations', this.organisationId]);
-    },
-    error: (err) => {
-      console.error('Create goal failed', err);
-      //
-    },
-  });
-}
+    if (this.goalForm.invalid || !this.organisationId) {
+      this.snackBar.open('Please fix the form errors.', 'Close', {
+        duration: 3000
+      });
+      return;
+    }
+
+    const payload = this.goalForm.value;
+
+    this.communityGoalService.createGoal(this.organisationId, payload).subscribe({
+      next: () => {
+        this.snackBar.open('Goal created successfully!', 'Close', {
+          duration: 3000
+        });
+
+        this.router.navigate(['/organisations', this.organisationId]);
+      },
+      error: () => {
+        this.snackBar.open('Failed to create goal.', 'Close', {
+          duration: 4000
+        });
+      }
+    });
+  }
 }
