@@ -75,11 +75,13 @@ public class Activity {
     private List<String> equipmentProvided;
 
     @ElementCollection
-    private List<String> tags;
+    private List<String> tags; //TODO: Maybe auslagern
 
     private String difficulty;
     private boolean isPublic;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private ActivityStatus status;
 
     private Timestamp createdAt;
     private Timestamp updatedAt;

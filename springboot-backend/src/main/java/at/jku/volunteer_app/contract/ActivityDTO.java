@@ -1,5 +1,6 @@
 package at.jku.volunteer_app.contract;
 
+import at.jku.volunteer_app.model.ActivityStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.sql.Timestamp;
@@ -32,7 +33,7 @@ public record ActivityDTO(
         String difficulty,
         @JsonProperty("isPublic")
         boolean isPublic,
-        String status,
+        ActivityStatus status,
         Timestamp createdAt,
         Timestamp updatedAt
 ) {

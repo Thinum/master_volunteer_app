@@ -333,7 +333,7 @@ public class DataLoader {
             parkCleanup.setSpotsTaken(8);
             parkCleanup.setDifficulty("easy");
             parkCleanup.setPublic(true);
-            parkCleanup.setStatus("open");
+            parkCleanup.setStatus(ActivityStatus.open);
             parkCleanup.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             parkCleanup.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             parkCleanup.setParticipants(Arrays.asList(alice, bob, charlie, diana));
@@ -356,7 +356,7 @@ public class DataLoader {
             codingWorkshop.setSpotsTaken(5);
             codingWorkshop.setDifficulty("medium");
             codingWorkshop.setPublic(true);
-            codingWorkshop.setStatus("upcoming");
+            codingWorkshop.setStatus(ActivityStatus.upcoming);
             codingWorkshop.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             codingWorkshop.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             codingWorkshop.setParticipants(Arrays.asList(charlie, alice));
@@ -384,7 +384,7 @@ public class DataLoader {
             charityConcert.setSpotsTaken(18);
             charityConcert.setDifficulty("medium");
             charityConcert.setPublic(true);
-            charityConcert.setStatus("open");
+            charityConcert.setStatus(ActivityStatus.open);
             charityConcert.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             charityConcert.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             charityConcert.setParticipants(Arrays.asList(
@@ -417,7 +417,7 @@ public class DataLoader {
             winterSupport.setSpotsTaken(12);
             winterSupport.setDifficulty("easy");
             winterSupport.setPublic(true);
-            winterSupport.setStatus("open");
+            winterSupport.setStatus(ActivityStatus.open);
             winterSupport.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             winterSupport.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             winterSupport.setParticipants(Arrays.asList(
@@ -450,7 +450,7 @@ public class DataLoader {
             tutoringSession.setSpotsTaken(7);
             tutoringSession.setDifficulty("medium");
             tutoringSession.setPublic(true);
-            tutoringSession.setStatus("open");
+            tutoringSession.setStatus(ActivityStatus.open);
             tutoringSession.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             tutoringSession.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             tutoringSession.setParticipants(Arrays.asList(
@@ -482,7 +482,7 @@ public class DataLoader {
             animalCare.setSpotsTaken(6);
             animalCare.setDifficulty("easy");
             animalCare.setPublic(true);
-            animalCare.setStatus("open");
+            animalCare.setStatus(ActivityStatus.open);
             animalCare.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             animalCare.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             animalCare.setParticipants(Arrays.asList(
@@ -514,7 +514,7 @@ public class DataLoader {
             fireTraining.setSpotsTaken(8);
             fireTraining.setDifficulty("hard");
             fireTraining.setPublic(true);
-            fireTraining.setStatus("open");
+            fireTraining.setStatus(ActivityStatus.open);
             fireTraining.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             fireTraining.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             fireTraining.setParticipants(Arrays.asList(
@@ -542,7 +542,7 @@ public class DataLoader {
             foodBank.setSpotsTaken(2);
             foodBank.setDifficulty("easy");
             foodBank.setPublic(true);
-            foodBank.setStatus("open");
+            foodBank.setStatus(ActivityStatus.open);
             foodBank.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             foodBank.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             foodBank.setParticipants(Arrays.asList(ethan, fiona));
@@ -566,7 +566,7 @@ public class DataLoader {
             reforestation.setSpotsTaken(12);
             reforestation.setDifficulty("hard");
             reforestation.setPublic(true);
-            reforestation.setStatus("upcoming");
+            reforestation.setStatus(ActivityStatus.upcoming);
             reforestation.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             reforestation.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             reforestation.setParticipants(Arrays.asList(alice, george, bob));
