@@ -21,6 +21,7 @@ import { GoogleMapsModule } from '@angular/google-maps';
 import { Project } from '../../../models/project.model';
 import { ProjectService } from '../../../services/api/project.service';
 import { Activity } from '../../../models/activity.model';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 const FALLBACK_LOCATION_LABEL = 'Location unavailable';
 const NOMINATIM_REVERSE_URL = 'https://nominatim.openstreetmap.org/reverse';
@@ -60,6 +61,7 @@ interface NominatimReverseResponse {
     MatIconButton,
     MatButton,
     GoogleMapsModule,
+    MatTooltipModule,
   ],
   templateUrl: './organisation-detail.component.html',
   styleUrl: './organisation-detail.component.css'
@@ -67,7 +69,7 @@ interface NominatimReverseResponse {
 export class OrganisationDetailComponent implements OnInit {
   detailedOrganisation?: Organisation;
   id?: number | null;
-  friends: User[] = [];
+  private friendIds = new Set<number>();
   goals: CommunityGoal[] = [];
   projects: Project[] = [];
   activities: Activity[] = [];
@@ -79,6 +81,14 @@ export class OrganisationDetailComponent implements OnInit {
 
   private readonly activitiesPageSize = 3;
   private visibleActivityCount = this.activitiesPageSize;
+
+  get allMembers(): User[] {
+    return this.detailedOrganisation?.orgMembers?.map(member => member.user) ?? [];
+  }
+
+  get friendMembers(): User[] {
+    return this.allMembers.filter(member => this.friendIds.has(member.id));
+  }
 
 constructor(
     private route: ActivatedRoute,
@@ -102,6 +112,10 @@ constructor(
           this.volunteerService.getCurrentUser().subscribe(user => {
             this.hasJoined = this.detailedOrganisation?.orgMembers?.
               some((orgMember) => orgMember.user.id === user.id) ?? false;
+            this.volunteerService.getFriends(user.id).subscribe({
+              next: friends => this.friendIds = new Set((friends ?? []).map(friend => friend.id)),
+              error: err => console.error('Could not load friends', err)
+            });
           });
         });
 
@@ -120,10 +134,6 @@ constructor(
     this.projectService.getAllProjects()
       .subscribe(projects => this.projects = projects ?? []);
 
-    this.volunteerService.getAllVolunteers()
-      .subscribe(users => {
-        this.friends = users;
-      });
   }
 
   goToCommunityGoals(): void {

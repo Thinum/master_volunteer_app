@@ -1,3 +1,8 @@
+:host {
+  display: block;
+  container-type: inline-size;
+}
+
 .app-card {
   display: flex;
   background-color: #ffffff;
@@ -57,4 +62,48 @@
 
 .app-card.compact .card-body{
   justify-content: start;
+}
+
+.card-right:empty {
+  display: none;
+}
+
+@container (max-width: 500px) {
+  .app-card.compact {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .card-left {
+    width: 25%;
+    min-width: 4.5rem;
+  }
+
+  .app-card.compact .card-left {
+    grid-row: 1 / span 2;
+    width: 100%;
+    min-width: 4.5rem;
+  }
+
+  .card-body,
+  .app-card.compact .card-body {
+    width: auto;
+    min-width: 0;
+    padding: 1rem;
+  }
+
+  .card-right {
+    width: auto;
+    min-width: 2.75rem;
+    padding-right: 0.5rem;
+  }
+
+  .app-card.compact .card-right {
+    grid-column: 2;
+    width: auto;
+    margin-left: 0;
+    padding: 0 1rem 1rem;
+    justify-content: flex-start;
+  }
 }

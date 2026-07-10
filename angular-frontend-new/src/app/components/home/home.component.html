@@ -71,7 +71,10 @@
       <!-- Last Friend Added -->
       <app-card size="compact" class="highlight-card" *ngIf="lastFriend">
         <div card-left>
-          <img [src]="lastFriend.profilePicture || 'https://i.pravatar.cc/40?img=5'" alt="{{ lastFriend.name }}" class="avatar"/>
+          <div class="friend-avatar" [attr.aria-label]="lastFriend.name">
+            <img *ngIf="lastFriend.profilePicture" [src]="lastFriend.profilePicture" [alt]="lastFriend.name"/>
+            <span *ngIf="!lastFriend.profilePicture">{{ lastFriend.name.charAt(0) }}</span>
+          </div>
         </div>
         <div card-body>
           <div class="highlight-info">
@@ -89,30 +92,6 @@
       </div>
     </div>
 
-    <!-- Right Column: Community Goals of Last Organization -->
-    <div class="grid-section" *ngIf="lastOrganisation">
-      <h4>Community goals: {{ lastOrganisation.orgName }}</h4>
-
-      <div class="goals-container" *ngIf="communityGoals && communityGoals.length > 0; else noGoals">
-        <div class="goal-item" *ngFor="let goal of communityGoals">
-          <div class="goal-header">
-            <span class="goal-title">{{ goal.title }}</span>
-            <span class="goal-values">{{ goal.currentValue || 0 }} / {{ goal.targetValue }}</span>
-          </div>
-          <div class="progress-bar-background">
-            <div class="progress-bar-fill" [style.width.%]="getGoalProgress(goal)"></div>
-          </div>
-          <p class="goal-desc" *ngIf="goal.description">{{ goal.description }}</p>
-        </div>
-      </div>
-
-      <ng-template #noGoals>
-        <div class="empty-goals">
-          <mat-icon class="empty-icon">insights</mat-icon>
-          <p>No active community goals are defined for this organization yet.</p>
-        </div>
-      </ng-template>
-    </div>
   </div>
 
   <!-- Recommended Activities Section -->

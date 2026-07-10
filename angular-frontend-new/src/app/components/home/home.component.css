@@ -1,11 +1,12 @@
 .home-container {
-  padding: 2.5rem;
+  padding: clamp(0rem, 3vw, 2.5rem);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: linear-gradient(135deg, #f9f9fe 0%, rgba(179, 205, 254, 0.05) 100%);
   justify-content: center;
   position: relative;
   overflow: auto;
   min-height: 100vh;
+  container: home-content / inline-size;
 }
 
 /* HEADER */
@@ -79,7 +80,7 @@
 /* GRID LAYOUT */
 .home-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -143,11 +144,24 @@
 }
 
 .friend-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 48px;
   height: 48px;
+  overflow: hidden;
   border-radius: 50%;
+  background: var(--relationship-friend, var(--avatar-bg));
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.friend-avatar img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  background-color: rgba(70, 96, 138, 0.1);
 }
 
 .category-tag {
@@ -173,7 +187,7 @@
 }
 
 /* Empty States */
-.empty-highlights, .empty-goals {
+.empty-highlights {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -191,60 +205,9 @@
   color: #b3cdfe;
 }
 
-.empty-highlights p, .empty-goals p {
+.empty-highlights p {
   font-size: 0.85rem;
   line-height: 1.4;
-  margin: 0;
-}
-
-/* Goals */
-.goals-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.goal-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.goal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.85rem;
-}
-
-.goal-title {
-  font-weight: 600;
-  color: #2f323a;
-}
-
-.goal-values {
-  font-weight: 700;
-  color: #39547d;
-}
-
-.progress-bar-background {
-  width: 100%;
-  height: 8px;
-  background-color: #f3f3fa;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #46608a, #2196f3);
-  border-radius: 4px;
-  transition: width 0.5s cubic-bezier(0.1, 0.8, 0.3, 1);
-}
-
-.goal-desc {
-  font-size: 0.75rem;
-  color: #7f8187;
   margin: 0;
 }
 
@@ -400,4 +363,115 @@
 .chat-icon{
   flex:1;
   align-content: flex-end;
+}
+
+/* React to the actual content width, not the outer browser viewport. */
+@container home-content (max-width: 700px) {
+  .header {
+    align-items: stretch;
+    margin-bottom: 1rem;
+    padding: 1.25rem;
+    flex-direction: column;
+    gap: 1.25rem;
+    border-radius: 0.875rem;
+  }
+
+  .user-info {
+    min-width: 0;
+    align-items: center;
+  }
+
+  .user-info > div {
+    min-width: 0;
+  }
+
+  .user-info h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    line-height: 1.3;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .profile-pic {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+  }
+
+  .role {
+    line-height: 1.35;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  .stat {
+    min-width: 0;
+    padding: 0 0.25rem;
+  }
+
+  .stat + .stat {
+    border-left: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  .stat .value {
+    font-size: 1.35rem;
+    line-height: 1.2;
+  }
+
+  .stat .label {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.6rem;
+    line-height: 1.25;
+    letter-spacing: 0.025em;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .notification,
+  .grid-section,
+  .recommended-section {
+    padding: 1rem;
+    border-radius: 0.875rem;
+  }
+
+  .home-grid,
+  .recommended-section {
+    margin-bottom: 1rem;
+  }
+
+  .grid-section {
+    gap: 0.75rem;
+  }
+
+  .grid-section br {
+    display: none;
+  }
+
+  .highlight-info,
+  .rec-content,
+  .request-info {
+    min-width: 0;
+  }
+
+  .highlight-info h5,
+  .highlight-info p,
+  .rec-content h5,
+  .rec-desc {
+    overflow-wrap: anywhere;
+  }
+
+  .join-button {
+    min-width: 3.5rem;
+    padding-inline: 0.75rem;
+  }
 }

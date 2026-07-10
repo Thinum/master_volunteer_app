@@ -63,7 +63,7 @@ export class FriendsComponent implements OnInit {
   }
 
   loadDataForUser(userId: number): void {
-    this.volunteerService.getConnections(userId)
+    this.volunteerService.getFriends(userId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(friends => this.friends = friends);
 

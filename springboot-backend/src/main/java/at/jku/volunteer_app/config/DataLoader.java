@@ -30,8 +30,11 @@ public class DataLoader {
                                    ChatConversationRepository chatConversationRepository,
                                    ChatMessageRepository chatMessageRepository,
                                    JdbcTemplate jdbcTemplate,
+                                   NotificationRepository notificationRepository,
                                    PasswordEncoder passwordEncoder) {
         return args -> {
+            ensureNotificationAutoIncrement(jdbcTemplate);
+
             dropLegacyInterestNormalizedNameColumn(jdbcTemplate);
             migrateLegacyCommunityGoalActivityTags(jdbcTemplate, interestRepository);
 
@@ -822,6 +825,48 @@ public class DataLoader {
             );
         });
     }
+
+    private void ensureOpenFriendRequests(UserRepository userRepository,
+                                          UserRelationshipRepository relationshipRepository,
+                                          NotificationRepository notificationRepository) {
+        List<User> activeUsers = userRepository.findAll().stream()
+                .filter(User::isActive)
+                .toList();
+
+        activeUsers.forEach(recipient -> {
+            if (notificationRepository.existsByUser_IdAndTypeAndHasBeenReadFalse(
+                    recipient.getId(), NotificationType.FRIEND_REQUEST)) {
+                return;
+            }
+
+            activeUsers.stream()
+                    .filter(sender -> sender.getId() != recipient.getId())
+                    .filter(sender -> !relationshipRepository.existsFriendship(
+                            recipient, sender, RelationshipType.FRIEND))
+                    .findFirst()
+                    .ifPresent(sender -> {
+                NotificationPayload payload = new NotificationPayload();
+                payload.setPayloadType("USER_ID");
+                payload.setPayload(String.valueOf(sender.getId()));
+
+                Notification request = new Notification();
+                request.setTitle("Friend request");
+                request.setText(sender.getName() + " wants to connect with you.");
+                request.setType(NotificationType.FRIEND_REQUEST);
+                request.setHasBeenRead(false);
+                request.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+                request.setUser(recipient);
+                request.setNotificationPayloadList(List.of(payload));
+                notificationRepository.save(request);
+            });
+        });
+    }
+
+    private void ensureNotificationAutoIncrement(JdbcTemplate jdbcTemplate) {
+        jdbcTemplate.execute("ALTER TABLE notification MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT");
+        jdbcTemplate.execute("ALTER TABLE notification_payload MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT");
+    }
+
 
     private void ensureGreenFutureGoalActivities(UserRepository userRepository,
                                                  ActivityRepository activityRepository,

@@ -32,15 +32,15 @@
 
 .organisation-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
 }
 
 .organisation-card {
   display: flex;
-  gap: 1rem;
   min-width: 0;
-  padding: 1rem;
+  min-height: 180px;
+  overflow: hidden;
   border: 1px solid rgba(175, 178, 187, 0.16);
   border-radius: 0.75rem;
   background-color: #ffffff;
@@ -59,25 +59,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 58px;
-  height: 58px;
-  border-radius: 0.75rem;
-  background-color: #f3f3fa;
+  width: 5.25rem;
+  min-height: 100%;
+  border-radius: 0;
+  background-color: #f0f4fa;
   flex: 0 0 auto;
   overflow: hidden;
-  padding: 0.45rem;
+  padding: 0.7rem;
 }
 
 .avatar {
-  width: 100%;
-  height: 100%;
-  border-radius: 0.45rem;
+  width: 3.75rem;
+  height: 3.75rem;
+  border-radius: 0.65rem;
   object-fit: contain;
+  background: #ffffff;
 }
 
 .avatar-placeholder {
-  width: 100%;
-  height: 100%;
+  width: 3.75rem;
+  height: 3.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -92,7 +93,16 @@
   flex: 1;
   min-width: 0;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.45rem;
+  padding: 1rem;
+}
+
+.organisation-type {
+  color: #46608a;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
 }
 
 .card-heading {
@@ -108,16 +118,6 @@
   font-size: 1rem;
   font-weight: 800;
   line-height: 1.25;
-}
-
-.category-pill {
-  padding: 0.2rem 0.55rem;
-  border-radius: 999px;
-  background-color: #f0f4fa;
-  color: #39547d;
-  font-size: 0.68rem;
-  font-weight: 800;
-  white-space: nowrap;
 }
 
 .description {
@@ -153,6 +153,7 @@
   justify-content: space-between;
   margin-top: auto;
   color: #46608a;
+  padding-top: 0.35rem;
 }
 
 .meta-item {
@@ -201,6 +202,21 @@
   }
 
   .organisation-card {
+    min-height: 165px;
+  }
+
+  .avatar-frame {
+    width: 4.25rem;
+    padding: 0.5rem;
+  }
+
+  .avatar,
+  .avatar-placeholder {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+
+  .card-content {
     padding: 0.85rem;
   }
 }

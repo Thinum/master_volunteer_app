@@ -1,0 +1,141 @@
+.notifications-list {
+  display: grid;
+  gap: 1rem;
+  width: min(100%, 760px);
+  margin: 0 auto;
+}
+
+.notification-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: start;
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid #e7e9f2;
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(70, 96, 138, 0.08);
+}
+
+.notification-icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  color: #46608a;
+  background: #edf1f8;
+  border-radius: 0.8rem;
+}
+
+.notification-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.notification-meta {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  color: #6b7280;
+  font-size: 0.78rem;
+}
+
+h2 {
+  margin: 0.35rem 0 0;
+  color: #23283a;
+  font-size: 1.1rem;
+}
+
+.message {
+  margin: 0.55rem 0 0;
+  color: #5c6270;
+}
+
+.organisation {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  margin: 0.35rem 0 0;
+  color: #46608a;
+  font-size: 0.875rem;
+}
+
+.organisation mat-icon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+}
+
+.progress-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 1rem;
+  color: #46608a;
+  font-size: 0.85rem;
+}
+
+.progress-track {
+  flex: 1;
+  height: 0.45rem;
+  overflow: hidden;
+  background: #e8ebf1;
+  border-radius: 999px;
+}
+
+.progress-track span {
+  display: block;
+  height: 100%;
+  background: #5b78a5;
+  border-radius: inherit;
+}
+
+.read-button {
+  color: #7a8190;
+}
+
+.friend-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: stretch;
+}
+
+.accept-button {
+  color: #fff;
+  background: #46608a;
+}
+
+.empty-state {
+  padding: 3rem 1rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+.empty-state > mat-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 2.5rem;
+}
+
+.empty-state h2 {
+  margin-top: 0.75rem;
+}
+
+.empty-state p {
+  margin-top: 0.35rem;
+}
+
+@media (max-width: 560px) {
+  .notification-card {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .read-button,
+  .friend-actions {
+    position: absolute;
+    right: 1.75rem;
+  }
+}

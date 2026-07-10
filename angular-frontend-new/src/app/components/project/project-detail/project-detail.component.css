@@ -17,7 +17,7 @@
     height: 40px;
     border-radius: 50%;
     overflow: hidden;
-    background: linear-gradient(to bottom right, #46608a, #39547d);
+    background: var(--relationship-friend, var(--avatar-bg));
     color: white;
     display: flex;
     align-items: center;
@@ -69,5 +69,17 @@
       margin-right: 0.5rem;
       color: #46608a;
     }
+  }
+}
+
+@media (max-width: 700px) {
+  .detail-card {
+    margin: 0;
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
   }
 }

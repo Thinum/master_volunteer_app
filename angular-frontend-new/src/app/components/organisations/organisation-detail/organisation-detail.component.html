@@ -177,17 +177,43 @@
     </mat-card>
   </div>
 
-  <mat-card class="friends-card">
-    <mat-card-header>
-      <mat-card-title>Friends</mat-card-title>
-    </mat-card-header>
+  <mat-card class="members-card">
     <mat-card-content>
-      <mat-list role="list">
-        <mat-list-item lines="10" *ngFor="let contact of detailedOrganisation.orgContacts">
-          <span matListItemTitle>{{ contact.name || 'Unknown User' }}</span>
-          <span matListItemLine *ngIf="contact.email">{{ contact.email }}</span>
-        </mat-list-item>
-      </mat-list>
+      <section class="member-section">
+        <h3><mat-icon>group</mat-icon> My friends in this organization</h3>
+        <div class="member-avatars" *ngIf="friendMembers.length > 0; else noFriendMembers">
+          <a
+            *ngFor="let friend of friendMembers"
+            class="member-avatar"
+            [routerLink]="['/profile', friend.id]"
+            matTooltip="{{ friend.name }}"
+            [attr.aria-label]="friend.name">
+            <img *ngIf="friend.profilePicture" [src]="friend.profilePicture" [alt]="friend.name">
+            <span *ngIf="!friend.profilePicture">{{ friend.name.charAt(0) }}</span>
+          </a>
+        </div>
+        <ng-template #noFriendMembers>
+          <p class="member-empty">No friends are members of this organization yet.</p>
+        </ng-template>
+      </section>
+
+      <section class="member-section">
+        <h3><mat-icon>groups</mat-icon> All members</h3>
+        <div class="member-avatars" *ngIf="allMembers.length > 0; else noMembers">
+          <a
+            *ngFor="let member of allMembers"
+            class="member-avatar"
+            [routerLink]="['/profile', member.id]"
+            matTooltip="{{ member.name }}"
+            [attr.aria-label]="member.name">
+            <img *ngIf="member.profilePicture" [src]="member.profilePicture" [alt]="member.name">
+            <span *ngIf="!member.profilePicture">{{ member.name.charAt(0) }}</span>
+          </a>
+        </div>
+        <ng-template #noMembers>
+          <p class="member-empty">No members yet.</p>
+        </ng-template>
+      </section>
     </mat-card-content>
   </mat-card>
 </div>

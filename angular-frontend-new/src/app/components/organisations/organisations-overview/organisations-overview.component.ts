@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgForOf, NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
@@ -9,11 +10,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 
 import { OrganisationService } from '../../../services/api/organisation.service';
+import { VolunteerService } from '../../../services/api/volunteer.service';
 import { Organisation, OrganisationCategory } from '../../../models/organisation.model';
 import { OrganisationListComponent } from './organisation-list/organisation-list.component';
 
 import {
-  MOCK_JOINED_ORGANISATIONS,
   MOCK_RECOMMENDED_ORGANISATIONS,
   MOCK_FEATURED_ORGANISATIONS
 } from '../../../mock/mock-organisations';
@@ -50,15 +51,37 @@ export class OrganisationsOverviewComponent implements OnInit {
   categories: OrganisationCategory[] = [];
   tags: string[] = [];
 
-  //TODO: not sure if these should be effected by the search / filters too?
-  joinedOrganisations = MOCK_JOINED_ORGANISATIONS;
+  joinedOrganisations: Organisation[] = [];
   recommendedOrganisations = MOCK_RECOMMENDED_ORGANISATIONS;
   featuredOrganisations = MOCK_FEATURED_ORGANISATIONS;
 
-  constructor(private organisationService: OrganisationService) {}
+  private readonly destroyRef = inject(DestroyRef);
+
+  constructor(
+    private organisationService: OrganisationService,
+    private volunteerService: VolunteerService
+  ) {}
 
   ngOnInit(): void {
     this.loadOrganisations();
+    this.loadJoinedOrganisations();
+  }
+
+  private loadJoinedOrganisations(): void {
+    this.volunteerService.getCurrentUser()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(user => {
+        if (!user?.id) {
+          this.joinedOrganisations = [];
+          return;
+        }
+
+        this.volunteerService.getOrganisations(user.id)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(organisations => {
+            this.joinedOrganisations = organisations ?? [];
+          });
+      });
   }
 
   private loadOrganisations(): void {

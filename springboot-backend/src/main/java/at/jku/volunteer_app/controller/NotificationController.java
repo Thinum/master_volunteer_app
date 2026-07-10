@@ -40,4 +40,20 @@ public class NotificationController {
                 notificationService.readNotification(userDetails, ContractMapper.toNotificationEntity(notification))
         );
     }
+
+    @PostMapping("/{id}/accept")
+    public NotificationDTO acceptFriendRequest(@PathVariable int id,
+                                               @AuthenticationPrincipal UserModelDetails userDetails) {
+        return ContractMapper.toNotificationDTO(
+                notificationService.respondToFriendRequest(userDetails.getUserId(), id, true)
+        );
+    }
+
+    @PostMapping("/{id}/reject")
+    public NotificationDTO rejectFriendRequest(@PathVariable int id,
+                                               @AuthenticationPrincipal UserModelDetails userDetails) {
+        return ContractMapper.toNotificationDTO(
+                notificationService.respondToFriendRequest(userDetails.getUserId(), id, false)
+        );
+    }
 }

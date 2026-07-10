@@ -1,27 +1,130 @@
-<div class="container">
-  <app-card *ngFor="let activity of activities" [routerLink]="['/activities', activity.id]" routerLinkActive="active" ariaCurrentWhenActive="page">
-    <div card-left>
-      <div class="date">
-        <span class="label">{{ getOrganisationNames(activity) }}</span>
-        <span class="value">{{ activity.date | date: 'd' }}</span>
-        <span class="label month">{{ activity.date | date:'MMM' }}</span>
+<div class="activities-page">
+  <section class="overview-header">
+    <div>
+      <span class="eyebrow">Activities</span>
+      <h1>Find your next activity</h1>
+      <p>Choose an opportunity, meet people and make a difference.</p>
+    </div>
+
+    <div class="overview-stats">
+      <div class="stat-item">
+        <span class="stat-value">{{ activities.length }}</span>
+        <span class="stat-label">total</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ joinedActivitiesCount }}</span>
+        <span class="stat-label">joined</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ openActivitiesCount }}</span>
+        <span class="stat-label">open</span>
       </div>
     </div>
-    <div card-body>
-      <div class="card-content" >
-        <p class="organization">{{ getOrganisationNames(activity) }}</p>
-        <p class="activity-title">{{ activity.title }}</p>
-        <p class="activity-description"> {{ activity.description }} </p>
-        <div class="friends" *ngIf="activity.participants && activity.participants.length > 0">
-        <span *ngFor="let friend of activity.participants" class="friend-avatar">
-          <img *ngIf="friend.profilePicture" [src]="friend.profilePicture" alt="{{ friend.name }}">
-          <span *ngIf="!friend.profilePicture">{{ friend.name }}</span>
-        </span>
+  </section>
+
+  <section class="search-panel">
+    <mat-form-field appearance="outline" class="search-bar" subscriptSizing="dynamic">
+      <mat-label>Search</mat-label>
+      <input matInput type="text" [value]="searchTerm" (input)="searchTerm = $any($event.target).value; applyFilters()">
+      <button mat-icon-button matSuffix type="button" aria-label="Search"><mat-icon>search</mat-icon></button>
+    </mat-form-field>
+
+    <button mat-stroked-button type="button" class="filter-button" (click)="showFilters = !showFilters">
+      <mat-icon>tune</mat-icon>
+      Filter
+      <span *ngIf="selectedStatus" class="filter-count">1</span>
+    </button>
+  </section>
+
+  <section *ngIf="showFilters" class="filter-panel">
+    <div class="filter-header">
+      <div><h3>Filter</h3><p>Narrow the list by activity status.</p></div>
+      <button mat-button type="button" *ngIf="selectedStatus || searchTerm" (click)="clearFilters()">Reset</button>
+    </div>
+    <mat-chip-listbox>
+      <mat-chip-option [selected]="selectedStatus === 'open'" (selectionChange)="toggleStatus('open')">Open</mat-chip-option>
+      <mat-chip-option [selected]="selectedStatus === 'upcoming'" (selectionChange)="toggleStatus('upcoming')">Upcoming</mat-chip-option>
+      <mat-chip-option [selected]="selectedStatus === 'finished'" (selectionChange)="toggleStatus('finished')">Finished</mat-chip-option>
+      <mat-chip-option [selected]="selectedStatus === 'canceled'" (selectionChange)="toggleStatus('canceled')">Canceled</mat-chip-option>
+    </mat-chip-listbox>
+  </section>
+
+  <section class="activity-section" *ngIf="joinedActivities.length">
+    <div class="section-header">
+      <div>
+        <h2>Joined</h2>
+        <p>{{ joinedActivities.length }} {{ joinedActivities.length === 1 ? 'activity' : 'activities' }}</p>
+      </div>
+    </div>
+    <ng-container *ngTemplateOutlet="activityGrid; context: { $implicit: joinedActivities }"></ng-container>
+  </section>
+
+  <section class="activity-section" *ngIf="recommendedActivities.length">
+    <div class="section-header">
+      <div>
+        <h2>Recommended</h2>
+        <p>{{ recommendedActivities.length }} {{ recommendedActivities.length === 1 ? 'activity' : 'activities' }}</p>
+      </div>
+    </div>
+    <ng-container *ngTemplateOutlet="activityGrid; context: { $implicit: recommendedActivities }"></ng-container>
+  </section>
+
+  <section class="activity-section">
+    <div class="section-header">
+      <div>
+        <h2>All activities</h2>
+        <p>{{ filteredActivities.length }} {{ filteredActivities.length === 1 ? 'activity' : 'activities' }}</p>
+      </div>
+    </div>
+
+    <ng-container *ngIf="filteredActivities.length; else emptyState"
+      [ngTemplateOutlet]="activityGrid"
+      [ngTemplateOutletContext]="{ $implicit: filteredActivities }">
+    </ng-container>
+  </section>
+
+  <ng-template #activityGrid let-list>
+    <div class="activity-grid">
+      <a
+        class="activity-card"
+        *ngFor="let activity of list"
+        [routerLink]="['/activities', activity.id]">
+        <div class="date-tile">
+          <span class="month">{{ activity.date | date:'MMM' }}</span>
+          <strong>{{ activity.date | date:'d' }}</strong>
         </div>
-      </div>
+
+        <div class="activity-content">
+          <span class="organisation">{{ getOrganisationNames(activity) }}</span>
+          <h3>{{ activity.title }}</h3>
+          <p>{{ activity.description || activity.body }}</p>
+
+          <div class="card-footer">
+            <div class="friends" *ngIf="activity.participants?.length">
+              <span *ngFor="let friend of activity.participants"
+                    class="friend-avatar"
+                    [matTooltip]="friend.name"
+                    [attr.aria-label]="friend.name">
+                <img *ngIf="friend.profilePicture" [src]="friend.profilePicture" [alt]="friend.name">
+                <span *ngIf="!friend.profilePicture">{{ friend.name.charAt(0) }}</span>
+              </span>
+              <span class="friend-label">friends joining</span>
+            </div>
+            <mat-icon class="arrow">arrow_forward</mat-icon>
+          </div>
+        </div>
+      </a>
     </div>
-  </app-card>
+  </ng-template>
+
+  <ng-template #emptyState>
+    <div class="empty-state">
+      <mat-icon>event_busy</mat-icon>
+      <p>No activities match your search.</p>
+    </div>
+  </ng-template>
 </div>
-<button [routerLink]="'/createActivity'" mat-fab class="corner-button" color="primary" (click)="addNew()" >
+
+<button routerLink="/createActivity" mat-fab class="corner-button" color="primary" aria-label="Create activity">
   <mat-icon>add</mat-icon>
 </button>

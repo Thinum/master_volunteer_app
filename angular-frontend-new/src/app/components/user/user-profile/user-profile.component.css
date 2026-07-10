@@ -68,6 +68,17 @@
   background-color: #f3f3fa;
 }
 
+.friend-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--relationship-friend, var(--avatar-bg));
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
 /* ACTIVITY ICON */
 .activity-icon {
   width: 42px;
@@ -126,4 +137,26 @@ mat-card-content {
 
 .profile-tags h3 {
   margin-bottom: 0.75rem;
+}
+
+@media (max-width: 600px) {
+  .profile-card {
+    max-width: 100%;
+    margin: 0 auto 1rem;
+  }
+
+  mat-card-header,
+  mat-card-content {
+    padding: 1rem;
+  }
+
+  .profile-image {
+    margin-right: 0.75rem;
+  }
+
+  .edit-profile-button {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    overflow: hidden;
+  }
 }

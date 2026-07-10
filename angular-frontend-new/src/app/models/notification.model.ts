@@ -4,6 +4,7 @@ export enum NotificationType {
   FRIEND_REQUEST = "FRIEND_REQUEST",
   FRIEND_ACCEPTED = "FRIEND_ACCEPTED",
   FRIEND_REJECTED = "FRIEND_REJECTED",
+  COMMUNITY_GOAL_PROGRESS = "COMMUNITY_GOAL_PROGRESS",
 }
 
 export interface AppNotification {
@@ -15,6 +16,8 @@ export interface AppNotification {
   createdAt: Date;
   user?: User;
   notificationPayloadList?: AppNotificationPayload[];
+  communityGoalTitle?: string;
+  organisationName?: string;
 }
 
 export interface AppNotificationPayload {

@@ -8,11 +8,10 @@ import { CardComponent } from '../../shared/components/card/card.component';
 import { User } from '../../models/user.model';
 import { Activity } from '../../models/activity.model';
 import { Organisation } from '../../models/organisation.model';
-import { CommunityGoal } from '../../models/community-goal.model';
 import { VolunteerService } from '../../services/api/volunteer.service';
 import { NotificationService } from '../../services/notification.service';
 import { ActivityService } from '../../services/api/activity.service';
-import { CommunityGoalService } from '../../services/api/community-goal.service';
+import { NotificationType } from '../../models/notification.model';
 
 @Component({
   selector: 'app-home',
@@ -38,15 +37,13 @@ export class HomeComponent implements OnInit {
   lastOrganisation: Organisation | null = null;
   lastFriend: User | null = null;
 
-  communityGoals: CommunityGoal[] = [];
   recommendedActivities: Activity[] = [];
   requests: any[] = [];
 
   constructor(
     private volunteerService: VolunteerService,
     private notificationService: NotificationService,
-    private activityService: ActivityService,
-    private communityGoalService: CommunityGoalService
+    private activityService: ActivityService
   ) {}
 
   ngOnInit(): void {
@@ -81,7 +78,6 @@ export class HomeComponent implements OnInit {
               this.organisationsCount = oList.length;
               if (oList.length > 0) {
                 this.lastOrganisation = oList[oList.length - 1];
-                this.loadCommunityGoals(this.lastOrganisation.id);
               }
             },
             error: (err) => console.error('Error fetching organisations:', err)
@@ -104,15 +100,6 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  private loadCommunityGoals(orgId: number): void {
-    this.communityGoalService.getGoalsForOrganisation(orgId).subscribe({
-      next: (goals) => {
-        this.communityGoals = goals || [];
-      },
-      error: (err) => console.error('Error fetching community goals:', err)
-    });
-  }
-
   private loadRecommendedActivities(joinedActivities: Activity[]): void {
     this.activityService.getAllActivities().subscribe({
       next: (allActivities) => {
@@ -128,25 +115,21 @@ export class HomeComponent implements OnInit {
   private loadNotifications(): void {
     this.notificationService.getNotifications().subscribe({
       next: (notifications) => {
-        this.requests = (notifications || []).map(notif => ({
+        this.requests = (notifications || [])
+          .filter(notif => notif.type === NotificationType.FRIEND_REQUEST)
+          .map(notif => ({
           id: notif.id,
           organisation: notif.title || 'Notification',
           title: notif.text || 'New request received',
-          hours: notif.id ? (notif.id * 4) % 12 + 1 : 4,
+          hours: notif.id && notif.id > 0 ? (notif.id * 4) % 12 + 1 : 4,
           user: {
             name: notif.user?.name || 'System',
             avatar: notif.user?.profilePicture || 'https://i.pravatar.cc/40?img=1'
           }
-        }));
+          }));
       },
       error: (err) => console.error('Error fetching notifications:', err)
     });
-  }
-
-  getGoalProgress(goal: CommunityGoal): number {
-    if (!goal.targetValue) return 0;
-    const progress = ((goal.currentValue || 0) / goal.targetValue) * 100;
-    return Math.min(100, Math.max(0, progress));
   }
 
   getSpotsTaken(activity: Activity): number {

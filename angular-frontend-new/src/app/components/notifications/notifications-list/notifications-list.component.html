@@ -1,13 +1,49 @@
-@for (notification of notificationsToDisplay; track notification.id) {
-  <app-card>
-    <div card-left>
-      <span>{{notification.type}}</span>
+<section class="notifications-list" aria-label="Notifications">
+  @for (notification of notificationsToDisplay; track notification.id) {
+    <article class="notification-card">
+      <div class="notification-icon" aria-hidden="true">
+        <mat-icon>{{notification.communityGoalTitle ? 'flag' : 'notifications'}}</mat-icon>
+      </div>
+
+      <div class="notification-content">
+        <div class="notification-meta">
+          <span>{{notification.title || 'Notification'}}</span>
+        </div>
+
+        <h2>{{notification.communityGoalTitle || notification.text}}</h2>
+        @if (notification.organisationName) {
+          <p class="organisation"><mat-icon>apartment</mat-icon>{{notification.organisationName}}</p>
+        }
+        @if (notification.communityGoalTitle) {
+          <p class="message">{{notification.text}}</p>
+        }
+
+        @if (getProgress(notification); as progress) {
+          <div class="progress-row">
+            <div class="progress-track" role="progressbar" aria-label="Community goal progress" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="progress">
+              <span [style.width.%]="progress"></span>
+            </div>
+            <strong>{{progress}}%</strong>
+          </div>
+        }
+      </div>
+
+      @if (notification.type === NotificationType.FRIEND_REQUEST) {
+        <div class="friend-actions">
+          <button mat-flat-button class="accept-button" (click)="acceptFriendRequest(notification)">Accept</button>
+          <button mat-button (click)="rejectFriendRequest(notification)">Decline</button>
+        </div>
+      } @else {
+        <button mat-icon-button class="read-button" aria-label="Mark notification as read" (click)="onNotificationClick(notification)">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </article>
+  } @empty {
+    <div class="empty-state">
+      <mat-icon>notifications_none</mat-icon>
+      <h2>You're all caught up</h2>
+      <p>There are no new notifications.</p>
     </div>
-    <div card-body>
-      <span>{{notification.text}}</span>
-    </div>
-    <div card-right>
-      <button mat-icon-button (click)="onNotificationClick(notification)"><mat-icon>check</mat-icon></button>
-    </div>
-  </app-card>
-}
+  }
+</section>

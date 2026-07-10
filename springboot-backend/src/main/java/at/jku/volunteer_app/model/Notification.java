@@ -16,6 +16,7 @@ import java.util.List;
 @Table(name = "notification")
 public class Notification {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String title = "";
     private String text = "";
@@ -23,7 +24,7 @@ public class Notification {
     @Enumerated(EnumType.STRING)
     private NotificationType type = NotificationType.NONE;
 
-    private boolean HasBeenRead = false;
+    private boolean hasBeenRead = false;
 
     private Timestamp createdAt;
 

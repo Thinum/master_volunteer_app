@@ -1,5 +1,8 @@
 /* Design System Variables */
 :root {
+  --bottom-nav-height: calc(5rem + env(safe-area-inset-bottom, 0px));
+  --bottom-nav-gap: 1.5rem;
+
   /* Colors: Tonal Architecture */
   --primary: #46608a;
   --primary-dim: #39547d;
@@ -62,12 +65,35 @@ html, body {
   padding: 0;
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
   font-family: var(--font-body), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background-color: var(--surface);
   color: var(--on-surface);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+img, svg, video, canvas {
+  max-width: 100%;
+}
+
+button, input, textarea, select {
+  font: inherit;
+}
+
+/* Routed Angular components should always be allowed to shrink with the viewport. */
+router-outlet + *, app-root, app-root > *, mat-card, mat-form-field {
+  min-width: 0;
+  max-width: 100%;
+}
+
+mat-form-field {
+  width: 100%;
 }
 
 /* Typography Classes */
@@ -166,4 +192,76 @@ body {
   bottom: 6.5rem;
   z-index: 100;
   display: flex;
+}
+
+@media (max-width: 700px) {
+  :root {
+    --bottom-nav-height: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+    --bottom-nav-gap: 1rem;
+  }
+
+  .display-md {
+    font-size: clamp(2rem, 10vw, 2.5rem);
+  }
+
+  h1 {
+    font-size: clamp(1.65rem, 8vw, 2rem);
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  h2, h3, p, a, span {
+    overflow-wrap: anywhere;
+  }
+
+  .detail-card,
+  .profile-card,
+  .edit-profile-card {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto 1rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .section {
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+
+  .contacts-grid,
+  .form-grid,
+  .picture-section {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .info-row,
+  .organisation-list-element {
+    align-items: flex-start;
+  }
+
+  .info-row mat-icon {
+    flex: 0 0 auto;
+  }
+
+  .form-actions {
+    flex-wrap: wrap;
+  }
+
+  .form-actions > button,
+  .form-actions > a {
+    flex: 1 1 9rem;
+  }
+
+  .corner-button {
+    right: 0.875rem;
+    bottom: calc(var(--bottom-nav-height) + 0.875rem);
+  }
+
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }

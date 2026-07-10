@@ -20,9 +20,9 @@
       </div>
 
       <div class="card-content">
+        <span class="organisation-type" *ngIf="org.category">{{ org.category }}</span>
         <div class="card-heading">
           <h4>{{ org.orgName }}</h4>
-          <span class="category-pill" *ngIf="org.category">{{ org.category }}</span>
         </div>
 
         <p class="description">{{ org.body || 'No description available.' }}</p>
