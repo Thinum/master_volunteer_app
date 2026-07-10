@@ -107,6 +107,16 @@
         <div card-body>
           <div class="rec-content">
             <h5>{{ act.title }}</h5>
+            <div class="rec-meta">
+              <span *ngIf="act.date">
+                <mat-icon>calendar_today</mat-icon>
+                {{ act.date | date:'MMM d' }}
+              </span>
+              <span *ngIf="act.location">
+                <mat-icon>place</mat-icon>
+                {{ act.location }}
+              </span>
+            </div>
             <p class="rec-desc">{{ act.description || act.body }}</p>
             <div class="skills-tags" *ngIf="act.skills && act.skills.length > 0">
               <span class="skill-tag" *ngFor="let skill of act.skills">{{ skill }}</span>
@@ -116,7 +126,7 @@
             </p>
           </div>
         </div>
-        <div card-right>
+        <div card-right class="rec-action">
           <button mat-raised-button color="primary" class="join-button" [disabled]="isActivityFull(act)" (click)="joinActivity(act.id); $event.stopPropagation()">
             {{ isActivityFull(act) ? 'Full' : 'Join' }}
           </button>
