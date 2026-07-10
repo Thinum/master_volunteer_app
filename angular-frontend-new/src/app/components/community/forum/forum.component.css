@@ -30,7 +30,7 @@
 .corner-button {
   position: fixed;
   right: 1rem;
-  bottom: 6.5rem;
+  bottom: calc(var(--bottom-nav-height) + var(--bottom-nav-gap));
   z-index: 100;
   border-radius: 50%;
   display: flex;
@@ -43,7 +43,7 @@
   border: none;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(70, 96, 138, 0.2);
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .corner-button:hover {
@@ -58,7 +58,7 @@
 .forum-list {
   display: flex;
   flex-direction: column;
-  padding-top: 1rem;
+  padding: 1rem;
   gap: 1rem;
 }
 
@@ -86,17 +86,18 @@
 }
 
 .forum-icon {
-  margin-right: 2.5rem;
-  width: 64px;
-  height: 64px;
+  display: block;
+  width: 3.75rem;
+  height: 3.75rem;
+  aspect-ratio: 1;
   border-radius: 50%;
   object-fit: cover;
   background: linear-gradient(to bottom right, #46608a, #39547d);
+  flex: 0 0 auto;
 }
 
 app-card [card-body] {
   overflow: hidden;
-  max-width: calc(100% - 80px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -108,4 +109,47 @@ app-card [card-body] {
 .card-content {
   width: 100%;
   overflow: hidden;
+}
+
+:host ::ng-deep app-card .app-card {
+  min-height: 8.5rem;
+}
+
+:host ::ng-deep app-card .card-body {
+  width: auto;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-left: 2rem;
+}
+
+:host ::ng-deep app-card .card-right {
+  width: 6.5rem;
+  min-width: 6.5rem;
+  padding: 0 1.25rem;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .forum-header {
+    padding: 1rem;
+  }
+
+  .forum-list {
+    padding: 1rem;
+  }
+
+  .forum-icon {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  :host ::ng-deep app-card .card-body {
+    padding-left: 1rem;
+  }
+
+  :host ::ng-deep app-card .card-right {
+    width: 4.75rem;
+    min-width: 4.75rem;
+    padding: 0 0.875rem;
+  }
 }

@@ -12,89 +12,119 @@ import { User } from '../../../../models/user.model';
 @Component({
   selector: 'app-friends-graph',
   template: `
-  <div class="legend">
-    <div class="legend-title">Relationship Types</div><br />
-    <div class="legend-items">
-      <div class="legend-item" *ngFor="let item of relationshipLegend">
-        <span class="legend-color" [style.background]="item.color"></span>
-        <span class="legend-label">{{ item.type }}</span>
+  <div class="graph-panel">
+    <div class="legend">
+      <div class="legend-title">Relationship Types</div>
+      <div class="legend-items">
+        <div class="legend-item" *ngFor="let item of relationshipLegend">
+          <span class="legend-color" [style.background]="item.color"></span>
+          <span class="legend-label">{{ item.type }}</span>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div #cyContainer class="cy-container"></div>
+    <div #cyContainer class="cy-container"></div>
+  </div>
   `,
   styles: [`
+    .graph-panel {
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+      border: 1px solid rgba(175, 178, 187, 0.35);
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 18% 12%, rgba(179, 205, 254, 0.32), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(249, 249, 254, 0.96));
+      box-shadow: 0 18px 42px rgba(47, 50, 58, 0.08);
+    }
+
     .cy-container {
       width: 100%;
-      height: 500px;
-      border-radius: 12px;
-      background: transparent;
-      padding: 16px;
+      height: min(560px, 66vh);
+      min-height: 420px;
+      border: 1px solid rgba(175, 178, 187, 0.24);
+      border-radius: 10px;
+      background:
+        linear-gradient(rgba(70, 96, 138, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(70, 96, 138, 0.045) 1px, transparent 1px),
+        rgba(255, 255, 255, 0.58);
+      background-size: 28px 28px;
+      overflow: hidden;
     }
 
-    /* Contextual Surface */
     .legend {
-      padding: 16px;
-      margin: 0 auto 16px auto; /* centers horizontally */
-      background-color: #E7EDFF;
-      border-radius: 12px;
-      max-width: 320px;
-
-      box-shadow: 0 20px 40px rgba(47, 50, 58, 0.06);
-
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 14px;
+      border: 1px solid rgba(175, 178, 187, 0.24);
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.72);
       font-family: 'Inter', sans-serif;
-
-      text-align: left; /* keeps content left-aligned */
     }
 
-    /* Typography hierarchy */
     .legend-title {
       font-family: 'Manrope', sans-serif;
-      font-size: 1.125rem; /* title-md */
-      font-weight: 600;
-      color: #2f323a; /* on_surface */
-      margin-bottom: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #2f323a;
+      white-space: nowrap;
     }
 
-    /* Editorial spacing instead of dividers */
     .legend-items {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
     }
 
-    /* Softer alignment */
     .legend-item {
       display: flex;
       align-items: center;
-      gap: 10px;
-
-      padding: 6px 8px;
-      border-radius: 8px;
-
-      /* subtle tonal hover layer (optional) */
-      transition: background 0.2s ease;
+      gap: 8px;
+      padding: 6px 10px;
+      border: 1px solid rgba(175, 178, 187, 0.18);
+      border-radius: 999px;
+      background: rgba(249, 249, 254, 0.82);
     }
 
     .legend-item:hover {
-      background: #f3f3fa; /* surface-container-low */
+      background: #f3f3fa;
     }
 
-    /* Color block */
     .legend-color {
-      width: 18px;
-      height: 18px;
-      border-radius: 6px;
-
-      /* Ghost border fallback */
-      outline: 1px solid rgba(175, 178, 187, 0.15);
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9);
     }
 
-    /* Label styling */
     .legend-label {
-      font-size: 0.875rem;
-      color: #5c5f68; /* on_surface_variant */
+      font-size: 0.8rem;
+      font-weight: 650;
+      color: #5c5f68;
+    }
+
+    @media (max-width: 700px) {
+      .graph-panel {
+        padding: 12px;
+      }
+
+      .legend {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .legend-items {
+        justify-content: flex-start;
+      }
+
+      .cy-container {
+        min-height: 360px;
+        height: 58vh;
+      }
     }
   `],
   imports: [CommonModule]
@@ -107,6 +137,9 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy, OnChange
   private cy!: cytoscape.Core;
   private activeLayout?: cytoscape.Layouts;
   private animationRunning = false;
+  private destroyed = false;
+  private loadSequence = 0;
+  private resizeObserver?: ResizeObserver;
   private nodeAnimations = new Map<string, boolean>();
   private router = inject(Router);
   private volunteerService = inject(VolunteerService);
@@ -149,68 +182,64 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy, OnChange
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['userId'] && !changes['userId'].firstChange) {
-      this.rebuildGraph();
+      this.loadGraphData();
     }
   }
 
   private initWhenVisible(): void {
-    const el = this.cyContainer.nativeElement;
-
-    const rect = el.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) {
+    if (!this.isContainerVisible()) {
       setTimeout(() => this.initWhenVisible(), 100);
       return;
     }
 
-    this.initGraph();
+    this.loadGraphData();
   }
 
-  private initGraph(): void {
+  private isContainerVisible(): boolean {
+    const rect = this.cyContainer.nativeElement.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
+  }
+
+  private loadGraphData(): void {
+    const requestId = ++this.loadSequence;
+    const requestedUserId = this.userId;
+
     forkJoin({
       users: this.volunteerService.getAllVolunteers(),
-      relationships: this.volunteerService.getUserRelationships(this.userId)
+      relationships: this.volunteerService.getUserRelationships(requestedUserId)
     }).subscribe({
       next: ({ users, relationships }) => {
+        if (this.destroyed || requestId !== this.loadSequence) return;
         this.loadedUsers = users;
         this.loadedRelationships = relationships;
-        const elements = this.getGraphElements();
-        this.createCytoscapeGraph(elements);
+        this.renderGraphElements();
       },
       error: (err) => {
+        if (this.destroyed || requestId !== this.loadSequence) return;
         console.warn('Failed to load relationships from API, falling back to mock data', err);
         this.loadedUsers = MOCK_USERS;
         this.loadedRelationships = this.getMockRelationshipsAsDTO();
-        const elements = this.getGraphElements();
-        this.createCytoscapeGraph(elements);
+        this.renderGraphElements();
       }
     });
   }
 
-  private rebuildGraph(): void {
-    if (!this.cy) return;
-
-    forkJoin({
-      users: this.volunteerService.getAllVolunteers(),
-      relationships: this.volunteerService.getUserRelationships(this.userId)
-    }).subscribe({
-      next: ({ users, relationships }) => {
-        this.loadedUsers = users;
-        this.loadedRelationships = relationships;
-        this.rebuildCytoscapeElements();
-      },
-      error: (err) => {
-        console.warn('Failed to load relationships from API, falling back to mock data', err);
-        this.loadedUsers = MOCK_USERS;
-        this.loadedRelationships = this.getMockRelationshipsAsDTO();
-        this.rebuildCytoscapeElements();
-      }
-    });
-  }
-
-  private rebuildCytoscapeElements(): void {
-    if (this.activeLayout) {
-      this.activeLayout.stop();
+  private renderGraphElements(): void {
+    if (!this.isContainerVisible()) {
+      return;
     }
+
+    const elements = this.getGraphElements();
+    if (this.cy) {
+      this.rebuildCytoscapeElements(elements);
+      return;
+    }
+
+    this.createCytoscapeGraph(elements);
+  }
+
+  private rebuildCytoscapeElements(elements = this.getGraphElements()): void {
+    this.stopGraphMotion();
     this.cy.stop();
 
     this.cy.nodes().forEach((node) => {
@@ -220,24 +249,11 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy, OnChange
       node.stop();
     });
 
-    const elements = this.getGraphElements();
-
     this.cy.remove('edge');
     this.cy.remove('node');
 
     this.cy.add(elements);
-
-    this.activeLayout = this.cy.layout({
-      name: 'cose',
-      animate: true,
-    });
-    this.activeLayout.run();
-
-    setTimeout(() => {
-      if (this.animationRunning) {
-        this.startIdleAnimation(this.cy);
-      }
-    }, 1000);
+    this.runStableLayout();
   }
 
   private createCytoscapeGraph(elements: cytoscape.ElementDefinition[]): void {
@@ -252,16 +268,35 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy, OnChange
           selector: 'node',
           style: {
             'shape': 'ellipse',
-            'width': 60,
-            'height': 60,
-            'border-width': 2,
-            'border-color': '#666',
+            'width': 66,
+            'height': 66,
+            'border-width': 4,
+            'border-color': '#ffffff',
+            'border-opacity': 1,
             'label': 'data(label)',
             'font-size': 12,
-            'color': '#333',
+            'font-weight': 700,
+            'font-family': 'Inter, sans-serif',
+            'color': '#2f323a',
             'text-valign': 'bottom',
-            'text-margin-y': 8,
-            'background-color': '#ccc'
+            'text-margin-y': 10,
+            'text-background-color': '#ffffff',
+            'text-background-opacity': 0.86,
+            'text-background-padding': '4px',
+            'text-background-shape': 'roundrectangle',
+            'background-color': '#b3cdfe',
+            'overlay-opacity': 0,
+            'transition-property': 'width height border-color',
+            'transition-duration': 160
+          }
+        },
+        {
+          selector: 'node.current-user',
+          style: {
+            'width': 76,
+            'height': 76,
+            'border-color': '#46608a',
+            'border-width': 5
           }
         },
         {
@@ -275,6 +310,12 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy, OnChange
             'background-image-crossorigin': 'anonymous',
           }
         },
+        {
+          selector: 'node:selected, node:active',
+          style: {
+            'border-color': '#7d5b80'
+          }
+        },
 
         //
         // --- EDGE STYLE WITH WEIGHT BASED ON likeScore ---
@@ -284,30 +325,38 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy, OnChange
           style: {
             'curve-style': 'bezier',
             'line-color': 'data(color)',
+            'opacity': 0.76,
+            'line-cap': 'round',
+            'target-arrow-shape': 'none',
+            'source-arrow-shape': 'none',
+            'transition-property': 'opacity width',
+            'transition-duration': 160,
 
             // Scale line width 1px → 8px based on likeScore=0–100
-            'width': 'mapData(likeScore, 0, 100, 1, 8)',
+            'width': 'mapData(likeScore, 0, 100, 1.5, 7)',
 
             // --- ARROWS ---
             //'target-arrow-shape': 'triangle',
             //'target-arrow-color': '#bbb',
             //'arrow-scale': 1.5
           }
+        },
+        {
+          selector: 'edge:selected, edge:active',
+          style: {
+            'opacity': 1,
+            'width': 'mapData(likeScore, 0, 100, 3, 9)'
+          }
         }
       ]
     });
 
-    setTimeout(() => {
+    this.resizeObserver = new ResizeObserver(() => {
       this.cy.resize();
-      this.cy.fit();
-    }, 100);
-
-    // Save initial layout reference
-    this.activeLayout = this.cy.layout({
-      name: 'cose',
-      animate: true,
     });
-    this.activeLayout.run();
+    this.resizeObserver.observe(this.cyContainer.nativeElement);
+
+    this.runStableLayout();
 
     // ----- Icon  logic -----
     this.cy.on('tap', 'node', (event) => {
@@ -337,11 +386,37 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy, OnChange
       }, 500);
     });
 
-    this.cy.ready(() => {
-      setTimeout(() => {
-        this.animationRunning = true;
-        this.startIdleAnimation(this.cy);
-      }, 1000);
+    this.cy.ready(() => this.cy.resize());
+  }
+
+  private runStableLayout(): void {
+    this.stopGraphMotion();
+    this.activeLayout = this.cy.layout({
+      name: 'cose',
+      animate: true,
+      animationDuration: 600,
+      fit: true,
+      padding: 40
+    });
+
+    this.activeLayout.one('layoutstop', () => {
+      if (this.destroyed || !this.cy) return;
+      this.cy.resize();
+      this.cy.fit(undefined, 40);
+      this.animationRunning = true;
+      this.startIdleAnimation(this.cy);
+    });
+
+    requestAnimationFrame(() => this.activeLayout?.run());
+  }
+
+  private stopGraphMotion(): void {
+    this.animationRunning = false;
+    this.nodeAnimations.clear();
+    this.activeLayout?.stop();
+    this.activeLayout = undefined;
+    this.cy?.nodes().forEach((node) => {
+      node.stop();
     });
   }
 
@@ -362,6 +437,7 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy, OnChange
     const nodes = this.loadedUsers
       .filter(user => includedUserIds.has(user.id))
       .map(user => ({
+        classes: user.id === currentUserId ? 'current-user' : '',
         data: {
           id: `u${user.id}`,
           userId: user.id,
@@ -440,11 +516,11 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy, OnChange
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
     this.animationRunning = false;
     this.nodeAnimations.clear();
-    if (this.activeLayout) {
-      this.activeLayout.stop();
-    }
+    this.resizeObserver?.disconnect();
+    this.activeLayout?.stop();
     if (this.cy) {
       this.cy.stop();
       this.cy.destroy();

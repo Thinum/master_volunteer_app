@@ -27,9 +27,11 @@
 .reply-avatar {
   width: 56px;
   height: 56px;
+  aspect-ratio: 1;
   border-radius: 50%;
   background: linear-gradient(to bottom right, #46608a, #39547d);
   object-fit: cover;
+  display: block;
   flex-shrink: 0;
 }
 
@@ -113,10 +115,20 @@ button {
 }
 
 @media (max-width: 640px) {
-  .topic-header,
   .reply,
   .reply-form {
     align-items: stretch;
+  }
+
+  .topic-header {
+    align-items: flex-start;
+    gap: 0.875rem;
+  }
+
+  .topic-icon,
+  .reply-avatar {
+    width: 48px;
+    height: 48px;
   }
 
   .reply-form {
