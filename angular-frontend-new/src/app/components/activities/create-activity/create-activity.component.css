@@ -26,6 +26,37 @@ google-map {
   box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
 }
 
+.chips-section {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.chips-section h3 {
+  margin: 0;
+  color: #2f323a;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.chip-input-row input,
+.chips-section input {
+  width: min(100%, 22rem);
+  min-height: 2.5rem;
+  padding: 0 0.75rem;
+  border: 1px solid rgba(70, 96, 138, 0.22);
+  border-radius: 0.5rem;
+  font: inherit;
+}
+
+.chip-input-row input:focus,
+.chips-section input:focus {
+  border-color: #46608a;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(70, 96, 138, 0.12);
+}
+
 .submit-container {
   grid-column: 1 / -1;
   display: flex;

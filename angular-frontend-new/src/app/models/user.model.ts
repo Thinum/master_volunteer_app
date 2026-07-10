@@ -1,5 +1,6 @@
-import { Organisation } from './organisation.model';
-import { Activity } from './activity.model';
+import type { Organisation } from './organisation.model';
+import type { Activity, InterestCategory } from './activity.model';
+import type { UserSkillProfile } from './skill.model';
 
 /**
  * Represents a user in the system.
@@ -25,9 +26,11 @@ export interface User {
 
   /** Skills selected from the shared skill catalogue. */
   skills?: string[];
+  skillProfiles?: UserSkillProfile[];
 
-  /** Fields of interest selected from the shared skill catalogue. */
+  /** Fields of interest selected from the custom interest taxonomy. */
   interests?: string[];
+  interestCategories?: InterestCategory[];
 
   /** Timestamp when the user joined. */
   joinedAt: Date;

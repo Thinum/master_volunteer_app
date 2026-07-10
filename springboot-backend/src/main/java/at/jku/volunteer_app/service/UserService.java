@@ -208,8 +208,8 @@ public class UserService implements UserDetailsService {
         existingUser.setEmail(updatedUser.getEmail());
         existingUser.setPhone(updatedUser.getPhone());
         existingUser.setProfilePicture(updatedUser.getProfilePicture());
-        existingUser.setSkills(updatedUser.getSkills() == null ? List.of() : updatedUser.getSkills());
-        existingUser.setInterests(updatedUser.getInterests() == null ? List.of() : updatedUser.getInterests());
+        existingUser.setSkillProfiles(updatedUser.getSkillProfiles() == null ? List.of() : updatedUser.getSkillProfiles());
+        existingUser.setInterestCategories(updatedUser.getInterestCategories() == null ? List.of() : updatedUser.getInterestCategories());
 
         return repository.save(existingUser);
     }

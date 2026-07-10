@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
     @Override
-    @EntityGraph(attributePaths = {"interests"})
+    @EntityGraph(attributePaths = {"interestCategories"})
     List<User> findAll();
 
     Optional<User> findByName(String name);

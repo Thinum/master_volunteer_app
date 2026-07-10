@@ -76,12 +76,43 @@
       <!-- Dynamic fields -->
       <section class="chips-section">
         <h3>Skills</h3>
-        <mat-chip-listbox>
-          <mat-chip *ngFor="let skill of skills.controls; let i = index" (removed)="removeSkill(i)">
-            {{ skill.value }}
-            <button matChipRemove><mat-icon>cancel</mat-icon></button>
-          </mat-chip>
+        <mat-chip-listbox multiple aria-label="Select activity skills">
+          <mat-chip-option
+            *ngFor="let skill of availableSkills"
+            [selected]="isSkillSelected(skill.name)"
+            (selectionChange)="toggleSkill(skill.name, $event)">
+            {{ skill.name }}
+          </mat-chip-option>
+        </mat-chip-listbox>
+        <div class="chip-input-row">
           <input placeholder="Add skill..." #skillInput (keyup.enter)="addSkill(skillInput)" />
+        </div>
+      </section>
+
+      <section class="chips-section">
+        <h3>Tags</h3>
+        <mat-chip-listbox multiple aria-label="Select activity tags">
+          <mat-chip-option
+            *ngFor="let tag of availableTags"
+            [selected]="isTagSelected(tag)"
+            (selectionChange)="toggleTag(tag, $event)">
+            {{ tag }}
+          </mat-chip-option>
+        </mat-chip-listbox>
+        <div class="chip-input-row">
+          <input placeholder="Add tag..." #tagInput (keyup.enter)="addTag(tagInput)" />
+        </div>
+      </section>
+
+      <section class="chips-section" *ngIf="availableCategories.length">
+        <h3>Activity categories</h3>
+        <mat-chip-listbox multiple aria-label="Select activity categories">
+          <mat-chip-option
+            *ngFor="let category of availableCategories"
+            [selected]="isCategorySelected(category)"
+            (selectionChange)="toggleCategory(category, $event)">
+            {{ category.label }}
+          </mat-chip-option>
         </mat-chip-listbox>
       </section>
 
@@ -108,7 +139,7 @@
       </section>
 
       <div class="submit-container">
-        <button mat-raised-button color="primary" type="submit" [disabled]="activityForm.invalid">
+        <button mat-raised-button color="primary" type="submit" [disabled]="activityForm.invalid || isSubmitting">
           Create Activity
         </button>
       </div>

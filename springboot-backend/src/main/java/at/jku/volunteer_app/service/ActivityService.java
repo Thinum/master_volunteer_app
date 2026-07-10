@@ -2,14 +2,17 @@ package at.jku.volunteer_app.service;
 
 import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import at.jku.volunteer_app.model.Activity;
+import at.jku.volunteer_app.model.InterestCategory;
+import at.jku.volunteer_app.model.Organisation;
 import at.jku.volunteer_app.repository.ActivityRepository;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class ActivityService {
@@ -25,16 +28,55 @@ public class ActivityService {
         return activityRepository.findAll();
     }
 
+    public List<String> getActivityTagCatalog() {
+        Set<String> tags = new LinkedHashSet<>(List.of(
+                "outdoor",
+                "outdoors",
+                "indoor",
+                "beginner-friendly",
+                "social",
+                "weekend",
+                "physical",
+                "advanced",
+                "after-school",
+                "community",
+                "environment",
+                "education",
+                "animals",
+                "food",
+                "emergency",
+                "training",
+                "rescue",
+                "music",
+                "fundraising",
+                "families",
+                "students",
+                "shelter",
+                "care"
+        ));
+
+        activityRepository.findAll().forEach(activity ->
+                safeList(activity.getTags()).stream()
+                        .map(this::cleanTag)
+                        .filter(tag -> tag != null && !tag.isBlank())
+                        .forEach(tags::add)
+        );
+
+        return new ArrayList<>(tags);
+    }
+
     public Activity getActivityById(int id) {
         return activityRepository.findById(id).get();
     }
 
     public Activity addActivity(Activity activity) {
+        normalizeActivityProfile(activity);
         syncSpotsTaken(activity);
         return activityRepository.save(activity);
     }
 
     public Activity updateActivity(Activity activity) {
+        normalizeActivityProfile(activity);
         syncSpotsTaken(activity);
         return activityRepository.save(activity);
     }
@@ -78,6 +120,54 @@ public class ActivityService {
         if (activity != null && activity.getParticipants() != null) {
             activity.setSpotsTaken(activity.getParticipants().size());
         }
+    }
+
+    private void normalizeActivityProfile(Activity activity) {
+        if (activity == null) {
+            return;
+        }
+
+        if (activity.getTags() == null) {
+            activity.setTags(List.of());
+        }
+
+        if (activity.getCategories() == null || activity.getCategories().isEmpty()) {
+            activity.setCategories(inferCategories(activity));
+        }
+    }
+
+    private List<InterestCategory> inferCategories(Activity activity) {
+        Set<InterestCategory> categories = new LinkedHashSet<>();
+
+        safeList(activity.getTags()).forEach(tag -> categories.addAll(InterestCategory.fromFreeText(tag)));
+        categories.addAll(InterestCategory.fromFreeText(activity.getTitle()));
+        categories.addAll(InterestCategory.fromFreeText(activity.getDescription()));
+        categories.addAll(InterestCategory.fromFreeText(activity.getBody()));
+
+        for (Organisation organisation : safeList(activity.getOrganisations())) {
+            if (organisation == null) {
+                continue;
+            }
+            if (organisation.getCategory() != null) {
+                categories.addAll(InterestCategory.fromFreeText(organisation.getCategory().name()));
+            }
+            if (organisation.getTags() != null) {
+                organisation.getTags().forEach(tag -> categories.addAll(InterestCategory.fromFreeText(tag)));
+            }
+        }
+
+        return new ArrayList<>(categories);
+    }
+
+    private <T> List<T> safeList(List<T> values) {
+        return values == null ? List.of() : values;
+    }
+
+    private String cleanTag(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim().replaceAll("\\s+", " ");
     }
 
 //    public List<Activity> getCompletedActivitiesForOrganisation(

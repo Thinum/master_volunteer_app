@@ -35,13 +35,11 @@ public class DataLoader {
         return args -> {
             ensureNotificationAutoIncrement(jdbcTemplate);
 
-            dropLegacyInterestNormalizedNameColumn(jdbcTemplate);
-            migrateLegacyCommunityGoalActivityTags(jdbcTemplate, interestRepository);
-
             if (userRepository.count() > 0) {
                 ensureDemoFriendships(userRepository, relationshipRepository);
                 seedCommunityData(forumEntryRepository, forumReplyRepository, chatConversationRepository, chatMessageRepository);
                 seedGoalDemoData(userRepository, organisationRepository, activityRepository, communityGoalRepository, interestRepository);
+                enrichDemoActivityRecommendationProfiles(activityRepository);
                 seedInterestCatalog(userRepository, organisationRepository, activityRepository, communityGoalRepository, interestRepository);
                 return; // Data already loaded
             }
@@ -53,8 +51,20 @@ public class DataLoader {
             alice.setPassword(passwordEncoder.encode("password"));
             alice.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=1&size=512");
             alice.setPhone("+43 660 111 0001");
-            alice.setSkills(Arrays.asList("Teamwork", "Communication", "Mentoring"));
-            alice.setInterests(Arrays.asList("Teaching", "Environmental Work", "Event Support"));
+            setUserProfile(
+                    alice,
+                    List.of(
+                            skill("Teamwork", SkillProficiency.INTERMEDIATE),
+                            skill("Communication", SkillProficiency.INTERMEDIATE),
+                            skill("Mentoring", SkillProficiency.ADVANCED)
+                    ),
+                    List.of(
+                            InterestCategory.EDUCATION_AND_TUTORING,
+                            InterestCategory.ENVIRONMENT_AND_NATURE,
+                            InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS,
+                            InterestCategory.ORGANISATION_AND_LEADERSHIP
+                    )
+            );
             alice.setActive(true);
             alice.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             alice.setUsername("alice");
@@ -65,8 +75,20 @@ public class DataLoader {
             bob.setPassword(passwordEncoder.encode("password"));
             bob.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=8&size=512");
             bob.setPhone("+43 660 111 0002");
-            bob.setSkills(Arrays.asList("Organization", "Physical activity"));
-            bob.setInterests(Arrays.asList("Fundraising", "Event Support"));
+            setUserProfile(
+                    bob,
+                    List.of(
+                            skill("Organization", SkillProficiency.INTERMEDIATE),
+                            skill("Physical activity", SkillProficiency.INTERMEDIATE),
+                            skill("Teamwork", SkillProficiency.BEGINNER)
+                    ),
+                    List.of(
+                            InterestCategory.HUMANITARIAN_AID,
+                            InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS,
+                            InterestCategory.OUTDOOR_ACTIVITIES,
+                            InterestCategory.SPORTS_AND_FITNESS
+                    )
+            );
             bob.setActive(true);
             bob.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             bob.setUsername("bob");
@@ -77,8 +99,19 @@ public class DataLoader {
             charlie.setPassword(passwordEncoder.encode("password"));
             charlie.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=3&size=512");
             charlie.setPhone("+43 660 111 0003");
-            charlie.setSkills(Arrays.asList("Programming", "Problem-Solving"));
-            charlie.setInterests(Arrays.asList("Teaching", "Social Media"));
+            setUserProfile(
+                    charlie,
+                    List.of(
+                            skill("Programming", SkillProficiency.ADVANCED),
+                            skill("Problem-Solving", SkillProficiency.INTERMEDIATE),
+                            skill("Teaching", SkillProficiency.INTERMEDIATE)
+                    ),
+                    List.of(
+                            InterestCategory.TECHNOLOGY,
+                            InterestCategory.EDUCATION_AND_TUTORING,
+                            InterestCategory.CHILDREN_AND_YOUTH
+                    )
+            );
             charlie.setActive(true);
             charlie.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             charlie.setUsername("charlie");
@@ -89,8 +122,19 @@ public class DataLoader {
             diana.setPassword(passwordEncoder.encode("password"));
             diana.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=4&size=512");
             diana.setPhone("+43 660 111 2222");
-            diana.setSkills(Arrays.asList("First Aid", "Communication"));
-            diana.setInterests(Arrays.asList("Event Support", "Fundraising"));
+            setUserProfile(
+                    diana,
+                    List.of(
+                            skill("First Aid", SkillProficiency.ADVANCED),
+                            skill("Communication", SkillProficiency.INTERMEDIATE),
+                            skill("Community Outreach", SkillProficiency.INTERMEDIATE)
+                    ),
+                    List.of(
+                            InterestCategory.HEALTH_AND_WELL_BEING,
+                            InterestCategory.HUMANITARIAN_AID,
+                            InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS
+                    )
+            );
             diana.setActive(true);
             diana.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             diana.setUsername("diana");
@@ -101,6 +145,19 @@ public class DataLoader {
             ethan.setPassword(passwordEncoder.encode("password"));
             ethan.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=12&size=512");
             ethan.setPhone("+43 660 222 3333");
+            setUserProfile(
+                    ethan,
+                    List.of(
+                            skill("Food Distribution", SkillProficiency.BEGINNER),
+                            skill("Teamwork", SkillProficiency.INTERMEDIATE),
+                            skill("Organization", SkillProficiency.BEGINNER)
+                    ),
+                    List.of(
+                            InterestCategory.FOOD_AND_COOKING,
+                            InterestCategory.HUMANITARIAN_AID,
+                            InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS
+                    )
+            );
             ethan.setActive(true);
             ethan.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             ethan.setUsername("ethan");
@@ -111,6 +168,17 @@ public class DataLoader {
             fiona.setPassword(passwordEncoder.encode("password"));
             fiona.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=6&size=512");
             fiona.setPhone("+43 660 111 0006");
+            setUserProfile(
+                    fiona,
+                    List.of(
+                            skill("Cooking", SkillProficiency.INTERMEDIATE),
+                            skill("Teamwork", SkillProficiency.BEGINNER)
+                    ),
+                    List.of(
+                            InterestCategory.FOOD_AND_COOKING,
+                            InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS
+                    )
+            );
             fiona.setActive(false);
             fiona.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             fiona.setUsername("fiona");
@@ -121,6 +189,19 @@ public class DataLoader {
             george.setPassword(passwordEncoder.encode("password"));
             george.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=13&size=512");
             george.setPhone("+43 660 111 0007");
+            setUserProfile(
+                    george,
+                    List.of(
+                            skill("Physical activity", SkillProficiency.ADVANCED),
+                            skill("Teamwork", SkillProficiency.INTERMEDIATE),
+                            skill("First Aid", SkillProficiency.BEGINNER)
+                    ),
+                    List.of(
+                            InterestCategory.OUTDOOR_ACTIVITIES,
+                            InterestCategory.SPORTS_AND_FITNESS,
+                            InterestCategory.EMERGENCY_AND_RESCUE_SERVICES
+                    )
+            );
             george.setActive(true);
             george.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             george.setUsername("george");
@@ -131,6 +212,19 @@ public class DataLoader {
             tom.setPassword(passwordEncoder.encode("password"));
             tom.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=tom&size=512");
             tom.setPhone("+43 660 333 1001");
+            setUserProfile(
+                    tom,
+                    List.of(
+                            skill("Teamwork", SkillProficiency.INTERMEDIATE),
+                            skill("Food Distribution", SkillProficiency.BEGINNER),
+                            skill("Physical activity", SkillProficiency.BEGINNER)
+                    ),
+                    List.of(
+                            InterestCategory.FOOD_AND_COOKING,
+                            InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS,
+                            InterestCategory.OUTDOOR_ACTIVITIES
+                    )
+            );
             tom.setActive(true);
             tom.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             tom.setUsername("tom");
@@ -141,6 +235,20 @@ public class DataLoader {
             sandra.setPassword(passwordEncoder.encode("password"));
             sandra.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=sandra&size=512");
             sandra.setPhone("+43 660 333 1002");
+            setUserProfile(
+                    sandra,
+                    List.of(
+                            skill("Event Planning", SkillProficiency.ADVANCED),
+                            skill("Fundraising", SkillProficiency.INTERMEDIATE),
+                            skill("Organization", SkillProficiency.INTERMEDIATE)
+                    ),
+                    List.of(
+                            InterestCategory.HUMANITARIAN_AID,
+                            InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS,
+                            InterestCategory.MUSIC,
+                            InterestCategory.ORGANISATION_AND_LEADERSHIP
+                    )
+            );
             sandra.setActive(true);
             sandra.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             sandra.setUsername("sandra");
@@ -151,6 +259,18 @@ public class DataLoader {
             mia.setPassword(passwordEncoder.encode("password"));
             mia.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=mia&size=512");
             mia.setPhone("+43 660 333 1003");
+            setUserProfile(
+                    mia,
+                    List.of(
+                            skill("Teaching", SkillProficiency.ADVANCED),
+                            skill("Mathematics", SkillProficiency.ADVANCED),
+                            skill("Mentoring", SkillProficiency.INTERMEDIATE)
+                    ),
+                    List.of(
+                            InterestCategory.EDUCATION_AND_TUTORING,
+                            InterestCategory.CHILDREN_AND_YOUTH
+                    )
+            );
             mia.setActive(true);
             mia.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             mia.setUsername("mia");
@@ -161,6 +281,19 @@ public class DataLoader {
             bella.setPassword(passwordEncoder.encode("password"));
             bella.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=bella&size=512");
             bella.setPhone("+43 660 333 1004");
+            setUserProfile(
+                    bella,
+                    List.of(
+                            skill("Animal Care", SkillProficiency.INTERMEDIATE),
+                            skill("Cleaning", SkillProficiency.BEGINNER),
+                            skill("Teamwork", SkillProficiency.INTERMEDIATE)
+                    ),
+                    List.of(
+                            InterestCategory.ANIMALS,
+                            InterestCategory.OUTDOOR_ACTIVITIES,
+                            InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS
+                    )
+            );
             bella.setActive(true);
             bella.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             bella.setUsername("bella");
@@ -171,6 +304,19 @@ public class DataLoader {
             sophia.setPassword(passwordEncoder.encode("password"));
             sophia.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=sophia&size=512");
             sophia.setPhone("+43 660 333 1005");
+            setUserProfile(
+                    sophia,
+                    List.of(
+                            skill("Animal Care", SkillProficiency.BEGINNER),
+                            skill("Teaching", SkillProficiency.INTERMEDIATE),
+                            skill("Communication", SkillProficiency.INTERMEDIATE)
+                    ),
+                    List.of(
+                            InterestCategory.ANIMALS,
+                            InterestCategory.EDUCATION_AND_TUTORING,
+                            InterestCategory.CHILDREN_AND_YOUTH
+                    )
+            );
             sophia.setActive(true);
             sophia.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             sophia.setUsername("sophia");
@@ -181,6 +327,19 @@ public class DataLoader {
             lukas.setPassword(passwordEncoder.encode("password"));
             lukas.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=lukas&size=512");
             lukas.setPhone("+43 660 333 1006");
+            setUserProfile(
+                    lukas,
+                    List.of(
+                            skill("Emergency Response", SkillProficiency.ADVANCED),
+                            skill("First Aid", SkillProficiency.INTERMEDIATE),
+                            skill("Physical Fitness", SkillProficiency.ADVANCED)
+                    ),
+                    List.of(
+                            InterestCategory.EMERGENCY_AND_RESCUE_SERVICES,
+                            InterestCategory.HEALTH_AND_WELL_BEING,
+                            InterestCategory.SPORTS_AND_FITNESS
+                    )
+            );
             lukas.setActive(true);
             lukas.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             lukas.setUsername("lukas");
@@ -191,6 +350,19 @@ public class DataLoader {
             emma.setPassword(passwordEncoder.encode("password"));
             emma.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=emma&size=512");
             emma.setPhone("+43 660 333 1007");
+            setUserProfile(
+                    emma,
+                    List.of(
+                            skill("Animal Care", SkillProficiency.ADVANCED),
+                            skill("Responsibility", SkillProficiency.INTERMEDIATE),
+                            skill("Cleaning", SkillProficiency.INTERMEDIATE)
+                    ),
+                    List.of(
+                            InterestCategory.ANIMALS,
+                            InterestCategory.ACCESSIBILITY_AND_INCLUSION,
+                            InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS
+                    )
+            );
             emma.setActive(true);
             emma.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             emma.setUsername("emma");
@@ -202,6 +374,19 @@ public class DataLoader {
             admin.setPassword(passwordEncoder.encode("admin123"));
             admin.setProfilePicture("https://api.dicebear.com/9.x/lorelei/svg/seed=admin&size=512");
             admin.setPhone("+43 000 000 0000");
+            setUserProfile(
+                    admin,
+                    List.of(
+                            skill("Organization", SkillProficiency.ADVANCED),
+                            skill("Event Planning", SkillProficiency.INTERMEDIATE),
+                            skill("Community Outreach", SkillProficiency.INTERMEDIATE)
+                    ),
+                    List.of(
+                            InterestCategory.ORGANISATION_AND_LEADERSHIP,
+                            InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS,
+                            InterestCategory.HUMANITARIAN_AID
+                    )
+            );
             admin.setActive(true);
             admin.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             admin.setUsername("admin");
@@ -343,12 +528,24 @@ public class DataLoader {
             parkCleanup.setLocation("Blue Mountain Park");
             parkCleanup.setCoordinates(new Coordinates(48.3069, 14.2858));
             parkCleanup.setCreatedBy(alice);
-            parkCleanup.setSkills(Arrays.asList("Teamwork", "Organization", "Physical activity"));
+            setActivityProfile(
+                    parkCleanup,
+                    List.of(
+                            InterestCategory.ENVIRONMENT_AND_NATURE,
+                            InterestCategory.OUTDOOR_ACTIVITIES,
+                            InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS
+                    ),
+                    List.of(
+                            requiredSkill("Teamwork", SkillProficiency.BEGINNER),
+                            requiredSkill("Physical activity", SkillProficiency.BEGINNER),
+                            preferredSkill("Organization", SkillProficiency.BEGINNER)
+                    ),
+                    List.of("environment", "cleanup", "community", "outdoors", "beginner-friendly", "physical")
+            );
             parkCleanup.setCapacity(25);
             parkCleanup.setSpotsTaken(8);
             parkCleanup.setDifficulty("easy");
             parkCleanup.setPublic(true);
-            parkCleanup.setTags(Arrays.asList("environment", "cleanup", "community"));
             parkCleanup.setStatus(ActivityStatus.finished);
             parkCleanup.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             parkCleanup.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
@@ -367,12 +564,25 @@ public class DataLoader {
             codingWorkshop.setLocation("Tech Learning Center");
             codingWorkshop.setCoordinates(new Coordinates(48.3060, 14.2865));
             codingWorkshop.setCreatedBy(charlie);
-            codingWorkshop.setSkills(Arrays.asList("Programming", "Communication", "Teaching", "Mentoring"));
+            setActivityProfile(
+                    codingWorkshop,
+                    List.of(
+                            InterestCategory.EDUCATION_AND_TUTORING,
+                            InterestCategory.CHILDREN_AND_YOUTH,
+                            InterestCategory.TECHNOLOGY
+                    ),
+                    List.of(
+                            requiredSkill("Teaching", SkillProficiency.INTERMEDIATE),
+                            requiredSkill("Communication", SkillProficiency.BEGINNER),
+                            preferredSkill("Programming", SkillProficiency.BEGINNER),
+                            preferredSkill("Mentoring", SkillProficiency.BEGINNER)
+                    ),
+                    List.of("education", "coding", "kids", "beginner-friendly", "indoor")
+            );
             codingWorkshop.setCapacity(15);
             codingWorkshop.setSpotsTaken(5);
             codingWorkshop.setDifficulty("medium");
             codingWorkshop.setPublic(true);
-            codingWorkshop.setTags(Arrays.asList("education", "coding", "kids"));
             codingWorkshop.setStatus(ActivityStatus.finished);
             codingWorkshop.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             codingWorkshop.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
@@ -391,17 +601,27 @@ public class DataLoader {
             charityConcert.setLocation("Linz Community Hall");
             charityConcert.setCoordinates(new Coordinates(48.3069, 14.2858));
             charityConcert.setCreatedBy(sandra);
-            charityConcert.setSkills(Arrays.asList(
-                    "Event Planning",
-                    "Communication",
-                    "Fundraising",
-                    "Teamwork"
-            ));
+            setActivityProfile(
+                    charityConcert,
+                    List.of(
+                            InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS,
+                            InterestCategory.HUMANITARIAN_AID,
+                            InterestCategory.ARTS_AND_CULTURE,
+                            InterestCategory.MUSIC,
+                            InterestCategory.ORGANISATION_AND_LEADERSHIP
+                    ),
+                    List.of(
+                            requiredSkill("Event Planning", SkillProficiency.INTERMEDIATE),
+                            preferredSkill("Communication", SkillProficiency.BEGINNER),
+                            preferredSkill("Fundraising", SkillProficiency.BEGINNER),
+                            preferredSkill("Teamwork", SkillProficiency.BEGINNER)
+                    ),
+                    List.of("fundraising", "event", "community", "music", "social", "weekend")
+            );
             charityConcert.setCapacity(50);
             charityConcert.setSpotsTaken(18);
             charityConcert.setDifficulty("medium");
             charityConcert.setPublic(true);
-            charityConcert.setTags(Arrays.asList("fundraising", "event", "community"));
             charityConcert.setStatus(ActivityStatus.open);
             charityConcert.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             charityConcert.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
@@ -426,16 +646,24 @@ public class DataLoader {
             winterSupport.setLocation("Community Center Linz");
             winterSupport.setCoordinates(new Coordinates(48.3069, 14.2858));
             winterSupport.setCreatedBy(sandra);
-            winterSupport.setSkills(Arrays.asList(
-                    "Teamwork",
-                    "Community Outreach",
-                    "Organization"
-            ));
+            setActivityProfile(
+                    winterSupport,
+                    List.of(
+                            InterestCategory.FOOD_AND_COOKING,
+                            InterestCategory.HUMANITARIAN_AID,
+                            InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS
+                    ),
+                    List.of(
+                            requiredSkill("Teamwork", SkillProficiency.BEGINNER),
+                            preferredSkill("Community Outreach", SkillProficiency.BEGINNER),
+                            preferredSkill("Organization", SkillProficiency.BEGINNER)
+                    ),
+                    List.of("food", "winter", "community", "families", "beginner-friendly", "social")
+            );
             winterSupport.setCapacity(30);
             winterSupport.setSpotsTaken(12);
             winterSupport.setDifficulty("easy");
             winterSupport.setPublic(true);
-            winterSupport.setTags(Arrays.asList("food", "winter", "community"));
             winterSupport.setStatus(ActivityStatus.finished);
             winterSupport.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             winterSupport.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
@@ -459,17 +687,24 @@ public class DataLoader {
             tutoringSession.setLocation("Learning Center Linz");
             tutoringSession.setCoordinates(new Coordinates(48.3010, 14.2880));
             tutoringSession.setCreatedBy(mia);
-            tutoringSession.setSkills(Arrays.asList(
-                    "Teaching",
-                    "Communication",
-                    "Mentoring",
-                    "Mathematics"
-            ));
+            setActivityProfile(
+                    tutoringSession,
+                    List.of(
+                            InterestCategory.EDUCATION_AND_TUTORING,
+                            InterestCategory.CHILDREN_AND_YOUTH
+                    ),
+                    List.of(
+                            requiredSkill("Teaching", SkillProficiency.INTERMEDIATE),
+                            requiredSkill("Mathematics", SkillProficiency.INTERMEDIATE),
+                            preferredSkill("Communication", SkillProficiency.BEGINNER),
+                            preferredSkill("Mentoring", SkillProficiency.BEGINNER)
+                    ),
+                    List.of("education", "tutoring", "students", "indoor", "after-school")
+            );
             tutoringSession.setCapacity(20);
             tutoringSession.setSpotsTaken(7);
             tutoringSession.setDifficulty("medium");
             tutoringSession.setPublic(true);
-            tutoringSession.setTags(Arrays.asList("education", "tutoring", "students"));
             tutoringSession.setStatus(ActivityStatus.open);
             tutoringSession.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             tutoringSession.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
@@ -492,17 +727,25 @@ public class DataLoader {
             animalCare.setLocation("Paws & Hearts Shelter");
             animalCare.setCoordinates(new Coordinates(48.3200, 14.3000));
             animalCare.setCreatedBy(emma);
-            animalCare.setSkills(Arrays.asList(
-                    "Animal Care",
-                    "Teamwork",
-                    "Responsibility",
-                    "Cleaning"
-            ));
+            setActivityProfile(
+                    animalCare,
+                    List.of(
+                            InterestCategory.ANIMALS,
+                            InterestCategory.OUTDOOR_ACTIVITIES,
+                            InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS
+                    ),
+                    List.of(
+                            requiredSkill("Animal Care", SkillProficiency.BEGINNER),
+                            preferredSkill("Teamwork", SkillProficiency.BEGINNER),
+                            preferredSkill("Responsibility", SkillProficiency.BEGINNER),
+                            preferredSkill("Cleaning", SkillProficiency.BEGINNER)
+                    ),
+                    List.of("animals", "shelter", "care", "outdoor", "beginner-friendly")
+            );
             animalCare.setCapacity(20);
             animalCare.setSpotsTaken(6);
             animalCare.setDifficulty("easy");
             animalCare.setPublic(true);
-            animalCare.setTags(Arrays.asList("animals", "shelter", "care"));
             animalCare.setStatus(ActivityStatus.open);
             animalCare.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             animalCare.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
@@ -525,17 +768,25 @@ public class DataLoader {
             fireTraining.setLocation("Volunteer Fire Station Linz");
             fireTraining.setCoordinates(new Coordinates(48.3050, 14.2860));
             fireTraining.setCreatedBy(lukas);
-            fireTraining.setSkills(Arrays.asList(
-                    "Emergency Response",
-                    "First Aid",
-                    "Teamwork",
-                    "Physical Fitness"
-            ));
+            setActivityProfile(
+                    fireTraining,
+                    List.of(
+                            InterestCategory.EMERGENCY_AND_RESCUE_SERVICES,
+                            InterestCategory.HEALTH_AND_WELL_BEING,
+                            InterestCategory.SPORTS_AND_FITNESS
+                    ),
+                    List.of(
+                            requiredSkill("Emergency Response", SkillProficiency.INTERMEDIATE),
+                            requiredSkill("First Aid", SkillProficiency.BEGINNER),
+                            preferredSkill("Teamwork", SkillProficiency.BEGINNER),
+                            preferredSkill("Physical Fitness", SkillProficiency.INTERMEDIATE)
+                    ),
+                    List.of("emergency", "training", "rescue", "physical", "advanced")
+            );
             fireTraining.setCapacity(25);
             fireTraining.setSpotsTaken(8);
             fireTraining.setDifficulty("hard");
             fireTraining.setPublic(true);
-            fireTraining.setTags(Arrays.asList("emergency", "training", "rescue"));
             fireTraining.setStatus(ActivityStatus.open);
             fireTraining.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             fireTraining.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
@@ -559,12 +810,23 @@ public class DataLoader {
             foodBank.setLocation("City Center Social Hall");
             foodBank.setCoordinates(new Coordinates(47.0707, 15.4395));
             foodBank.setCreatedBy(admin);
-            foodBank.setSkills(Arrays.asList("Organization", "Teamwork"));
+            setActivityProfile(
+                    foodBank,
+                    List.of(
+                            InterestCategory.FOOD_AND_COOKING,
+                            InterestCategory.HUMANITARIAN_AID,
+                            InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS
+                    ),
+                    List.of(
+                            requiredSkill("Organization", SkillProficiency.BEGINNER),
+                            requiredSkill("Teamwork", SkillProficiency.BEGINNER)
+                    ),
+                    List.of("food", "families", "community", "indoor", "beginner-friendly")
+            );
             foodBank.setCapacity(10);
             foodBank.setSpotsTaken(2);
             foodBank.setDifficulty("easy");
             foodBank.setPublic(true);
-            foodBank.setTags(Arrays.asList("food", "families", "community"));
             foodBank.setStatus(ActivityStatus.finished);
             foodBank.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             foodBank.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
@@ -584,12 +846,23 @@ public class DataLoader {
             reforestation.setLocation("High Peak Forest");
             reforestation.setCoordinates(new Coordinates(48.4500, 14.1500));
             reforestation.setCreatedBy(admin);
-            reforestation.setSkills(Arrays.asList("Physical activity", "Teamwork"));
+            setActivityProfile(
+                    reforestation,
+                    List.of(
+                            InterestCategory.ENVIRONMENT_AND_NATURE,
+                            InterestCategory.OUTDOOR_ACTIVITIES,
+                            InterestCategory.SPORTS_AND_FITNESS
+                    ),
+                    List.of(
+                            requiredSkill("Physical activity", SkillProficiency.INTERMEDIATE),
+                            requiredSkill("Teamwork", SkillProficiency.BEGINNER)
+                    ),
+                    List.of("environment", "trees", "outdoors", "physical", "weekend")
+            );
             reforestation.setCapacity(50);
             reforestation.setSpotsTaken(12);
             reforestation.setDifficulty("hard");
             reforestation.setPublic(true);
-            reforestation.setTags(Arrays.asList("environment", "trees", "outdoors"));
             reforestation.setStatus(ActivityStatus.finished);
             reforestation.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             reforestation.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
@@ -606,6 +879,7 @@ public class DataLoader {
                     animalCare,
                     fireTraining
             ));
+            enrichDemoActivityRecommendationProfiles(activityRepository);
 
             // 5. Create Appointments
             Appointment appt1 = new Appointment(0, "Park Cleanup Session 1", "Initial clearing", "Pasching Park", Timestamp.valueOf("2025-11-20 09:00:00"), Timestamp.valueOf("2025-11-20 12:00:00"), alice.getId(), parkCleanup);
@@ -692,63 +966,63 @@ public class DataLoader {
                 activities,
                 activityRepository,
                 "Community Park Cleanup",
-                Arrays.asList("environment", "cleanup", "community"),
+                Arrays.asList("environment", "cleanup", "community", "outdoors", "beginner-friendly", "physical"),
                 ActivityStatus.finished
         );
         updateActivityForGoalDemo(
                 activities,
                 activityRepository,
                 "Mountain Reforestation Project",
-                Arrays.asList("environment", "trees", "outdoors"),
+                Arrays.asList("environment", "trees", "outdoors", "physical", "weekend"),
                 ActivityStatus.finished
         );
         updateActivityForGoalDemo(
                 activities,
                 activityRepository,
                 "Coding Workshop for Kids",
-                Arrays.asList("education", "coding", "kids"),
+                Arrays.asList("education", "coding", "kids", "beginner-friendly", "indoor"),
                 ActivityStatus.finished
         );
         updateActivityForGoalDemo(
                 activities,
                 activityRepository,
                 "Local Food Bank Assistance",
-                Arrays.asList("food", "families", "community"),
+                Arrays.asList("food", "families", "community", "indoor", "beginner-friendly"),
                 ActivityStatus.finished
         );
         updateActivityForGoalDemo(
                 activities,
                 activityRepository,
                 "Winter Support Initiative - Food Distribution",
-                Arrays.asList("food", "winter", "community"),
+                Arrays.asList("food", "winter", "community", "families", "beginner-friendly", "social"),
                 ActivityStatus.finished
         );
         updateActivityForGoalDemo(
                 activities,
                 activityRepository,
                 "Setting up a Charity Concert for Trauma Recovery",
-                Arrays.asList("fundraising", "event", "community"),
+                Arrays.asList("fundraising", "event", "community", "music", "social", "weekend"),
                 ActivityStatus.open
         );
         updateActivityForGoalDemo(
                 activities,
                 activityRepository,
                 "Math Tutoring Session",
-                Arrays.asList("education", "tutoring", "students"),
+                Arrays.asList("education", "tutoring", "students", "indoor", "after-school"),
                 ActivityStatus.open
         );
         updateActivityForGoalDemo(
                 activities,
                 activityRepository,
                 "Animal Shelter Care Day",
-                Arrays.asList("animals", "shelter", "care"),
+                Arrays.asList("animals", "shelter", "care", "outdoor", "beginner-friendly"),
                 ActivityStatus.open
         );
         updateActivityForGoalDemo(
                 activities,
                 activityRepository,
                 "Volunteer Firefighter Training",
-                Arrays.asList("emergency", "training", "rescue"),
+                Arrays.asList("emergency", "training", "rescue", "physical", "advanced"),
                 ActivityStatus.open
         );
 
@@ -969,12 +1243,24 @@ public class DataLoader {
         activity.setLocation("Green Future Community Site");
         activity.setCoordinates(new Coordinates(48.3069, 14.2858));
         activity.setCreatedBy(contributor);
-        activity.setSkills(Arrays.asList("Teamwork", "Organization", "Physical activity"));
+        setActivityProfile(
+                activity,
+                List.of(
+                        InterestCategory.ENVIRONMENT_AND_NATURE,
+                        InterestCategory.OUTDOOR_ACTIVITIES,
+                        InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS
+                ),
+                List.of(
+                        requiredSkill("Teamwork", SkillProficiency.BEGINNER),
+                        requiredSkill("Physical activity", SkillProficiency.BEGINNER),
+                        preferredSkill("Organization", SkillProficiency.BEGINNER)
+                ),
+                List.of("environment", "community", "outdoors", "beginner-friendly", "physical")
+        );
         activity.setCapacity(20);
         activity.setSpotsTaken(contributor == null ? 0 : 1);
         activity.setDifficulty("easy");
         activity.setPublic(true);
-        activity.setTags(Arrays.asList("environment", "community", "outdoors"));
         activity.setStatus(ActivityStatus.finished);
         activity.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         activity.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
@@ -994,10 +1280,207 @@ public class DataLoader {
                 .findFirst()
                 .ifPresent(activity -> {
                     activity.setTags(tags);
+                    activity.setCategories(InterestCategory.fromNames(tags));
                     activity.setStatus(status);
                     activity.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
                     activityRepository.save(activity);
                 });
+    }
+
+    private void enrichDemoActivityRecommendationProfiles(ActivityRepository activityRepository) {
+        activityRepository.findAll().forEach(activity -> {
+            String title = activity.getTitle();
+            if (title == null) {
+                return;
+            }
+
+            boolean updated = switch (title) {
+                case "Community Park Cleanup" -> {
+                    setActivityProfile(
+                            activity,
+                            List.of(
+                                    InterestCategory.ENVIRONMENT_AND_NATURE,
+                                    InterestCategory.OUTDOOR_ACTIVITIES,
+                                    InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS
+                            ),
+                            List.of(
+                                    requiredSkill("Teamwork", SkillProficiency.BEGINNER),
+                                    requiredSkill("Physical activity", SkillProficiency.BEGINNER),
+                                    preferredSkill("Organization", SkillProficiency.BEGINNER)
+                            ),
+                            List.of("environment", "cleanup", "community", "outdoors", "beginner-friendly", "physical")
+                    );
+                    yield true;
+                }
+                case "Coding Workshop for Kids" -> {
+                    setActivityProfile(
+                            activity,
+                            List.of(
+                                    InterestCategory.EDUCATION_AND_TUTORING,
+                                    InterestCategory.CHILDREN_AND_YOUTH,
+                                    InterestCategory.TECHNOLOGY
+                            ),
+                            List.of(
+                                    requiredSkill("Teaching", SkillProficiency.INTERMEDIATE),
+                                    requiredSkill("Communication", SkillProficiency.BEGINNER),
+                                    preferredSkill("Programming", SkillProficiency.BEGINNER),
+                                    preferredSkill("Mentoring", SkillProficiency.BEGINNER)
+                            ),
+                            List.of("education", "coding", "kids", "beginner-friendly", "indoor")
+                    );
+                    yield true;
+                }
+                case "Setting up a Charity Concert for Trauma Recovery" -> {
+                    setActivityProfile(
+                            activity,
+                            List.of(
+                                    InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS,
+                                    InterestCategory.HUMANITARIAN_AID,
+                                    InterestCategory.ARTS_AND_CULTURE,
+                                    InterestCategory.MUSIC,
+                                    InterestCategory.ORGANISATION_AND_LEADERSHIP
+                            ),
+                            List.of(
+                                    requiredSkill("Event Planning", SkillProficiency.INTERMEDIATE),
+                                    preferredSkill("Communication", SkillProficiency.BEGINNER),
+                                    preferredSkill("Fundraising", SkillProficiency.BEGINNER),
+                                    preferredSkill("Teamwork", SkillProficiency.BEGINNER)
+                            ),
+                            List.of("fundraising", "event", "community", "music", "social", "weekend")
+                    );
+                    yield true;
+                }
+                case "Winter Support Initiative - Food Distribution" -> {
+                    setActivityProfile(
+                            activity,
+                            List.of(
+                                    InterestCategory.FOOD_AND_COOKING,
+                                    InterestCategory.HUMANITARIAN_AID,
+                                    InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS
+                            ),
+                            List.of(
+                                    requiredSkill("Teamwork", SkillProficiency.BEGINNER),
+                                    preferredSkill("Community Outreach", SkillProficiency.BEGINNER),
+                                    preferredSkill("Organization", SkillProficiency.BEGINNER)
+                            ),
+                            List.of("food", "winter", "community", "families", "beginner-friendly", "social")
+                    );
+                    yield true;
+                }
+                case "Math Tutoring Session" -> {
+                    setActivityProfile(
+                            activity,
+                            List.of(
+                                    InterestCategory.EDUCATION_AND_TUTORING,
+                                    InterestCategory.CHILDREN_AND_YOUTH
+                            ),
+                            List.of(
+                                    requiredSkill("Teaching", SkillProficiency.INTERMEDIATE),
+                                    requiredSkill("Mathematics", SkillProficiency.INTERMEDIATE),
+                                    preferredSkill("Communication", SkillProficiency.BEGINNER),
+                                    preferredSkill("Mentoring", SkillProficiency.BEGINNER)
+                            ),
+                            List.of("education", "tutoring", "students", "indoor", "after-school")
+                    );
+                    yield true;
+                }
+                case "Animal Shelter Care Day" -> {
+                    setActivityProfile(
+                            activity,
+                            List.of(
+                                    InterestCategory.ANIMALS,
+                                    InterestCategory.OUTDOOR_ACTIVITIES,
+                                    InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS
+                            ),
+                            List.of(
+                                    requiredSkill("Animal Care", SkillProficiency.BEGINNER),
+                                    preferredSkill("Teamwork", SkillProficiency.BEGINNER),
+                                    preferredSkill("Responsibility", SkillProficiency.BEGINNER),
+                                    preferredSkill("Cleaning", SkillProficiency.BEGINNER)
+                            ),
+                            List.of("animals", "shelter", "care", "outdoor", "beginner-friendly")
+                    );
+                    yield true;
+                }
+                case "Volunteer Firefighter Training" -> {
+                    setActivityProfile(
+                            activity,
+                            List.of(
+                                    InterestCategory.EMERGENCY_AND_RESCUE_SERVICES,
+                                    InterestCategory.HEALTH_AND_WELL_BEING,
+                                    InterestCategory.SPORTS_AND_FITNESS
+                            ),
+                            List.of(
+                                    requiredSkill("Emergency Response", SkillProficiency.INTERMEDIATE),
+                                    requiredSkill("First Aid", SkillProficiency.BEGINNER),
+                                    preferredSkill("Teamwork", SkillProficiency.BEGINNER),
+                                    preferredSkill("Physical Fitness", SkillProficiency.INTERMEDIATE)
+                            ),
+                            List.of("emergency", "training", "rescue", "physical", "advanced")
+                    );
+                    yield true;
+                }
+                case "Local Food Bank Assistance" -> {
+                    setActivityProfile(
+                            activity,
+                            List.of(
+                                    InterestCategory.FOOD_AND_COOKING,
+                                    InterestCategory.HUMANITARIAN_AID,
+                                    InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS
+                            ),
+                            List.of(
+                                    requiredSkill("Organization", SkillProficiency.BEGINNER),
+                                    requiredSkill("Teamwork", SkillProficiency.BEGINNER)
+                            ),
+                            List.of("food", "families", "community", "indoor", "beginner-friendly")
+                    );
+                    yield true;
+                }
+                case "Mountain Reforestation Project" -> {
+                    setActivityProfile(
+                            activity,
+                            List.of(
+                                    InterestCategory.ENVIRONMENT_AND_NATURE,
+                                    InterestCategory.OUTDOOR_ACTIVITIES,
+                                    InterestCategory.SPORTS_AND_FITNESS
+                            ),
+                            List.of(
+                                    requiredSkill("Physical activity", SkillProficiency.INTERMEDIATE),
+                                    requiredSkill("Teamwork", SkillProficiency.BEGINNER)
+                            ),
+                            List.of("environment", "trees", "outdoors", "physical", "weekend")
+                    );
+                    yield true;
+                }
+                case "Riverbank Waste Audit",
+                     "Community Compost Build",
+                     "Native Flower Planting",
+                     "Trail Litter Survey",
+                     "School Sustainability Booth" -> {
+                    setActivityProfile(
+                            activity,
+                            List.of(
+                                    InterestCategory.ENVIRONMENT_AND_NATURE,
+                                    InterestCategory.OUTDOOR_ACTIVITIES,
+                                    InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS
+                            ),
+                            List.of(
+                                    requiredSkill("Teamwork", SkillProficiency.BEGINNER),
+                                    requiredSkill("Physical activity", SkillProficiency.BEGINNER),
+                                    preferredSkill("Organization", SkillProficiency.BEGINNER)
+                            ),
+                            List.of("environment", "community", "outdoors", "beginner-friendly", "physical")
+                    );
+                    yield true;
+                }
+                default -> false;
+            };
+
+            if (updated) {
+                activity.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+                activityRepository.save(activity);
+            }
+        });
     }
 
     private Organisation findOrganisationByName(List<Organisation> organisations, String name) {
@@ -1105,6 +1588,32 @@ public class DataLoader {
         );
     }
 
+    private void setUserProfile(User user, List<UserSkill> skills, List<InterestCategory> interests) {
+        user.setSkillProfiles(skills);
+        user.setInterestCategories(interests);
+    }
+
+    private UserSkill skill(String name, SkillProficiency proficiency) {
+        return new UserSkill(name, null, proficiency);
+    }
+
+    private void setActivityProfile(Activity activity,
+                                    List<InterestCategory> categories,
+                                    List<ActivitySkillRequirement> skillRequirements,
+                                    List<String> tags) {
+        activity.setCategories(categories);
+        activity.setSkillRequirements(skillRequirements);
+        activity.setTags(tags);
+    }
+
+    private ActivitySkillRequirement requiredSkill(String name, SkillProficiency minimumProficiency) {
+        return ActivitySkillRequirement.required(name, minimumProficiency);
+    }
+
+    private ActivitySkillRequirement preferredSkill(String name, SkillProficiency minimumProficiency) {
+        return ActivitySkillRequirement.preferred(name, minimumProficiency);
+    }
+
     private void seedCommunityData(ForumEntryRepository forumEntryRepository,
                                    ForumReplyRepository forumReplyRepository,
                                    ChatConversationRepository chatConversationRepository,
@@ -1198,6 +1707,13 @@ public class DataLoader {
                                      InterestRepository interestRepository) {
         Set<String> interestNames = new HashSet<>();
 
+        addAllInterestNames(
+                interestNames,
+                Arrays.stream(InterestCategory.values())
+                        .map(InterestCategory::getLabel)
+                        .toList()
+        );
+
         addAllInterestNames(interestNames, Arrays.asList(
                 "Teamwork",
                 "Organization",
@@ -1279,93 +1795,5 @@ public class DataLoader {
     private boolean sameInterestName(String first, String second) {
         return normalizeInterestName(first) != null
                 && normalizeInterestName(first).equals(normalizeInterestName(second));
-    }
-
-    private void dropLegacyInterestNormalizedNameColumn(JdbcTemplate jdbcTemplate) {
-        try {
-            Integer columnCount = jdbcTemplate.queryForObject(
-                    """
-                            SELECT COUNT(*)
-                            FROM information_schema.columns
-                            WHERE table_schema = DATABASE()
-                              AND table_name = 'interest'
-                              AND column_name = 'normalized_name'
-                            """,
-                    Integer.class
-            );
-
-            if (columnCount != null && columnCount > 0) {
-                jdbcTemplate.execute("ALTER TABLE interest DROP COLUMN normalized_name");
-            }
-        } catch (Exception ignored) {
-            // Schema cleanup is best-effort for local dev databases.
-        }
-    }
-
-    private void migrateLegacyCommunityGoalActivityTags(JdbcTemplate jdbcTemplate, InterestRepository interestRepository) {
-        try {
-            Integer tableCount = jdbcTemplate.queryForObject(
-                    """
-                            SELECT COUNT(*)
-                            FROM information_schema.tables
-                            WHERE table_schema = DATABASE()
-                              AND table_name = 'community_goal_activity_tags'
-                            """,
-                    Integer.class
-            );
-
-            if (tableCount == null || tableCount == 0) {
-                return;
-            }
-
-            List<java.util.Map<String, Object>> legacyRows = jdbcTemplate.queryForList(
-                    "SELECT community_goal_id, activity_tags FROM community_goal_activity_tags"
-            );
-
-            for (java.util.Map<String, Object> row : legacyRows) {
-                Object goalIdValue = row.get("community_goal_id");
-                Object interestNameValue = row.get("activity_tags");
-                if (!(goalIdValue instanceof Number) || interestNameValue == null) {
-                    continue;
-                }
-
-                String interestName = normalizeInterestName(String.valueOf(interestNameValue));
-                if (interestName == null) {
-                    continue;
-                }
-
-                Interest interest = interestRepository.findAll().stream()
-                        .filter(existingInterest -> sameInterestName(existingInterest.getName(), interestName))
-                        .findFirst()
-                        .orElseGet(() -> {
-                            Interest newInterest = new Interest();
-                            newInterest.setName(interestName);
-                            return interestRepository.save(newInterest);
-                        });
-
-                int goalId = ((Number) goalIdValue).intValue();
-                Integer relationCount = jdbcTemplate.queryForObject(
-                        """
-                                SELECT COUNT(*)
-                                FROM community_goal_activity_interests
-                                WHERE community_goal_id = ?
-                                  AND interest_id = ?
-                                """,
-                        Integer.class,
-                        goalId,
-                        interest.getId()
-                );
-
-                if (relationCount == null || relationCount == 0) {
-                    jdbcTemplate.update(
-                            "INSERT INTO community_goal_activity_interests (community_goal_id, interest_id) VALUES (?, ?)",
-                            goalId,
-                            interest.getId()
-                    );
-                }
-            }
-        } catch (Exception ignored) {
-            // Legacy migration is best-effort for local dev databases.
-        }
     }
 }

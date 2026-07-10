@@ -118,8 +118,21 @@
               </span>
             </div>
             <p class="rec-desc">{{ act.description || act.body }}</p>
+            <div class="activity-tags" *ngIf="act.tags && act.tags.length > 0">
+              <span
+                class="activity-tag"
+                [class.activity-tag--matched]="isRecommendationMatchedTag(act, tag)"
+                *ngFor="let tag of getVisibleTags(act)">
+                {{ tag }}
+              </span>
+            </div>
             <div class="skills-tags" *ngIf="act.skills && act.skills.length > 0">
               <span class="skill-tag" *ngFor="let skill of act.skills">{{ skill }}</span>
+            </div>
+            <div class="recommendation-reasons" *ngIf="act.recommendation?.reasons?.length">
+              <span class="reason-tag" *ngFor="let reason of act.recommendation?.reasons | slice:0:3">
+                {{ reason.label }}
+              </span>
             </div>
             <p class="slots-info" *ngIf="act.capacity">
               {{ getSpotsTaken(act) }} / {{ act.capacity }} spots taken

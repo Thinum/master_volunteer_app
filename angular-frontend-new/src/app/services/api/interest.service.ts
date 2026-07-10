@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { InterestCategory } from '../../models/activity.model';
 
 @Injectable({
   providedIn: 'root',
@@ -13,5 +14,9 @@ export class InterestService {
 
   getAllInterests(): Observable<string[]> {
     return this.http.get<string[]>(this.apiUrl);
+  }
+
+  getInterestCatalog(): Observable<InterestCategory[]> {
+    return this.http.get<InterestCategory[]>(`${this.apiUrl}/catalog`);
   }
 }

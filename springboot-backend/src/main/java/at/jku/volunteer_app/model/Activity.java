@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -60,7 +62,14 @@ public class Activity {
     private User createdBy;
 
     @ElementCollection
-    private List<String> skills;
+    @CollectionTable(name = "activity_skills", joinColumns = @JoinColumn(name = "activity_id"))
+    private List<ActivitySkillRequirement> skillRequirements;
+
+    @ElementCollection
+    @CollectionTable(name = "activity_categories", joinColumns = @JoinColumn(name = "activity_id"))
+    @Column(name = "category")
+    @Convert(converter = InterestCategoryConverter.class)
+    private List<InterestCategory> categories;
 
     @ElementCollection
     private List<String> qualifications;
@@ -75,7 +84,9 @@ public class Activity {
     private List<String> equipmentProvided;
 
     @ElementCollection
-    private List<String> tags; //TODO: Maybe auslagern
+    @CollectionTable(name = "activity_tags", joinColumns = @JoinColumn(name = "activity_id"))
+    @Column(name = "tags")
+    private List<String> tags;
 
     private String difficulty;
     private boolean isPublic;
@@ -85,4 +96,81 @@ public class Activity {
 
     private Timestamp createdAt;
     private Timestamp updatedAt;
+
+    @Transient
+    public List<String> getSkills() {
+        if (skillRequirements == null) {
+            return List.of();
+        }
+
+        return skillRequirements.stream()
+                .map(ActivitySkillRequirement::getName)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    public void setSkills(List<String> skills) {
+        if (skills == null) {
+            this.skillRequirements = List.of();
+            return;
+        }
+
+        this.skillRequirements = skills.stream()
+                .filter(skill -> skill != null && !skill.isBlank())
+                .map(String::trim)
+                .distinct()
+                .map(ActivitySkillRequirement::required)
+                .toList();
+    }
+
+    @Transient
+    public List<ActivitySkillRequirement> getRequiredSkills() {
+        return getSkillRequirementsByRequiredFlag(true);
+    }
+
+    @Transient
+    public List<ActivitySkillRequirement> getPreferredSkills() {
+        return getSkillRequirementsByRequiredFlag(false);
+    }
+
+    public void setRequiredSkills(List<ActivitySkillRequirement> requiredSkills) {
+        replaceSkillRequirements(requiredSkills, true);
+    }
+
+    public void setPreferredSkills(List<ActivitySkillRequirement> preferredSkills) {
+        replaceSkillRequirements(preferredSkills, false);
+    }
+
+    private List<ActivitySkillRequirement> getSkillRequirementsByRequiredFlag(boolean required) {
+        if (skillRequirements == null) {
+            return List.of();
+        }
+
+        return skillRequirements.stream()
+                .filter(requirement -> requirement != null && requirement.isRequiredSkill() == required)
+                .toList();
+    }
+
+    private void replaceSkillRequirements(List<ActivitySkillRequirement> replacements, boolean required) {
+        List<ActivitySkillRequirement> updated = new ArrayList<>();
+        if (skillRequirements != null) {
+            updated.addAll(skillRequirements.stream()
+                    .filter(requirement -> requirement != null && requirement.isRequiredSkill() != required)
+                    .toList());
+        }
+
+        if (replacements != null) {
+            replacements.stream()
+                    .filter(Objects::nonNull)
+                    .map(requirement -> new ActivitySkillRequirement(
+                            requirement.getName(),
+                            requirement.getEscoSkillUri(),
+                            requirement.getMinimumProficiencyOrDefault(),
+                            required
+                    ))
+                    .forEach(updated::add);
+        }
+
+        this.skillRequirements = updated;
+    }
 }

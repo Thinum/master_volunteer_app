@@ -101,6 +101,28 @@ export class HomeComponent implements OnInit {
   }
 
   private loadRecommendedActivities(joinedActivities: Activity[]): void {
+    this.activityService.getRecommendedActivities().subscribe({
+      next: (recommendations) => {
+        const joinedIds = new Set(joinedActivities.map(a => a.id));
+        this.recommendedActivities = (recommendations || [])
+          .filter(recommendation => !joinedIds.has(recommendation.activity.id))
+          .slice(0, 3)
+          .map(recommendation => ({
+            ...recommendation.activity,
+            recommendation: {
+              score: recommendation.score,
+              reasons: recommendation.reasons || []
+            }
+          }));
+      },
+      error: (err) => {
+        console.error('Error fetching recommended activities:', err);
+        this.loadFallbackRecommendedActivities(joinedActivities);
+      }
+    });
+  }
+
+  private loadFallbackRecommendedActivities(joinedActivities: Activity[]): void {
     this.activityService.getAllActivities().subscribe({
       next: (allActivities) => {
         const joinedIds = new Set(joinedActivities.map(a => a.id));
@@ -108,7 +130,7 @@ export class HomeComponent implements OnInit {
           .filter(a => !joinedIds.has(a.id))
           .slice(0, 3);
       },
-      error: (err) => console.error('Error fetching recommended activities:', err)
+      error: (err) => console.error('Error fetching fallback recommendations:', err)
     });
   }
 
@@ -140,6 +162,17 @@ export class HomeComponent implements OnInit {
     return !!activity.capacity && this.getSpotsTaken(activity) >= activity.capacity;
   }
 
+  getVisibleTags(activity: Activity): string[] {
+    return (activity.tags || []).slice(0, 4);
+  }
+
+  isRecommendationMatchedTag(activity: Activity, tag: string): boolean {
+    const normalizedTag = this.normalizeChip(tag);
+    return (activity.recommendation?.reasons || []).some(reason =>
+      reason.type === 'TAG' && this.normalizeChip(reason.label) === normalizedTag
+    );
+  }
+
   joinActivity(activityId: number): void {
     const activity = this.recommendedActivities.find(act => act.id === activityId);
     if (activity && this.isActivityFull(activity)) {
@@ -154,5 +187,9 @@ export class HomeComponent implements OnInit {
       },
       error: (err) => console.error('Error joining activity:', err)
     });
+  }
+
+  private normalizeChip(value: string): string {
+    return value.trim().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').toLowerCase();
   }
 }

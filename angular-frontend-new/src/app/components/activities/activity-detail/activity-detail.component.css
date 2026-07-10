@@ -89,6 +89,26 @@
   color: #46608a;
 }
 
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+.activity-tag {
+  max-width: 100%;
+  padding: 0.25rem 0.65rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: #f0f4fa;
+  color: #39547d;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .contacts-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

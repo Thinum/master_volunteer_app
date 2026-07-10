@@ -1,6 +1,7 @@
 package at.jku.volunteer_app.contract;
 
 import at.jku.volunteer_app.model.Activity;
+import at.jku.volunteer_app.model.ActivitySkillRequirement;
 import at.jku.volunteer_app.model.Appointment;
 import at.jku.volunteer_app.model.ChatConversation;
 import at.jku.volunteer_app.model.ChatMessage;
@@ -9,15 +10,22 @@ import at.jku.volunteer_app.model.Coordinates;
 import at.jku.volunteer_app.model.ForumEntry;
 import at.jku.volunteer_app.model.ForumReply;
 import at.jku.volunteer_app.model.Interest;
+import at.jku.volunteer_app.model.InterestCategory;
 import at.jku.volunteer_app.model.Location;
 import at.jku.volunteer_app.model.Notification;
 import at.jku.volunteer_app.model.NotificationPayload;
 import at.jku.volunteer_app.model.Organisation;
 import at.jku.volunteer_app.model.OrganisationMember;
+import at.jku.volunteer_app.model.SkillProficiency;
 import at.jku.volunteer_app.model.User;
+import at.jku.volunteer_app.model.UserSkill;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,8 +44,10 @@ public final class ContractMapper {
                 user.getEmail(),
                 user.getProfilePicture(),
                 user.getPhone(),
-                safeList(user.getSkills()),
-                normalizeInterestNames(user.getInterests()),
+                toUserSkillNameList(user.getSkillProfiles()),
+                toUserSkillDTOList(user.getSkillProfiles()),
+                toInterestLabelList(user.getInterestCategories()),
+                toInterestCategoryDTOList(user.getInterestCategories()),
                 user.isActive(),
                 user.getJoinedAt(),
                 user.getUsername(),
@@ -56,8 +66,8 @@ public final class ContractMapper {
         user.setEmail(dto.email());
         user.setProfilePicture(dto.profilePicture());
         user.setPhone(dto.phone());
-        user.setSkills(safeList(dto.skills()));
-        user.setInterests(normalizeInterestNames(dto.interests()));
+        user.setSkillProfiles(toUserSkillEntityList(dto.skillProfiles(), dto.skills()));
+        user.setInterestCategories(toInterestCategoryEntityList(dto.interestCategories(), dto.interests()));
         user.setActive(dto.isActive());
         user.setJoinedAt(dto.joinedAt());
         user.setUsername(dto.username());
@@ -90,6 +100,9 @@ public final class ContractMapper {
                 toUserDTOList(activity.getParticipants()),
                 toUserDTO(activity.getCreatedBy()),
                 safeList(activity.getSkills()),
+                toActivitySkillRequirementDTOList(activity.getRequiredSkills()),
+                toActivitySkillRequirementDTOList(activity.getPreferredSkills()),
+                toInterestCategoryDTOList(activity.getCategories()),
                 safeList(activity.getQualifications()),
                 safeList(activity.getPrerequisites()),
                 activity.getCapacity(),
@@ -125,7 +138,12 @@ public final class ContractMapper {
         activity.setCoordinates(toCoordinatesEntity(dto.coordinates()));
         activity.setParticipants(toUserEntityList(dto.participants()));
         activity.setCreatedBy(toUserEntity(dto.createdBy()));
-        activity.setSkills(safeList(dto.skills()));
+        activity.setSkillRequirements(toActivitySkillRequirementEntityList(
+                dto.requiredSkills(),
+                dto.preferredSkills(),
+                dto.skills()
+        ));
+        activity.setCategories(toInterestCategoryEntityList(dto.categories(), null));
         activity.setQualifications(safeList(dto.qualifications()));
         activity.setPrerequisites(safeList(dto.prerequisites()));
         activity.setCapacity(dto.capacity());
@@ -505,19 +523,167 @@ public final class ContractMapper {
                 .toList();
     }
 
-    private static <T> List<T> safeList(List<T> values) {
-        return values == null ? List.of() : values;
-    }
-
-    private static List<String> normalizeInterestNames(List<String> values) {
-        if (values == null) {
-            return List.of();
-        }
-        return values.stream()
-                .map(ContractMapper::normalizeInterestName)
-                .filter(value -> value != null)
+    private static List<String> toUserSkillNameList(List<UserSkill> skills) {
+        return safeList(skills).stream()
+                .map(UserSkill::getName)
+                .map(ContractMapper::cleanLabel)
+                .filter(Objects::nonNull)
                 .distinct()
                 .toList();
+    }
+
+    private static List<UserSkillDTO> toUserSkillDTOList(List<UserSkill> skills) {
+        return safeList(skills).stream()
+                .filter(Objects::nonNull)
+                .map(skill -> new UserSkillDTO(
+                        cleanLabel(skill.getName()),
+                        blankToNull(skill.getEscoSkillUri()),
+                        skill.getProficiencyOrDefault()
+                ))
+                .filter(skill -> skill.name() != null)
+                .toList();
+    }
+
+    private static List<UserSkill> toUserSkillEntityList(List<UserSkillDTO> skillProfiles, List<String> legacySkills) {
+        Map<String, UserSkill> skillsByKey = new LinkedHashMap<>();
+
+        safeList(skillProfiles).stream()
+                .filter(Objects::nonNull)
+                .map(dto -> new UserSkill(
+                        cleanLabel(dto.name()),
+                        blankToNull(dto.escoSkillUri()),
+                        dto.proficiency() == null ? SkillProficiency.defaultUserLevel() : dto.proficiency()
+                ))
+                .filter(skill -> skill.getName() != null)
+                .forEach(skill -> skillsByKey.put(skillKey(skill.getName(), skill.getEscoSkillUri()), skill));
+
+        if (skillsByKey.isEmpty()) {
+            safeList(legacySkills).stream()
+                    .map(ContractMapper::cleanLabel)
+                    .filter(Objects::nonNull)
+                    .map(UserSkill::fromName)
+                    .forEach(skill -> skillsByKey.put(skillKey(skill.getName(), skill.getEscoSkillUri()), skill));
+        }
+
+        return new ArrayList<>(skillsByKey.values());
+    }
+
+    private static List<ActivitySkillRequirementDTO> toActivitySkillRequirementDTOList(
+            List<ActivitySkillRequirement> requirements
+    ) {
+        return safeList(requirements).stream()
+                .filter(Objects::nonNull)
+                .map(requirement -> new ActivitySkillRequirementDTO(
+                        cleanLabel(requirement.getName()),
+                        blankToNull(requirement.getEscoSkillUri()),
+                        requirement.getMinimumProficiencyOrDefault(),
+                        requirement.isRequiredSkill()
+                ))
+                .filter(requirement -> requirement.name() != null)
+                .toList();
+    }
+
+    private static List<ActivitySkillRequirement> toActivitySkillRequirementEntityList(
+            List<ActivitySkillRequirementDTO> requiredSkills,
+            List<ActivitySkillRequirementDTO> preferredSkills,
+            List<String> legacySkills
+    ) {
+        Map<String, ActivitySkillRequirement> requirementsByKey = new LinkedHashMap<>();
+
+        safeList(requiredSkills).stream()
+                .map(dto -> toActivitySkillRequirement(dto, true))
+                .filter(Objects::nonNull)
+                .forEach(requirement -> requirementsByKey.put(requirementKey(requirement), requirement));
+
+        safeList(preferredSkills).stream()
+                .map(dto -> toActivitySkillRequirement(dto, false))
+                .filter(Objects::nonNull)
+                .forEach(requirement -> requirementsByKey.put(requirementKey(requirement), requirement));
+
+        if (requirementsByKey.isEmpty()) {
+            safeList(legacySkills).stream()
+                    .map(ContractMapper::cleanLabel)
+                    .filter(Objects::nonNull)
+                    .map(ActivitySkillRequirement::required)
+                    .forEach(requirement -> requirementsByKey.put(requirementKey(requirement), requirement));
+        }
+
+        return new ArrayList<>(requirementsByKey.values());
+    }
+
+    private static ActivitySkillRequirement toActivitySkillRequirement(
+            ActivitySkillRequirementDTO dto,
+            boolean required
+    ) {
+        if (dto == null) {
+            return null;
+        }
+
+        String name = cleanLabel(dto.name());
+        if (name == null) {
+            return null;
+        }
+
+        return new ActivitySkillRequirement(
+                name,
+                blankToNull(dto.escoSkillUri()),
+                dto.minimumProficiency() == null
+                        ? SkillProficiency.defaultActivityMinimum()
+                        : dto.minimumProficiency(),
+                required
+        );
+    }
+
+    private static List<String> toInterestLabelList(List<InterestCategory> categories) {
+        return safeList(categories).stream()
+                .filter(Objects::nonNull)
+                .map(InterestCategory::getLabel)
+                .distinct()
+                .toList();
+    }
+
+    private static List<InterestCategoryDTO> toInterestCategoryDTOList(List<InterestCategory> categories) {
+        return safeList(categories).stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .map(category -> new InterestCategoryDTO(
+                        category.getCode(),
+                        category.getLabel(),
+                        category.getEscoConceptUri()
+                ))
+                .toList();
+    }
+
+    private static List<InterestCategory> toInterestCategoryEntityList(
+            List<InterestCategoryDTO> categories,
+            List<String> legacyNames
+    ) {
+        Map<String, InterestCategory> categoriesByCode = new LinkedHashMap<>();
+
+        safeList(categories).stream()
+                .map(ContractMapper::toInterestCategory)
+                .filter(Objects::nonNull)
+                .forEach(category -> categoriesByCode.put(category.getCode(), category));
+
+        safeList(legacyNames).stream()
+                .flatMap(name -> InterestCategory.fromFreeText(name).stream())
+                .forEach(category -> categoriesByCode.put(category.getCode(), category));
+
+        return new ArrayList<>(categoriesByCode.values());
+    }
+
+    private static InterestCategory toInterestCategory(InterestCategoryDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        return InterestCategory.fromText(dto.code())
+                .or(() -> InterestCategory.fromText(dto.label()))
+                .orElse(null);
+    }
+
+    private static <T> List<T> safeList(List<T> values) {
+        return values == null ? List.of() : values;
     }
 
     private static List<String> toInterestNameList(List<Interest> interests) {
@@ -539,6 +705,29 @@ public final class ContractMapper {
         String trimmed = value.trim().replaceAll("\\s+", " ");
         return trimmed.substring(0, 1).toUpperCase(Locale.ROOT)
                 + trimmed.substring(1).toLowerCase(Locale.ROOT);
+    }
+
+    private static String cleanLabel(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim().replaceAll("\\s+", " ");
+    }
+
+    private static String blankToNull(String value) {
+        return cleanLabel(value);
+    }
+
+    private static String skillKey(String name, String escoSkillUri) {
+        String uri = blankToNull(escoSkillUri);
+        if (uri != null) {
+            return uri.toLowerCase(Locale.ROOT);
+        }
+        return cleanLabel(name).toLowerCase(Locale.ROOT);
+    }
+
+    private static String requirementKey(ActivitySkillRequirement requirement) {
+        return skillKey(requirement.getName(), requirement.getEscoSkillUri()) + ":" + requirement.isRequiredSkill();
     }
 
     private static <T> Set<T> safeSet(Set<T> values) {

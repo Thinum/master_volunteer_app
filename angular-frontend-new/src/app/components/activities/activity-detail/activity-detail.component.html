@@ -29,6 +29,10 @@
     </div>
   </div>
 
+  <div class="tag-row" *ngIf="activity?.tags?.length">
+    <span class="activity-tag" *ngFor="let tag of activity?.tags">{{ tag }}</span>
+  </div>
+
   </div>
 
   <!-- Description -->
@@ -113,6 +117,15 @@
         </mat-expansion-panel-header>
         <mat-chip-listbox>
           <mat-chip *ngFor="let skill of activity?.skills">{{ skill }}</mat-chip>
+        </mat-chip-listbox>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Tags</mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-chip-listbox>
+          <mat-chip *ngFor="let tag of activity?.tags">{{ tag }}</mat-chip>
         </mat-chip-listbox>
       </mat-expansion-panel>
 

@@ -1,9 +1,36 @@
 /**
  * Represents an activity or event in the system.
  */
-import { Organisation } from './organisation.model';
-import { Appointment } from './appointment.model';
-import { User } from './user.model';
+import type { Organisation } from './organisation.model';
+import type { Appointment } from './appointment.model';
+import type { User } from './user.model';
+import type { ActivitySkillRequirement } from './skill.model';
+
+export interface InterestCategory {
+  code: string;
+  label: string;
+  escoConceptUri?: string;
+}
+
+export type RecommendationReasonType = 'INTEREST' | 'REQUIRED_SKILL' | 'PREFERRED_SKILL' | 'TAG' | 'CATEGORY';
+
+export interface RecommendationReason {
+  type: RecommendationReasonType;
+  label: string;
+  detail: string;
+  scoreContribution: number;
+}
+
+export interface ActivityRecommendation {
+  activity: Activity;
+  score: number;
+  reasons: RecommendationReason[];
+}
+
+export interface ActivityRecommendationSummary {
+  score: number;
+  reasons: RecommendationReason[];
+}
 
 export interface Activity {
   id: number;
@@ -35,14 +62,18 @@ export interface Activity {
   // content enrichment
   description?: string;
   tags?: string[];
+  categories?: InterestCategory[];
   difficulty?: 'easy' | 'medium' | 'hard';
   isPublic?: boolean;
   status?: 'open' | 'upcoming' | 'finished' | 'canceled';
 
   // skills & requirements
   skills: string[];
+  requiredSkills?: ActivitySkillRequirement[];
+  preferredSkills?: ActivitySkillRequirement[];
   qualifications: string[];
   prerequisites: string[];
+  recommendation?: ActivityRecommendationSummary;
 
   // logistics
   capacity?: number;

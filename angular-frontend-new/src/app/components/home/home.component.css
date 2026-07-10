@@ -337,6 +337,20 @@
   gap: 0.35rem;
 }
 
+.activity-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.4rem;
+}
+
+.recommendation-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
 .slots-info {
   margin: 0.65rem 0 0;
   color: #5c5f68;
@@ -351,6 +365,30 @@
   padding: 0.15rem 0.5rem;
   border-radius: 0.5rem;
   font-weight: 600;
+}
+
+.activity-tag {
+  background-color: #f0f4fa;
+  color: #39547d;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+}
+
+.activity-tag--matched {
+  background-color: #eef7ed;
+  color: #2f6b3a;
+  box-shadow: inset 0 0 0 1px rgba(47, 107, 58, 0.22);
+}
+
+.reason-tag {
+  background-color: #eef7ed;
+  color: #2f6b3a;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
 }
 
 .rec-action {

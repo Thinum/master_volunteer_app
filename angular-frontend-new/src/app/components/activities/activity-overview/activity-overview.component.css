@@ -70,6 +70,7 @@
 .filter-header { display: flex; justify-content: space-between; gap: 1rem; }
 .filter-header h3 { margin: 0; }
 .filter-header p { margin: 0.25rem 0 0; color: #5c5f68; font-size: 0.875rem; }
+.filter-panel h4 { margin: 0; color: #5c5f68; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
 
 .activity-section {
   padding: 1.25rem;
@@ -132,6 +133,42 @@
 .organisation { color: #46608a; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; }
 .activity-content h3 { margin: 0.35rem 0; font-size: 1.05rem; line-height: 1.3; }
 .activity-content > p { display: -webkit-box; margin: 0; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: #5c5f68; font-size: 0.85rem; line-height: 1.45; }
+
+.tag-row,
+.reason-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.55rem;
+}
+
+.activity-tag,
+.reason-tag {
+  max-width: 100%;
+  padding: 0.18rem 0.5rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activity-tag {
+  background: #f0f4fa;
+  color: #39547d;
+}
+
+.activity-tag--matched {
+  background: #eef7ed;
+  color: #2f6b3a;
+  box-shadow: inset 0 0 0 1px rgba(47, 107, 58, 0.22);
+}
+
+.reason-tag {
+  background: #eef7ed;
+  color: #2f6b3a;
+}
 
 .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: auto; padding-top: 0.85rem; }
 .friends { display: flex; min-width: 0; align-items: center; }

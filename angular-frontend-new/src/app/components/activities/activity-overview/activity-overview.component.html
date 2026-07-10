@@ -32,21 +32,33 @@
     <button mat-stroked-button type="button" class="filter-button" (click)="showFilters = !showFilters">
       <mat-icon>tune</mat-icon>
       Filter
-      <span *ngIf="selectedStatus" class="filter-count">1</span>
+      <span *ngIf="activeFilterCount" class="filter-count">{{ activeFilterCount }}</span>
     </button>
   </section>
 
   <section *ngIf="showFilters" class="filter-panel">
     <div class="filter-header">
-      <div><h3>Filter</h3><p>Narrow the list by activity status.</p></div>
-      <button mat-button type="button" *ngIf="selectedStatus || searchTerm" (click)="clearFilters()">Reset</button>
+      <div><h3>Filter</h3><p>Narrow the list by activity status and tags.</p></div>
+      <button mat-button type="button" *ngIf="selectedStatus || selectedTags.length || searchTerm" (click)="clearFilters()">Reset</button>
     </div>
+    <h4>Status</h4>
     <mat-chip-listbox>
       <mat-chip-option [selected]="selectedStatus === 'open'" (selectionChange)="toggleStatus('open')">Open</mat-chip-option>
       <mat-chip-option [selected]="selectedStatus === 'upcoming'" (selectionChange)="toggleStatus('upcoming')">Upcoming</mat-chip-option>
       <mat-chip-option [selected]="selectedStatus === 'finished'" (selectionChange)="toggleStatus('finished')">Finished</mat-chip-option>
       <mat-chip-option [selected]="selectedStatus === 'canceled'" (selectionChange)="toggleStatus('canceled')">Canceled</mat-chip-option>
     </mat-chip-listbox>
+    <ng-container *ngIf="tagOptions.length">
+      <h4>Tags</h4>
+      <mat-chip-listbox multiple>
+        <mat-chip-option
+          *ngFor="let tag of tagOptions"
+          [selected]="isTagSelected(tag)"
+          (selectionChange)="toggleTag(tag)">
+          {{ tag }}
+        </mat-chip-option>
+      </mat-chip-listbox>
+    </ng-container>
   </section>
 
   <section class="activity-section" *ngIf="joinedActivities.length">
@@ -98,6 +110,17 @@
           <span class="organisation">{{ getOrganisationNames(activity) }}</span>
           <h3>{{ activity.title }}</h3>
           <p>{{ activity.description || activity.body }}</p>
+          <div class="tag-row" *ngIf="activity.tags?.length">
+            <span
+              class="activity-tag"
+              [class.activity-tag--matched]="isRecommendationMatchedTag(activity, tag)"
+              *ngFor="let tag of getVisibleTags(activity)">
+              {{ tag }}
+            </span>
+          </div>
+          <div class="reason-row" *ngIf="activity.recommendation?.reasons?.length">
+            <span class="reason-tag" *ngFor="let reason of getVisibleReasons(activity)">{{ reason.label }}</span>
+          </div>
 
           <div class="card-footer">
             <div class="friends" *ngIf="activity.participants?.length">

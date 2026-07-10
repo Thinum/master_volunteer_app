@@ -14,3 +14,18 @@ export interface Skill {
   /** Optional description or example usage. */
   description?: string;
 }
+
+export type SkillProficiency = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+
+export interface UserSkillProfile {
+  name: string;
+  escoSkillUri?: string;
+  proficiency?: SkillProficiency;
+}
+
+export interface ActivitySkillRequirement {
+  name: string;
+  escoSkillUri?: string;
+  minimumProficiency?: SkillProficiency;
+  required: boolean;
+}

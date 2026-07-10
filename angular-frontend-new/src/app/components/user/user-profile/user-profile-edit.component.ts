@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MOCK_SKILLS } from '../../../mock/mock-skills';
 import { Skill } from '../../../models/skill.model';
+import { InterestCategory } from '../../../models/activity.model';
 import { User } from '../../../models/user.model';
 import { VolunteerService } from '../../../services/api/volunteer.service';
 import { InterestService } from '../../../services/api/interest.service';
@@ -41,6 +42,7 @@ export class UserProfileEditComponent implements OnInit {
 
   protected readonly availableSkills: Skill[] = MOCK_SKILLS;
   protected availableInterests: string[] = MOCK_SKILLS.map(skill => this.normalizeInterestName(skill.name));
+  private interestCatalog: InterestCategory[] = [];
   protected currentUser?: User;
   protected selectedSkills: string[] = [];
   protected selectedInterests: string[] = [];
@@ -54,21 +56,31 @@ export class UserProfileEditComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.interestService.getAllInterests().subscribe({
+    this.interestService.getInterestCatalog().subscribe({
       next: interests => {
+        this.interestCatalog = interests;
         this.availableInterests = interests.length
-          ? interests.map(interest => this.normalizeInterestName(interest))
+          ? interests.map(interest => interest.label)
           : this.availableInterests;
       },
       error: () => {
-        this.availableInterests = MOCK_SKILLS.map(skill => this.normalizeInterestName(skill.name));
+        this.interestService.getAllInterests().subscribe({
+          next: interests => {
+            this.availableInterests = interests.length
+              ? interests.map(interest => this.normalizeInterestName(interest))
+              : this.availableInterests;
+          },
+          error: () => {
+            this.availableInterests = MOCK_SKILLS.map(skill => this.normalizeInterestName(skill.name));
+          }
+        });
       }
     });
 
     this.volunteerService.getCurrentUser().subscribe(user => {
       this.currentUser = user;
-      this.selectedSkills = [...(user.skills ?? [])];
-      this.selectedInterests = (user.interests ?? []).map(interest => this.normalizeInterestName(interest));
+      this.selectedSkills = this.getSelectedSkillNames(user);
+      this.selectedInterests = this.getSelectedInterestLabels(user);
       this.profileForm.patchValue({
         name: user.name,
         email: user.email,
@@ -127,7 +139,14 @@ export class UserProfileEditComponent implements OnInit {
       ...this.currentUser,
       ...this.profileForm.getRawValue(),
       skills: this.selectedSkills,
+      skillProfiles: this.selectedSkills.map(skill => ({
+        name: skill,
+        proficiency: this.currentUser?.skillProfiles?.find(profile => profile.name === skill)?.proficiency ?? 'INTERMEDIATE'
+      })),
       interests: this.selectedInterests,
+      interestCategories: this.selectedInterests
+        .map(interest => this.findInterestCategory(interest))
+        .filter((interest): interest is InterestCategory => !!interest),
     };
 
     this.volunteerService.updateCurrentUser(updatedUser).subscribe({
@@ -160,5 +179,36 @@ export class UserProfileEditComponent implements OnInit {
   private normalizeInterestName(value: string): string {
     const trimmed = value.trim().replace(/\s+/g, ' ');
     return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
+  }
+
+  private getSelectedSkillNames(user: User): string[] {
+    const profileSkills = (user.skillProfiles ?? [])
+      .map(skill => skill.name)
+      .filter((skill): skill is string => !!skill);
+
+    return profileSkills.length ? profileSkills : [...(user.skills ?? [])];
+  }
+
+  private getSelectedInterestLabels(user: User): string[] {
+    const categoryLabels = (user.interestCategories ?? [])
+      .map(interest => interest.label)
+      .filter((interest): interest is string => !!interest)
+      .map(interest => this.normalizeInterestName(interest));
+
+    return categoryLabels.length
+      ? categoryLabels
+      : (user.interests ?? []).map(interest => this.normalizeInterestName(interest));
+  }
+
+  private findInterestCategory(label: string): InterestCategory | undefined {
+    const normalizedLabel = this.normalizeForComparison(label);
+    return this.interestCatalog.find(interest =>
+      this.normalizeForComparison(interest.label) === normalizedLabel ||
+      this.normalizeForComparison(interest.code) === normalizedLabel
+    );
+  }
+
+  private normalizeForComparison(value: string): string {
+    return value.trim().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').toLowerCase();
   }
 }

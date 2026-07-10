@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -31,13 +33,13 @@ public class User {
 
     @ElementCollection
     @CollectionTable(name = "user_skills", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "skill")
-    private List<String> skills;
+    private List<UserSkill> skillProfiles;
 
     @ElementCollection
     @CollectionTable(name = "user_interests", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "interest")
-    private List<String> interests;
+    @Convert(converter = InterestCategoryConverter.class)
+    private List<InterestCategory> interestCategories;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp joinedAt;
@@ -62,4 +64,49 @@ public class User {
         orphanRemoval = true)
     @JsonIgnore
     private List<Notification> notifications;
+
+    @Transient
+    public List<String> getSkills() {
+        if (skillProfiles == null) {
+            return List.of();
+        }
+
+        return skillProfiles.stream()
+                .map(UserSkill::getName)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    public void setSkills(List<String> skills) {
+        if (skills == null) {
+            this.skillProfiles = List.of();
+            return;
+        }
+
+        this.skillProfiles = skills.stream()
+                .filter(skill -> skill != null && !skill.isBlank())
+                .map(String::trim)
+                .distinct()
+                .map(UserSkill::fromName)
+                .toList();
+    }
+
+    @Transient
+    public List<String> getInterests() {
+        if (interestCategories == null) {
+            return List.of();
+        }
+
+        return interestCategories.stream()
+                .filter(Objects::nonNull)
+                .map(InterestCategory::getLabel)
+                .distinct()
+                .toList();
+    }
+
+    public void setInterests(List<String> interests) {
+        this.interestCategories = interests == null
+                ? new ArrayList<>()
+                : InterestCategory.fromNames(interests);
+    }
 }

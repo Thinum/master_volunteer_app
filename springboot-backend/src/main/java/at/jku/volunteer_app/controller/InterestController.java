@@ -1,5 +1,6 @@
 package at.jku.volunteer_app.controller;
 
+import at.jku.volunteer_app.contract.InterestCategoryDTO;
 import at.jku.volunteer_app.service.InterestService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,5 +21,10 @@ public class InterestController {
     @GetMapping
     public List<String> getAllInterests() {
         return interestService.getAllInterestNames();
+    }
+
+    @GetMapping("/catalog")
+    public List<InterestCategoryDTO> getInterestCatalog() {
+        return interestService.getInterestCatalog();
     }
 }

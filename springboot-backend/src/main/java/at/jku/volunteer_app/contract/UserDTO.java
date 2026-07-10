@@ -12,7 +12,9 @@ public record UserDTO(
         String profilePicture,
         String phone,
         List<String> skills,
+        List<UserSkillDTO> skillProfiles,
         List<String> interests,
+        List<InterestCategoryDTO> interestCategories,
         @JsonProperty("isActive")
         boolean isActive,
         Timestamp joinedAt,
