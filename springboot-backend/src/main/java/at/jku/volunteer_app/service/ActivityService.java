@@ -129,6 +129,8 @@ public class ActivityService {
 
         if (activity.getTags() == null) {
             activity.setTags(List.of());
+        } else {
+            activity.setTags(cleanTags(activity.getTags()));
         }
 
         if (activity.getCategories() == null || activity.getCategories().isEmpty()) {
@@ -168,6 +170,26 @@ public class ActivityService {
             return null;
         }
         return value.trim().replaceAll("\\s+", " ");
+    }
+
+    private List<String> cleanTags(List<String> values) {
+        Set<String> seen = new LinkedHashSet<>();
+        List<String> cleaned = new ArrayList<>();
+
+        safeList(values).stream()
+                .map(this::cleanTag)
+                .filter(tag -> tag != null && !tag.isBlank())
+                .forEach(tag -> {
+                    String key = tag.replace('_', ' ')
+                            .replace('-', ' ')
+                            .toLowerCase()
+                            .replaceAll("\\s+", " ");
+                    if (seen.add(key)) {
+                        cleaned.add(tag);
+                    }
+                });
+
+        return cleaned;
     }
 
 //    public List<Activity> getCompletedActivitiesForOrganisation(

@@ -75,7 +75,7 @@
       <mat-chip-listbox multiple>
         <mat-chip-option
           *ngFor="let tag of tags"
-          [selected]="selectedTags.includes(tag)"
+          [selected]="isTagSelected(tag)"
           (selectionChange)="toggleTag(tag)">
           {{ tag }}
         </mat-chip-option>

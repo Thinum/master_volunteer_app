@@ -31,22 +31,22 @@
     <p><strong>Phone:</strong> {{ user?.phone }}</p>
     }
 
-    @if (user?.skills?.length) {
+    @if (visibleSkills.length) {
     <section class="profile-tags">
       <h3>Skills</h3>
       <mat-chip-set>
-        @for (skill of user?.skills; track skill) {
+        @for (skill of visibleSkills; track skill) {
         <mat-chip>{{ skill }}</mat-chip>
         }
       </mat-chip-set>
     </section>
     }
 
-    @if (user?.interests?.length) {
+    @if (visibleInterests.length) {
     <section class="profile-tags">
       <h3>Fields of Interest</h3>
       <mat-chip-set>
-        @for (interest of user?.interests; track interest) {
+        @for (interest of visibleInterests; track interest) {
         <mat-chip>{{ interest }}</mat-chip>
         }
       </mat-chip-set>

@@ -118,7 +118,7 @@
               </span>
             </div>
             <p class="rec-desc">{{ act.description || act.body }}</p>
-            <div class="activity-tags" *ngIf="act.tags && act.tags.length > 0">
+            <div class="activity-tags" *ngIf="getVisibleTags(act).length > 0">
               <span
                 class="activity-tag"
                 [class.activity-tag--matched]="isRecommendationMatchedTag(act, tag)"
@@ -126,11 +126,11 @@
                 {{ tag }}
               </span>
             </div>
-            <div class="skills-tags" *ngIf="act.skills && act.skills.length > 0">
-              <span class="skill-tag" *ngFor="let skill of act.skills">{{ skill }}</span>
+            <div class="skills-tags" *ngIf="getVisibleSkills(act).length > 0">
+              <span class="skill-tag" *ngFor="let skill of getVisibleSkills(act)">{{ skill }}</span>
             </div>
-            <div class="recommendation-reasons" *ngIf="act.recommendation?.reasons?.length">
-              <span class="reason-tag" *ngFor="let reason of act.recommendation?.reasons | slice:0:3">
+            <div class="recommendation-reasons" *ngIf="getVisibleReasons(act).length">
+              <span class="reason-tag" *ngFor="let reason of getVisibleReasons(act)">
                 {{ reason.label }}
               </span>
             </div>

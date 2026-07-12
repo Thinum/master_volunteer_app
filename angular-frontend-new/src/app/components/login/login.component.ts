@@ -101,11 +101,11 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   private loadOrganisations(): void {
     this.organisationService.getAllOrganisations().subscribe(orgs => {
-      this.organisations = orgs;
-      for (let org of orgs) {
+      this.organisations = (orgs ?? []).map(org => this.withCleanTags(org));
+      for (let org of this.organisations) {
         this.loadExampleActivitiesForOrganisation(org.id);
       }
-      this.organisationsFiltered = [...orgs];
+      this.organisationsFiltered = [...this.organisations];
       this.extractCategoriesAndTags();
     });
   }
@@ -118,7 +118,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       if (org.category) {
         categorySet.add(org.category);
       }
-      (org.tags ?? []).forEach(tag => {
+      this.getTags(org).forEach(tag => {
         tagSet.add(tag);
       });
     });
@@ -135,7 +135,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         !search ||
         org.orgName.toLowerCase().includes(search) ||
         org.body.toLowerCase().includes(search) ||
-        (org.tags ?? []).some(tag =>
+        this.getTags(org).some(tag =>
           tag.toLowerCase().includes(search)
         );
 
@@ -146,7 +146,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       const matchesTags =
         this.selectedTags.length === 0 ||
         this.selectedTags.every(tag =>
-          (org.tags ?? []).includes(tag)
+          this.getTags(org).some(orgTag => this.normalizeTag(orgTag) === this.normalizeTag(tag))
         );
 
       return matchesSearch && matchesCategory && matchesTags;
@@ -154,8 +154,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   toggleTag(tag: string): void {
-    if (this.selectedTags.includes(tag)) {
-      this.selectedTags = this.selectedTags.filter(t => t !== tag);
+    if (this.selectedTags.some(selectedTag => this.normalizeTag(selectedTag) === this.normalizeTag(tag))) {
+      this.selectedTags = this.selectedTags.filter(t => this.normalizeTag(t) !== this.normalizeTag(tag));
     } else {
       this.selectedTags.push(tag);
     }
@@ -198,5 +198,40 @@ export class LoginComponent implements OnInit, OnDestroy {
         console.error('Failed to load organisation activities', err);
       }
     });
+  }
+
+  protected getVisibleTags(org: Organisation): string[] {
+    return this.getTags(org).slice(0, 4);
+  }
+
+  private withCleanTags(org: Organisation): Organisation {
+    return {
+      ...org,
+      tags: this.getTags(org)
+    };
+  }
+
+  private getTags(org: Organisation): string[] {
+    return this.uniqueLabels(org.tags ?? []);
+  }
+
+  private uniqueLabels(values: string[]): string[] {
+    const labels = new Map<string, string>();
+
+    values
+      .map(value => value?.trim().replace(/\s+/g, ' '))
+      .filter((value): value is string => !!value)
+      .forEach(value => {
+        const normalized = this.normalizeTag(value);
+        if (!labels.has(normalized)) {
+          labels.set(normalized, value);
+        }
+      });
+
+    return Array.from(labels.values());
+  }
+
+  private normalizeTag(value: string): string {
+    return value.trim().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').toLowerCase();
   }
 }

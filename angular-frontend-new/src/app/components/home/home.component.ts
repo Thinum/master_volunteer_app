@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { CardComponent } from '../../shared/components/card/card.component';
 import { User } from '../../models/user.model';
-import { Activity } from '../../models/activity.model';
+import { Activity, RecommendationReason } from '../../models/activity.model';
 import { Organisation } from '../../models/organisation.model';
 import { VolunteerService } from '../../services/api/volunteer.service';
 import { NotificationService } from '../../services/notification.service';
@@ -163,14 +163,35 @@ export class HomeComponent implements OnInit {
   }
 
   getVisibleTags(activity: Activity): string[] {
-    return (activity.tags || []).slice(0, 4);
+    return this.uniqueLabels(activity.tags || []).slice(0, 4);
+  }
+
+  getVisibleSkills(activity: Activity): string[] {
+    return this.uniqueLabels(activity.skills || []);
   }
 
   isRecommendationMatchedTag(activity: Activity, tag: string): boolean {
     const normalizedTag = this.normalizeChip(tag);
     return (activity.recommendation?.reasons || []).some(reason =>
-      reason.type === 'TAG' && this.normalizeChip(reason.label) === normalizedTag
+      this.normalizeChip(reason.label) === normalizedTag
     );
+  }
+
+  getVisibleReasons(activity: Activity): RecommendationReason[] {
+    const visibleLabels = new Set([
+      ...this.getVisibleTags(activity),
+      ...this.getVisibleSkills(activity)
+    ].map(label => this.normalizeChip(label)));
+    const reasonsByLabel = new Map<string, RecommendationReason>();
+
+    (activity.recommendation?.reasons || []).forEach(reason => {
+      const normalizedLabel = this.normalizeChip(reason.label);
+      if (!visibleLabels.has(normalizedLabel) && !reasonsByLabel.has(normalizedLabel)) {
+        reasonsByLabel.set(normalizedLabel, reason);
+      }
+    });
+
+    return Array.from(reasonsByLabel.values()).slice(0, 3);
   }
 
   joinActivity(activityId: number): void {
@@ -191,5 +212,21 @@ export class HomeComponent implements OnInit {
 
   private normalizeChip(value: string): string {
     return value.trim().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').toLowerCase();
+  }
+
+  private uniqueLabels(values: string[]): string[] {
+    const labels = new Map<string, string>();
+
+    values
+      .map(value => value?.trim().replace(/\s+/g, ' '))
+      .filter((value): value is string => !!value)
+      .forEach(value => {
+        const normalized = this.normalizeChip(value);
+        if (!labels.has(normalized)) {
+          labels.set(normalized, value);
+        }
+      });
+
+    return Array.from(labels.values());
   }
 }

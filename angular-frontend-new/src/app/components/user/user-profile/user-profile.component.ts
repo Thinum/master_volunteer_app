@@ -117,4 +117,31 @@ export class UserProfileComponent implements OnInit {
       error: err => console.error(err)
     });
   }
+
+  get visibleSkills(): string[] {
+    return this.uniqueLabels(this.user?.skills ?? []);
+  }
+
+  get visibleInterests(): string[] {
+    const categoryLabels = (this.user?.interestCategories ?? [])
+      .map(interest => interest.label)
+      .filter((interest): interest is string => !!interest);
+
+    return this.uniqueLabels(categoryLabels.length ? categoryLabels : (this.user?.interests ?? []));
+  }
+
+  private uniqueLabels(values: string[]): string[] {
+    const labels = new Map<string, string>();
+
+    values
+      .map(value => value?.trim().replace(/\s+/g, ' '))
+      .filter((value): value is string => !!value)
+      .forEach(value => labels.set(this.normalizeLabel(value), value));
+
+    return Array.from(labels.values());
+  }
+
+  private normalizeLabel(value: string): string {
+    return value.trim().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').toLowerCase();
+  }
 }

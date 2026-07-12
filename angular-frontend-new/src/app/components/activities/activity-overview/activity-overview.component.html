@@ -118,7 +118,7 @@
               {{ tag }}
             </span>
           </div>
-          <div class="reason-row" *ngIf="activity.recommendation?.reasons?.length">
+          <div class="reason-row" *ngIf="getVisibleReasons(activity).length">
             <span class="reason-tag" *ngFor="let reason of getVisibleReasons(activity)">{{ reason.label }}</span>
           </div>
 

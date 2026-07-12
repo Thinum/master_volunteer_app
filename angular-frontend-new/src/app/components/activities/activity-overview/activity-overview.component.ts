@@ -87,21 +87,31 @@ export class ActivityOverviewComponent implements OnInit {
   }
 
   getOrganisationNames(activity: Activity): string {
-    return activity.organisations?.map(org => org.orgName).join(', ') || 'No organization';
+    return this.uniqueLabels(activity.organisations?.map(org => org.orgName) ?? []).join(', ') || 'No organization';
   }
 
   getVisibleTags(activity: Activity): string[] {
-    return (activity.tags || []).slice(0, 4);
+    return this.getActivityTags(activity).slice(0, 4);
   }
 
   getVisibleReasons(activity: Activity): RecommendationReason[] {
-    return (activity.recommendation?.reasons || []).slice(0, 3);
+    const visibleLabels = new Set(this.getVisibleTags(activity).map(tag => this.normalizeChip(tag)));
+    const reasonsByLabel = new Map<string, RecommendationReason>();
+
+    (activity.recommendation?.reasons || []).forEach(reason => {
+      const normalizedLabel = this.normalizeChip(reason.label);
+      if (!visibleLabels.has(normalizedLabel) && !reasonsByLabel.has(normalizedLabel)) {
+        reasonsByLabel.set(normalizedLabel, reason);
+      }
+    });
+
+    return Array.from(reasonsByLabel.values()).slice(0, 3);
   }
 
   isRecommendationMatchedTag(activity: Activity, tag: string): boolean {
     const normalizedTag = this.normalizeChip(tag);
     return (activity.recommendation?.reasons || []).some(reason =>
-      reason.type === 'TAG' && this.normalizeChip(reason.label) === normalizedTag
+      this.normalizeChip(reason.label) === normalizedTag
     );
   }
 
@@ -169,6 +179,7 @@ export class ActivityOverviewComponent implements OnInit {
   private withFriendParticipants(activity: Activity): Activity {
     return {
       ...activity,
+      tags: this.uniqueLabels(activity.tags || []),
       participants: (activity.participants || []).filter(participant => this.friendIds.has(participant.id))
     };
   }
@@ -178,10 +189,10 @@ export class ActivityOverviewComponent implements OnInit {
       activity.title.toLowerCase().includes(search) ||
       (activity.description || activity.body || '').toLowerCase().includes(search) ||
       this.getOrganisationNames(activity).toLowerCase().includes(search) ||
-      (activity.tags || []).some(tag => tag.toLowerCase().includes(search));
+      this.getActivityTags(activity).some(tag => tag.toLowerCase().includes(search));
     const matchesStatus = !this.selectedStatus || (activity.status || 'open') === this.selectedStatus;
     const matchesTags = this.selectedTags.length === 0 || this.selectedTags.every(selectedTag =>
-      (activity.tags || []).some(tag => this.normalizeChip(tag) === this.normalizeChip(selectedTag))
+      this.getActivityTags(activity).some(tag => this.normalizeChip(tag) === this.normalizeChip(selectedTag))
     );
     return matchesSearch && matchesStatus && matchesTags;
   }
@@ -191,7 +202,7 @@ export class ActivityOverviewComponent implements OnInit {
     const activityTags: string[] = [];
 
     activities.forEach(activity => {
-      activityTags.push(...(activity.tags || []));
+      activityTags.push(...this.getActivityTags(activity));
     });
 
     [...(tagCatalog || []), ...activityTags]
@@ -209,5 +220,25 @@ export class ActivityOverviewComponent implements OnInit {
 
   private normalizeChip(value: string): string {
     return value.trim().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').toLowerCase();
+  }
+
+  private getActivityTags(activity: Activity): string[] {
+    return this.uniqueLabels(activity.tags || []);
+  }
+
+  private uniqueLabels(values: string[]): string[] {
+    const labels = new Map<string, string>();
+
+    values
+      .map(value => value?.trim().replace(/\s+/g, ' '))
+      .filter((value): value is string => !!value)
+      .forEach(value => {
+        const normalized = this.normalizeChip(value);
+        if (!labels.has(normalized)) {
+          labels.set(normalized, value);
+        }
+      });
+
+    return Array.from(labels.values());
   }
 }

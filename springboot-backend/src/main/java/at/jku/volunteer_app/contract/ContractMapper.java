@@ -21,6 +21,8 @@ import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.model.UserSkill;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -103,12 +105,12 @@ public final class ContractMapper {
                 toActivitySkillRequirementDTOList(activity.getRequiredSkills()),
                 toActivitySkillRequirementDTOList(activity.getPreferredSkills()),
                 toInterestCategoryDTOList(activity.getCategories()),
-                safeList(activity.getQualifications()),
-                safeList(activity.getPrerequisites()),
+                cleanStringList(activity.getQualifications()),
+                cleanStringList(activity.getPrerequisites()),
                 activity.getCapacity(),
                 activity.getSpotsTaken(),
-                safeList(activity.getEquipmentProvided()),
-                safeList(activity.getTags()),
+                cleanStringList(activity.getEquipmentProvided()),
+                cleanStringList(activity.getTags()),
                 activity.getDifficulty(),
                 activity.isPublic(),
                 activity.getStatus(),
@@ -143,13 +145,13 @@ public final class ContractMapper {
                 dto.preferredSkills(),
                 dto.skills()
         ));
-        activity.setCategories(toInterestCategoryEntityList(dto.categories(), null));
-        activity.setQualifications(safeList(dto.qualifications()));
-        activity.setPrerequisites(safeList(dto.prerequisites()));
+        activity.setCategories(toInterestCategoryEntityList(dto.categories(), dto.tags()));
+        activity.setQualifications(cleanStringList(dto.qualifications()));
+        activity.setPrerequisites(cleanStringList(dto.prerequisites()));
         activity.setCapacity(dto.capacity());
         activity.setSpotsTaken(dto.spotsTaken());
-        activity.setEquipmentProvided(safeList(dto.equipmentProvided()));
-        activity.setTags(safeList(dto.tags()));
+        activity.setEquipmentProvided(cleanStringList(dto.equipmentProvided()));
+        activity.setTags(cleanStringList(dto.tags()));
         activity.setDifficulty(dto.difficulty());
         activity.setPublic(dto.isPublic());
         activity.setStatus(dto.status());
@@ -176,7 +178,7 @@ public final class ContractMapper {
                 organisation.isDeactivated(),
                 organisation.getReactivationTime(),
                 organisation.getCategory(),
-                safeSet(organisation.getTags()),
+                cleanStringSet(organisation.getTags()),
                 toUserDTOSet(organisation.getOrgContacts()),
                 toOrganisationMemberDTOSet(organisation.getOrgMembers())
         );
@@ -196,7 +198,7 @@ public final class ContractMapper {
         organisation.setDeactivated(dto.deactivated());
         organisation.setReactivationTime(dto.reactivationTime());
         organisation.setCategory(dto.category());
-        organisation.setTags(safeSet(dto.tags()));
+        organisation.setTags(cleanStringSet(dto.tags()));
         organisation.setOrgContacts(toUserEntitySet(dto.orgContacts()));
         organisation.setOrgMembers(toOrganisationMemberEntitySet(dto.orgMembers(), organisation));
         return organisation;
@@ -528,7 +530,16 @@ public final class ContractMapper {
                 .map(UserSkill::getName)
                 .map(ContractMapper::cleanLabel)
                 .filter(Objects::nonNull)
-                .distinct()
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toMap(
+                                ContractMapper::normalizedKey,
+                                value -> value,
+                                (existing, ignored) -> existing,
+                                LinkedHashMap::new
+                        ),
+                        values -> new ArrayList<>(values.values())
+                ))
+                .stream()
                 .toList();
     }
 
@@ -541,6 +552,16 @@ public final class ContractMapper {
                         skill.getProficiencyOrDefault()
                 ))
                 .filter(skill -> skill.name() != null)
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toMap(
+                                skill -> skillKey(skill.name(), skill.escoSkillUri()),
+                                skill -> skill,
+                                (existing, ignored) -> existing,
+                                LinkedHashMap::new
+                        ),
+                        values -> new ArrayList<>(values.values())
+                ))
+                .stream()
                 .toList();
     }
 
@@ -638,7 +659,16 @@ public final class ContractMapper {
         return safeList(categories).stream()
                 .filter(Objects::nonNull)
                 .map(InterestCategory::getLabel)
-                .distinct()
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toMap(
+                                ContractMapper::normalizedKey,
+                                value -> value,
+                                (existing, ignored) -> existing,
+                                LinkedHashMap::new
+                        ),
+                        values -> new ArrayList<>(values.values())
+                ))
+                .stream()
                 .toList();
     }
 
@@ -686,6 +716,29 @@ public final class ContractMapper {
         return values == null ? List.of() : values;
     }
 
+    private static List<String> cleanStringList(Collection<String> values) {
+        return new ArrayList<>(cleanStringMap(values).values());
+    }
+
+    private static Set<String> cleanStringSet(Collection<String> values) {
+        return new LinkedHashSet<>(cleanStringMap(values).values());
+    }
+
+    private static Map<String, String> cleanStringMap(Collection<String> values) {
+        Map<String, String> cleanedByKey = new LinkedHashMap<>();
+
+        if (values == null) {
+            return cleanedByKey;
+        }
+
+        values.stream()
+                .map(ContractMapper::cleanLabel)
+                .filter(Objects::nonNull)
+                .forEach(value -> cleanedByKey.putIfAbsent(normalizedKey(value), value));
+
+        return cleanedByKey;
+    }
+
     private static List<String> toInterestNameList(List<Interest> interests) {
         if (interests == null) {
             return List.of();
@@ -712,6 +765,14 @@ public final class ContractMapper {
             return null;
         }
         return value.trim().replaceAll("\\s+", " ");
+    }
+
+    private static String normalizedKey(String value) {
+        return cleanLabel(value)
+                .replace('_', ' ')
+                .replace('-', ' ')
+                .toLowerCase(Locale.ROOT)
+                .replaceAll("\\s+", " ");
     }
 
     private static String blankToNull(String value) {

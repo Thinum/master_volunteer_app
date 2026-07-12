@@ -271,6 +271,22 @@ public class ActivityRecommendationService {
             double contribution
     ) {
         double roundedContribution = round(contribution);
+        String normalizedLabel = normalizeText(label);
+
+        for (int i = 0; i < reasons.size(); i++) {
+            RecommendationReasonDTO existingReason = reasons.get(i);
+            if (!normalizeText(existingReason.label()).equals(normalizedLabel)) {
+                continue;
+            }
+
+            if (roundedContribution > existingReason.scoreContribution()) {
+                reasons.set(i, new RecommendationReasonDTO(type, label, detail, roundedContribution));
+                return contribution - existingReason.scoreContribution();
+            }
+
+            return 0.0;
+        }
+
         reasons.add(new RecommendationReasonDTO(type, label, detail, roundedContribution));
         return contribution;
     }

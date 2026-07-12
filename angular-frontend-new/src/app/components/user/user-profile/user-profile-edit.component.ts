@@ -59,19 +59,19 @@ export class UserProfileEditComponent implements OnInit {
     this.interestService.getInterestCatalog().subscribe({
       next: interests => {
         this.interestCatalog = interests;
-        this.availableInterests = interests.length
+        this.setAvailableInterests(interests.length
           ? interests.map(interest => interest.label)
-          : this.availableInterests;
+          : this.availableInterests);
       },
       error: () => {
         this.interestService.getAllInterests().subscribe({
           next: interests => {
-            this.availableInterests = interests.length
+            this.setAvailableInterests(interests.length
               ? interests.map(interest => this.normalizeInterestName(interest))
-              : this.availableInterests;
+              : this.availableInterests);
           },
           error: () => {
-            this.availableInterests = MOCK_SKILLS.map(skill => this.normalizeInterestName(skill.name));
+            this.setAvailableInterests(MOCK_SKILLS.map(skill => this.normalizeInterestName(skill.name)));
           }
         });
       }
@@ -79,8 +79,9 @@ export class UserProfileEditComponent implements OnInit {
 
     this.volunteerService.getCurrentUser().subscribe(user => {
       this.currentUser = user;
-      this.selectedSkills = this.getSelectedSkillNames(user);
-      this.selectedInterests = this.getSelectedInterestLabels(user);
+      this.selectedSkills = this.uniqueLabels(this.getSelectedSkillNames(user));
+      this.selectedInterests = this.uniqueLabels(this.getSelectedInterestLabels(user));
+      this.setAvailableInterests(this.availableInterests);
       this.profileForm.patchValue({
         name: user.name,
         email: user.email,
@@ -107,11 +108,13 @@ export class UserProfileEditComponent implements OnInit {
   }
 
   protected isSkillSelected(skillName: string): boolean {
-    return this.selectedSkills.includes(skillName);
+    const normalizedSkill = this.normalizeForComparison(skillName);
+    return this.selectedSkills.some(skill => this.normalizeForComparison(skill) === normalizedSkill);
   }
 
   protected isInterestSelected(skillName: string): boolean {
-    return this.selectedInterests.includes(this.normalizeInterestName(skillName));
+    const normalizedInterest = this.normalizeForComparison(skillName);
+    return this.selectedInterests.some(interest => this.normalizeForComparison(interest) === normalizedInterest);
   }
 
   protected onPictureSelected(event: Event): void {
@@ -138,13 +141,15 @@ export class UserProfileEditComponent implements OnInit {
     const updatedUser: User = {
       ...this.currentUser,
       ...this.profileForm.getRawValue(),
-      skills: this.selectedSkills,
-      skillProfiles: this.selectedSkills.map(skill => ({
+      skills: this.uniqueLabels(this.selectedSkills),
+      skillProfiles: this.uniqueLabels(this.selectedSkills).map(skill => ({
         name: skill,
-        proficiency: this.currentUser?.skillProfiles?.find(profile => profile.name === skill)?.proficiency ?? 'INTERMEDIATE'
+        proficiency: this.currentUser?.skillProfiles?.find(profile =>
+          this.normalizeForComparison(profile.name) === this.normalizeForComparison(skill)
+        )?.proficiency ?? 'INTERMEDIATE'
       })),
-      interests: this.selectedInterests,
-      interestCategories: this.selectedInterests
+      interests: this.uniqueLabels(this.selectedInterests),
+      interestCategories: this.uniqueLabels(this.selectedInterests)
         .map(interest => this.findInterestCategory(interest))
         .filter((interest): interest is InterestCategory => !!interest),
     };
@@ -163,14 +168,15 @@ export class UserProfileEditComponent implements OnInit {
   }
 
   private setSelection(values: string[], value: string, selected: boolean): string[] {
-    const alreadySelected = values.includes(value);
+    const normalizedValue = this.normalizeForComparison(value);
+    const alreadySelected = values.some(existing => this.normalizeForComparison(existing) === normalizedValue);
 
     if (selected && !alreadySelected) {
-      return [...values, value];
+      return this.uniqueLabels([...values, value]);
     }
 
     if (!selected && alreadySelected) {
-      return values.filter(existing => existing !== value);
+      return values.filter(existing => this.normalizeForComparison(existing) !== normalizedValue);
     }
 
     return values;
@@ -198,6 +204,26 @@ export class UserProfileEditComponent implements OnInit {
     return categoryLabels.length
       ? categoryLabels
       : (user.interests ?? []).map(interest => this.normalizeInterestName(interest));
+  }
+
+  private setAvailableInterests(values: string[]): void {
+    this.availableInterests = this.uniqueLabels([...values, ...this.selectedInterests]);
+  }
+
+  private uniqueLabels(values: string[]): string[] {
+    const labels = new Map<string, string>();
+
+    values
+      .map(value => value?.trim().replace(/\s+/g, ' '))
+      .filter((value): value is string => !!value)
+      .forEach(value => {
+        const normalized = this.normalizeForComparison(value);
+        if (!labels.has(normalized)) {
+          labels.set(normalized, value);
+        }
+      });
+
+    return Array.from(labels.values());
   }
 
   private findInterestCategory(label: string): InterestCategory | undefined {

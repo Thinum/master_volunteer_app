@@ -11,7 +11,9 @@ import at.jku.volunteer_app.model.Organisation;
 import at.jku.volunteer_app.repository.OrganisationRepository;
 
 import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class OrganisationService {
@@ -39,10 +41,12 @@ public class OrganisationService {
     }
 
     public Organisation addOrganisation(Organisation organisation) {
+        normalizeOrganisationProfile(organisation);
         return organisationRepository.save(organisation);
     }
 
     public Organisation updateOrganisation(Organisation organisation) {
+        normalizeOrganisationProfile(organisation);
         return organisationRepository.save(organisation);
     }
 
@@ -79,5 +83,43 @@ public class OrganisationService {
     public List<Activity> getExampleActivities(int organisationId){
         // Just as a test we return all activities for the organisation
         return this.activityRepository.findAllByOrganisations_Id(organisationId);
+    }
+
+    private void normalizeOrganisationProfile(Organisation organisation) {
+        if (organisation == null) {
+            return;
+        }
+        organisation.setTags(cleanTags(organisation.getTags()));
+    }
+
+    private Set<String> cleanTags(Set<String> values) {
+        Set<String> cleaned = new LinkedHashSet<>();
+        Set<String> seen = new LinkedHashSet<>();
+
+        if (values == null) {
+            return cleaned;
+        }
+
+        values.stream()
+                .map(this::cleanTag)
+                .filter(tag -> tag != null && !tag.isBlank())
+                .forEach(tag -> {
+                    String key = tag.replace('_', ' ')
+                            .replace('-', ' ')
+                            .toLowerCase()
+                            .replaceAll("\\s+", " ");
+                    if (seen.add(key)) {
+                        cleaned.add(tag);
+                    }
+                });
+
+        return cleaned;
+    }
+
+    private String cleanTag(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim().replaceAll("\\s+", " ");
     }
 }

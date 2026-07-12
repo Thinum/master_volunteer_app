@@ -79,15 +79,15 @@ export class OrganisationsOverviewComponent implements OnInit {
         this.volunteerService.getOrganisations(user.id)
           .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe(organisations => {
-            this.joinedOrganisations = organisations ?? [];
+            this.joinedOrganisations = (organisations ?? []).map(org => this.withCleanTags(org));
           });
       });
   }
 
   private loadOrganisations(): void {
      this.organisationService.getAllOrganisations().subscribe(orgs => {
-        this.organisations = orgs;
-        this.organisationsFiltered = [...orgs];
+        this.organisations = (orgs ?? []).map(org => this.withCleanTags(org));
+        this.organisationsFiltered = [...this.organisations];
 
         this.extractCategoriesAndTags();
       });
@@ -104,7 +104,7 @@ export class OrganisationsOverviewComponent implements OnInit {
         categorySet.add(org.category);
       }
 
-      (org.tags ?? []).forEach(tag => {
+      this.getTags(org).forEach(tag => {
         tagSet.add(tag);
       });
     });
@@ -122,7 +122,7 @@ export class OrganisationsOverviewComponent implements OnInit {
         !search ||
         org.orgName.toLowerCase().includes(search) ||
         (org.body ?? '').toLowerCase().includes(search) ||
-        (org.tags ?? []).some(tag =>
+        this.getTags(org).some(tag =>
           tag.toLowerCase().includes(search)
         );
 
@@ -133,7 +133,7 @@ export class OrganisationsOverviewComponent implements OnInit {
       const matchesTags =
         this.selectedTags.length === 0 ||
         this.selectedTags.every(tag =>
-          (org.tags ?? []).includes(tag)
+          this.getTags(org).some(orgTag => this.normalizeTag(orgTag) === this.normalizeTag(tag))
         );
 
       return matchesSearch && matchesCategory && matchesTags;
@@ -141,12 +141,16 @@ export class OrganisationsOverviewComponent implements OnInit {
   }
 
   toggleTag(tag: string): void {
-    if (this.selectedTags.includes(tag)) {
-      this.selectedTags = this.selectedTags.filter(t => t !== tag);
+    if (this.isTagSelected(tag)) {
+      this.selectedTags = this.selectedTags.filter(t => this.normalizeTag(t) !== this.normalizeTag(tag));
     } else {
       this.selectedTags.push(tag);
     }
     this.applyFilters();
+  }
+
+  isTagSelected(tag: string): boolean {
+    return this.selectedTags.some(selectedTag => this.normalizeTag(selectedTag) === this.normalizeTag(tag));
   }
 
   toggleCategory(category: OrganisationCategory): void {
@@ -167,4 +171,35 @@ export class OrganisationsOverviewComponent implements OnInit {
   }
 
   addNew(): void {}
+
+  private withCleanTags(org: Organisation): Organisation {
+    return {
+      ...org,
+      tags: this.getTags(org)
+    };
+  }
+
+  private getTags(org: Organisation): string[] {
+    return this.uniqueLabels(org.tags ?? []);
+  }
+
+  private uniqueLabels(values: string[]): string[] {
+    const labels = new Map<string, string>();
+
+    values
+      .map(value => value?.trim().replace(/\s+/g, ' '))
+      .filter((value): value is string => !!value)
+      .forEach(value => {
+        const normalized = this.normalizeTag(value);
+        if (!labels.has(normalized)) {
+          labels.set(normalized, value);
+        }
+      });
+
+    return Array.from(labels.values());
+  }
+
+  private normalizeTag(value: string): string {
+    return value.trim().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').toLowerCase();
+  }
 }

@@ -8,7 +8,10 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 @Data
@@ -83,12 +86,32 @@ public class User {
             return;
         }
 
-        this.skillProfiles = skills.stream()
+        setSkillProfiles(skills.stream()
                 .filter(skill -> skill != null && !skill.isBlank())
                 .map(String::trim)
                 .distinct()
                 .map(UserSkill::fromName)
-                .toList();
+                .toList());
+    }
+
+    public void setSkillProfiles(List<UserSkill> skillProfiles) {
+        if (skillProfiles == null) {
+            this.skillProfiles = List.of();
+            return;
+        }
+
+        Map<String, UserSkill> skillsByKey = new LinkedHashMap<>();
+        skillProfiles.stream()
+                .filter(Objects::nonNull)
+                .map(skill -> new UserSkill(
+                        cleanLabel(skill.getName()),
+                        cleanLabel(skill.getEscoSkillUri()),
+                        skill.getProficiencyOrDefault()
+                ))
+                .filter(skill -> skill.getName() != null)
+                .forEach(skill -> skillsByKey.putIfAbsent(skillKey(skill), skill));
+
+        this.skillProfiles = new ArrayList<>(skillsByKey.values());
     }
 
     @Transient
@@ -105,8 +128,31 @@ public class User {
     }
 
     public void setInterests(List<String> interests) {
-        this.interestCategories = interests == null
+        setInterestCategories(interests == null
                 ? new ArrayList<>()
-                : InterestCategory.fromNames(interests);
+                : InterestCategory.fromNames(interests));
+    }
+
+    public void setInterestCategories(List<InterestCategory> interestCategories) {
+        this.interestCategories = interestCategories == null
+                ? new ArrayList<>()
+                : new ArrayList<>(interestCategories.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList());
+    }
+
+    private String skillKey(UserSkill skill) {
+        if (skill.getEscoSkillUri() != null) {
+            return skill.getEscoSkillUri().toLowerCase(Locale.ROOT);
+        }
+        return skill.getName().toLowerCase(Locale.ROOT);
+    }
+
+    private String cleanLabel(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim().replaceAll("\\s+", " ");
     }
 }

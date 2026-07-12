@@ -95,11 +95,19 @@ export class ActivityDetailComponent implements OnInit {
   }
 
   get allParticipants(): User[] {
-    return this.activity?.participants || [];
+    return this.uniqueUsers(this.activity?.participants || []);
   }
 
   get friendParticipants(): User[] {
     return this.allParticipants.filter(participant => this.friendIds.has(participant.id));
+  }
+
+  get visibleTags(): string[] {
+    return this.uniqueLabels(this.activity?.tags || []);
+  }
+
+  get visibleSkills(): string[] {
+    return this.uniqueLabels(this.activity?.skills || []);
   }
 
   private updateJoinState(): void {
@@ -142,5 +150,27 @@ export class ActivityDetailComponent implements OnInit {
         console.error('Could not join activity', err)
       },
     );
+  }
+
+  private uniqueUsers(users: User[]): User[] {
+    const usersById = new Map<number, User>();
+    users.forEach(user => usersById.set(user.id, user));
+    return Array.from(usersById.values());
+  }
+
+  private uniqueLabels(values: string[]): string[] {
+    const labels = new Map<string, string>();
+
+    values
+      .map(value => value?.trim().replace(/\s+/g, ' '))
+      .filter((value): value is string => !!value)
+      .forEach(value => {
+        const normalized = value.replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').toLowerCase();
+        if (!labels.has(normalized)) {
+          labels.set(normalized, value);
+        }
+      });
+
+    return Array.from(labels.values());
   }
 }

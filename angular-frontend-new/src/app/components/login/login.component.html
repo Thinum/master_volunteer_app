@@ -183,8 +183,8 @@
                       <h4 class="org-name">{{ org.orgName }}</h4>
                       <p class="org-body">{{ org.body }}</p>
 
-                      <div *ngIf="org.tags && org.tags.length > 0" class="org-tags">
-                        <span *ngFor="let tag of org.tags" class="tag">{{ tag }}</span>
+                      <div *ngIf="getVisibleTags(org).length > 0" class="org-tags">
+                        <span *ngFor="let tag of getVisibleTags(org)" class="tag">{{ tag }}</span>
                       </div>
                     </div>
                   </mat-panel-description>
