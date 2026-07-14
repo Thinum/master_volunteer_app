@@ -1,0 +1,56 @@
+.assignment-page {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 1rem 5rem;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+header h1 {
+  margin-bottom: 0.25rem;
+}
+
+header p,
+.notice {
+  color: #5f6775;
+}
+
+header mat-icon {
+  width: 48px;
+  height: 48px;
+  font-size: 48px;
+  color: #46608a;
+}
+
+.notice {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: #eef3fb;
+}
+
+.assignment-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.5rem 1rem;
+  padding-top: 1rem;
+}
+
+mat-checkbox span,
+mat-checkbox small {
+  display: block;
+}
+
+mat-checkbox small {
+  color: #777;
+}

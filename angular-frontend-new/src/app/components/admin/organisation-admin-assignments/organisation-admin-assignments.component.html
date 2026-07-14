@@ -1,0 +1,45 @@
+<section class="assignment-page">
+  <header>
+    <div>
+      <h1>Organization admin assignments</h1>
+      <p>Choose any registered user to manage each organization.</p>
+    </div>
+    <mat-icon>admin_panel_settings</mat-icon>
+  </header>
+
+  <p class="notice">
+    Platform administrators are automatically retained for every organization.
+  </p>
+
+  <p *ngIf="loading">Loading assignments…</p>
+
+  <div class="assignment-grid" *ngIf="!loading">
+    <mat-card *ngFor="let assignment of assignments">
+      <mat-card-header>
+        <mat-card-title>{{ assignment.organisationName }}</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="admin-list">
+          <mat-checkbox
+            *ngFor="let admin of availableAdmins"
+            [checked]="isSelected(assignment.organisationId, admin.id)"
+            (change)="toggleAdmin(assignment.organisationId, admin.id, $event)">
+            <span>{{ adminLabel(admin) }}</span>
+            <small>{{ admin.email }}</small>
+          </mat-checkbox>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button
+          mat-raised-button
+          color="primary"
+          [disabled]="savingOrganisationId === assignment.organisationId"
+          (click)="save(assignment)">
+          Save assignments
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</section>
