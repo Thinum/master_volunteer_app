@@ -8,5 +8,9 @@ import java.util.Optional;
 
 @Repository
 public interface Org_AdminRepository extends JpaRepository<Org_Admin, Integer> {
-    Optional<Org_Admin> findById(int id);
+    Optional<Org_Admin> findOneById(int id);
+
+    Optional<Org_Admin> findOneByUsername(String username);
+
+    java.util.List<Org_Admin> findAllByPlatformAdminTrue();
 }

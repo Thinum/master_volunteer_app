@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {ActivatedRoute, RouterLink} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
@@ -7,10 +7,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { NgFor, NgIf, DatePipe } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Activity} from '../../../models/activity.model';
 import { User } from '../../../models/user.model';
 import {VolunteerService} from '../../../services/api/volunteer.service';
 import {ActivityService} from '../../../services/api/activity.service';
+import {OrganisationService} from '../../../services/api/organisation.service';
 import {MatListItem} from '@angular/material/list';
 import {ShareButtonComponent} from '../../../shared/components/share-button/share-button.component';
 
@@ -34,6 +36,7 @@ interface Contact {
     NgIf,
     DatePipe,
     MatTooltipModule,
+    MatSnackBarModule,
     MatListItem,
     RouterLink,
     ShareButtonComponent
@@ -46,10 +49,14 @@ export class ActivityDetailComponent implements OnInit {
   activity!: Activity | undefined;
   hasJoined: boolean = false;
   currentUser: User | null = null;
+  canManage = false;
   private friendIds = new Set<number>();
 
   constructor(private route: ActivatedRoute, private volunteerService: VolunteerService,
-              private activityService: ActivityService) {}
+              private activityService: ActivityService,
+              private organisationService: OrganisationService,
+              private router: Router,
+              private snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
     this.activityId = Number(this.route.snapshot.paramMap.get('id'));
@@ -57,6 +64,11 @@ export class ActivityDetailComponent implements OnInit {
       next: activity => {
         this.activity = activity;
         this.updateJoinState();
+        this.organisationService.getAdministeredOrganisations().subscribe({
+          next: organisations => this.canManage = activity.organisations.some(
+            activityOrg => organisations.some(adminOrg => adminOrg.id === activityOrg.id)),
+          error: () => this.canManage = false
+        });
       },
       error: err => console.error('Could not load activity', err)
     });
@@ -122,8 +134,23 @@ export class ActivityDetailComponent implements OnInit {
     console.log('Activity cancelled:', this.activity?.title);
   }
 
-  onDelete() {
-    console.log('Activity deleted:', this.activity?.title);
+  editActivity(): void {
+    if (this.canManage) {
+      this.router.navigate(['/activities', this.activityId, 'edit']);
+    }
+  }
+
+  onDelete(): void {
+    if (!this.canManage || !window.confirm('Delete this activity?')) {
+      return;
+    }
+    this.activityService.deleteActivity(this.activityId).subscribe({
+      next: () => {
+        this.snackBar.open('Activity deleted.', 'Close', { duration: 2500 });
+        this.router.navigate(['/activities']);
+      },
+      error: () => this.snackBar.open('Could not delete activity.', 'Close', { duration: 3500 })
+    });
   }
 
   joinActivity(){

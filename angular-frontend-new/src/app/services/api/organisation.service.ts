@@ -27,6 +27,10 @@ export class OrganisationService {
     return this.http.get<Organisation>(`${this.apiUrl}/${id}`);
   }
 
+  getAdministeredOrganisations(): Observable<Organisation[]> {
+    return this.http.get<Organisation[]>(`${this.apiUrl}/administered`);
+  }
+
   /**
    * Adds a new organisation.
    */

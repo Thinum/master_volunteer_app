@@ -72,6 +72,7 @@ export class OrganisationDetailComponent implements OnInit {
   private friendIds = new Set<number>();
   goals: CommunityGoal[] = [];
   projects: Project[] = [];
+  canManage = false;
   activities: Activity[] = [];
   visibleActivities: Activity[] = [];
   hasJoined = false;
@@ -131,8 +132,13 @@ constructor(
 
    }
 
-    this.projectService.getAllProjects()
+    this.projectService.getAllProjects(this.id ?? undefined)
       .subscribe(projects => this.projects = projects ?? []);
+
+    this.organisationService.getAdministeredOrganisations().subscribe({
+      next: organisations => this.canManage = organisations.some(org => org.id === this.id),
+      error: () => this.canManage = false
+    });
 
   }
 
@@ -144,6 +150,19 @@ constructor(
     this.router.navigate(['/community-goals'], {
       queryParams: { organisationId: this.id }
     });
+  }
+
+
+  createProject(): void {
+    if (this.id) {
+      this.router.navigate(['/projects/new'], { queryParams: { organisationId: this.id } });
+    }
+  }
+
+  createActivity(): void {
+    if (this.id) {
+      this.router.navigate(['/createActivity'], { queryParams: { organisationId: this.id } });
+    }
   }
 
   goToCreateGoal(): void {

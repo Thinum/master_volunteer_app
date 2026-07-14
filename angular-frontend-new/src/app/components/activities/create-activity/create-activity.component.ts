@@ -10,14 +10,16 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Activity, InterestCategory } from '../../../models/activity.model';
 import { Organisation } from '../../../models/organisation.model';
 import { MOCK_ORGANISATIONS } from '../../../mock/mock-organisations';
 import { MOCK_SKILLS } from '../../../mock/mock-skills';
 import { ActivityService } from '../../../services/api/activity.service';
 import { InterestService } from '../../../services/api/interest.service';
+import { OrganisationService } from '../../../services/api/organisation.service';
 
 const DEFAULT_ACTIVITY_TAGS = [
   'outdoor',
@@ -57,6 +59,7 @@ const DEFAULT_ACTIVITY_TAGS = [
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
+    MatSelectModule,
     MatNativeDateModule,
     MatSnackBarModule,
     ReactiveFormsModule
@@ -71,6 +74,9 @@ export class CreateActivityComponent implements OnInit {
   availableCategories: InterestCategory[] = [];
   selectedCategoryCodes = new Set<string>();
   isSubmitting = false;
+  administeredOrganisations: Organisation[] = [];
+  activityId?: number;
+
 
   center = { lat: 48.3069, lng: 14.2858 };
   zoom = 10;
@@ -91,6 +97,8 @@ export class CreateActivityComponent implements OnInit {
     private fb: FormBuilder,
     private activityService: ActivityService,
     private interestService: InterestService,
+    private route: ActivatedRoute,
+    private organisationService: OrganisationService,
     private router: Router,
     private snackBar: MatSnackBar
   ) {
@@ -105,7 +113,7 @@ export class CreateActivityComponent implements OnInit {
       tags: this.fb.array([]),
       qualifications: this.fb.array([]),
       prerequisites: this.fb.array([]),
-      organization: [''],
+      organization: [0, Validators.min(1)],
       expiresAt: [''],
       friends: this.fb.array([]),
       contacts: this.fb.array([]),
@@ -114,6 +122,31 @@ export class CreateActivityComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const routeId = Number(this.route.snapshot.paramMap.get('id'));
+    this.activityId = routeId > 0 ? routeId : undefined;
+    const requestedOrganisationId = Number(this.route.snapshot.queryParamMap.get('organisationId'));
+
+    this.organisationService.getAdministeredOrganisations().subscribe({
+      next: organisations => {
+        this.administeredOrganisations = organisations ?? [];
+        if (!this.administeredOrganisations.length) {
+          this.snackBar.open('Only organization admins can manage activities.', 'Close', { duration: 3500 });
+          this.router.navigate(['/activities']);
+          return;
+        }
+
+        if (this.activityId) {
+          this.loadActivity(this.activityId);
+          return;
+        }
+
+        const selectedId = this.administeredOrganisations.some(org => org.id === requestedOrganisationId)
+          ? requestedOrganisationId
+          : this.administeredOrganisations[0].id;
+        this.activityForm.patchValue({ organization: selectedId });
+      },
+      error: () => this.router.navigate(['/activities'])
+    });
     this.activityService.getActivityTagCatalog().subscribe({
       next: tags => {
         this.availableTags = this.uniqueLabels([...DEFAULT_ACTIVITY_TAGS, ...(tags || [])]);
@@ -240,7 +273,7 @@ export class CreateActivityComponent implements OnInit {
       body: raw.description || raw.title,
       description: raw.description || raw.title,
       projectId: 0,
-      organisations: [],
+      organisations: this.administeredOrganisations.filter(org => org.id === Number(raw.organization)),
       appointments: [],
       participants: [],
       date: raw.date ? new Date(raw.date) : undefined,
@@ -269,9 +302,13 @@ export class CreateActivityComponent implements OnInit {
       updatedAt: now
     };
 
-    this.activityService.createActivity(activity).subscribe({
+    const request = this.activityId
+      ? this.activityService.updateActivity(this.activityId, activity)
+      : this.activityService.createActivity(activity);
+
+    request.subscribe({
       next: createdActivity => {
-        this.snackBar.open('Activity created', 'Close', { duration: 2500 });
+        this.snackBar.open(`Activity ${this.activityId ? 'updated' : 'created'}`, 'Close', { duration: 2500 });
         this.router.navigate(['/activities', createdActivity.id]);
       },
       error: err => {
@@ -280,6 +317,46 @@ export class CreateActivityComponent implements OnInit {
         this.snackBar.open('Could not create activity', 'Close', { duration: 3500 });
       }
     });
+  }
+
+  get isEditing(): boolean {
+    return !!this.activityId;
+  }
+
+  private loadActivity(id: number): void {
+    this.activityService.getActivityById(id).subscribe({
+      next: activity => {
+        const organisationId = activity.organisations?.[0]?.id;
+        if (!organisationId || !this.administeredOrganisations.some(org => org.id === organisationId)) {
+          this.snackBar.open('You cannot edit this activity.', 'Close', { duration: 3500 });
+          this.router.navigate(['/activities', id]);
+          return;
+        }
+
+        this.activityForm.patchValue({
+          title: activity.title,
+          date: activity.date ? new Date(activity.date) : '',
+          location: activity.location ?? '',
+          description: activity.description ?? activity.body,
+          duration: activity.duration ?? '',
+          capacity: activity.capacity ?? 1,
+          organization: organisationId,
+          expiresAt: activity.expiresAt ? new Date(activity.expiresAt) : ''
+        });
+        this.markerPosition = activity.coordinates ?? null;
+        this.replaceFormArray(this.skills, activity.skills ?? []);
+        this.replaceFormArray(this.tags, activity.tags ?? []);
+        this.replaceFormArray(this.qualifications, activity.qualifications ?? []);
+        this.replaceFormArray(this.prerequisites, activity.prerequisites ?? []);
+        this.selectedCategoryCodes = new Set((activity.categories ?? []).map(category => category.code));
+      },
+      error: () => this.router.navigate(['/activities'])
+    });
+  }
+
+  private replaceFormArray(array: FormArray, values: string[]): void {
+    array.clear();
+    values.forEach(value => array.push(this.fb.control(value)));
   }
 
   private setFormArraySelection(array: FormArray, value: string, selected: boolean): void {

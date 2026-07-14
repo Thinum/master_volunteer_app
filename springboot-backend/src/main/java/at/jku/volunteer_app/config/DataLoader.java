@@ -2,6 +2,7 @@ package at.jku.volunteer_app.config;
 
 import at.jku.volunteer_app.model.*;
 import at.jku.volunteer_app.repository.*;
+import at.jku.volunteer_app.service.OrganisationAdminService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -28,6 +29,7 @@ public class DataLoader {
     @Bean
     CommandLineRunner initDatabase(UserRepository userRepository,
                                    OrganisationRepository organisationRepository,
+                                   OrganisationAdminService organisationAdminService,
                                    ActivityRepository activityRepository,
                                    CommunityGoalRepository communityGoalRepository,
                                    InterestRepository interestRepository,
@@ -44,6 +46,7 @@ public class DataLoader {
             ensureNotificationAutoIncrement(jdbcTemplate);
 
             if (userRepository.count() > 0) {
+                organisationAdminService.ensureDefaultAssignments();
                 ensureDemoFriendships(userRepository, relationshipRepository);
                 seedCommunityData(forumEntryRepository, forumReplyRepository, chatConversationRepository, chatMessageRepository);
                 seedGoalDemoData(userRepository, organisationRepository, activityRepository, communityGoalRepository, interestRepository);
@@ -399,6 +402,7 @@ public class DataLoader {
             admin.setActive(true);
             admin.setJoinedAt(new Timestamp(System.currentTimeMillis()));
             admin.setUsername("admin");
+            admin.setPlatformAdmin(true);
 
             userRepository.saveAll(Arrays.asList(alice, bob, charlie,
                     diana, ethan, fiona, george, tom, sandra, mia,
@@ -522,6 +526,7 @@ public class DataLoader {
                     volunteerFire
             );
             organisationRepository.saveAll(organisations);
+            organisationAdminService.ensureDefaultAssignments();
 
             // 4. Create Activities
             Activity parkCleanup = new Activity();
@@ -2241,4 +2246,5 @@ public class DataLoader {
         return normalizeInterestName(first) != null
                 && normalizeInterestName(first).equals(normalizeInterestName(second));
     }
+
 }

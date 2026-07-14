@@ -1,26 +1,26 @@
 <mat-card class="detail-card">
-
-  <h1 class="title">{{ detailedProject?.title }}</h1>
+  <div class="detail-heading">
+    <div>
+      <h1 class="title">{{ detailedProject?.title }}</h1>
+      <span class="status">{{ detailedProject?.closed ? 'Closed' : 'Open' }}</span>
+    </div>
+    <div class="admin-actions" *ngIf="canManage">
+      <button mat-stroked-button (click)="editProject()">
+        <mat-icon>edit</mat-icon> Edit
+      </button>
+      <button mat-stroked-button color="warn" (click)="deleteProject()">
+        <mat-icon>delete</mat-icon> Delete
+      </button>
+    </div>
+  </div>
 
   <div class="info-row">
     <mat-icon>place</mat-icon>
-    <span>{{ detailedProject?.location }}</span>
+    <span>{{ locationLabel }}</span>
   </div>
 
   <div class="section">
     <h3><mat-icon>description</mat-icon> Description</h3>
-    <p>{{ detailedProject?.description }}</p>
+    <p>{{ detailedProject?.description || 'No description provided.' }}</p>
   </div>
-
-  <div class="section">
-    <h3><mat-icon>group</mat-icon> Your Friends</h3>
-    <div class="friends">
-    </div>
-  </div>
-
-  <div class="section">
-    <h3><mat-icon>info</mat-icon> Project Details</h3>
-  </div>
-
 </mat-card>
-

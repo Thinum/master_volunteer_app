@@ -1,40 +1,37 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Project} from '../../models/project.model';
-import {Observable, of} from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { Project } from '../../models/project.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProjectService {
-  private readonly projects: Project[] = [
-    {
-      id: 1,
-      title: "Example 1",
-      description: "Description Project",
-      closed: true,
-    },
-    {
-      id: 2,
-      title: "Example 2",
-      description: "Description Project 2",
-      closed: true,
-    },
-    {
-      id: 3,
-      title: "Example 3",
-      description: "Description Project 3",
-      closed: false,
-    }
-  ]
+  private readonly apiUrl = `${environment.apiUrl}/projects`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private readonly http: HttpClient) {}
 
-  getAllProjects(): Observable<Project[]> {
-    return of(this.projects);
+  getAllProjects(organisationId?: number): Observable<Project[]> {
+    const options = organisationId
+      ? { params: new HttpParams().set('organisationId', organisationId) }
+      : {};
+    return this.http.get<Project[]>(this.apiUrl, options);
   }
 
   getProjectById(id: number): Observable<Project> {
-    return of(this.projects.find(project => project.id === id) ?? this.projects[0]);
+    return this.http.get<Project>(`${this.apiUrl}/${id}`);
+  }
+
+  createProject(project: Project): Observable<Project> {
+    return this.http.post<Project>(this.apiUrl, project);
+  }
+
+  updateProject(id: number, project: Project): Observable<Project> {
+    return this.http.put<Project>(`${this.apiUrl}/${id}`, project);
+  }
+
+  deleteProject(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

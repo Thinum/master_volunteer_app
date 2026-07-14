@@ -10,4 +10,5 @@ import lombok.EqualsAndHashCode;
 @Table(name = "org_admin")
 public class Org_Admin extends Member {
 
+    private boolean platformAdmin;
 }

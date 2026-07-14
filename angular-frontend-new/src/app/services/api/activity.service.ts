@@ -26,6 +26,14 @@ export class ActivityService {
     return this.http.get<string[]>(`${this.apiUrl}/tags/catalog`);
   }
 
+
+  updateActivity(id: number, activity: Activity) {
+    return this.http.put<Activity>(`${this.apiUrl}/${id}`, activity);
+  }
+
+  deleteActivity(id: number) {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
   createActivity(activity: Activity) {
     return this.http.post<Activity>(this.apiUrl, activity);
   }

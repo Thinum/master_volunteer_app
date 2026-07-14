@@ -4,8 +4,11 @@ import at.jku.volunteer_app.contract.ActivityDTO;
 import at.jku.volunteer_app.contract.ContractMapper;
 import at.jku.volunteer_app.contract.OrganisationDTO;
 import at.jku.volunteer_app.model.UserModelDetails;
+import at.jku.volunteer_app.service.OrganisationAdminService;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import at.jku.volunteer_app.service.OrganisationService;
 
 import java.util.List;
@@ -14,14 +17,27 @@ import java.util.List;
 @RequestMapping("/organisations")
 public class OrganisationController {
     private final OrganisationService organisationService;
+    private final OrganisationAdminService organisationAdminService;
 
-    public OrganisationController(OrganisationService organisationService) {
+    public OrganisationController(OrganisationService organisationService,
+                                  OrganisationAdminService organisationAdminService) {
         this.organisationService = organisationService;
+        this.organisationAdminService = organisationAdminService;
     }
 
     @GetMapping
     public List<OrganisationDTO> getAllOrganisations() {
         return ContractMapper.toOrganisationDTOList(organisationService.getAllOrganisations());
+    }
+
+    @GetMapping("/administered")
+    public List<OrganisationDTO> getAdministeredOrganisations(
+            @AuthenticationPrincipal UserModelDetails userDetails) {
+        if (userDetails == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
+        }
+        return ContractMapper.toOrganisationDTOList(
+                organisationAdminService.getAdministeredOrganisations(userDetails.getUserId()));
     }
 
     @GetMapping("/{id}")
@@ -48,7 +64,8 @@ public class OrganisationController {
                 organisation.category(),
                 organisation.tags(),
                 organisation.orgContacts(),
-                organisation.orgMembers()
+                organisation.orgMembers(),
+                organisation.orgAdmins()
         );
         return ContractMapper.toOrganisationDTO(organisationService.updateOrganisation(ContractMapper.toOrganisationEntity(organisationToUpdate)));
     }

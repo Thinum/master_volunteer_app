@@ -20,12 +20,15 @@ public class OrganisationService {
     private final OrganisationRepository organisationRepository;
     private final UserRepository userRepository;
     private final ActivityRepository activityRepository;
+    private final OrganisationAdminService organisationAdminService;
 
     public OrganisationService(OrganisationRepository organisationRepository, UserRepository userRepository,
-                               ActivityRepository activityRepository) {
+                               ActivityRepository activityRepository,
+                               OrganisationAdminService organisationAdminService) {
         this.organisationRepository = organisationRepository;
         this.userRepository = userRepository;
         this.activityRepository = activityRepository;
+        this.organisationAdminService = organisationAdminService;
     }
 
     public List<Organisation> getAllOrganisations(){
@@ -42,7 +45,9 @@ public class OrganisationService {
 
     public Organisation addOrganisation(Organisation organisation) {
         normalizeOrganisationProfile(organisation);
-        return organisationRepository.save(organisation);
+        Organisation saved = organisationRepository.save(organisation);
+        organisationAdminService.assignPlatformAdminsTo(saved);
+        return organisationRepository.findById(saved.getId()).orElse(saved);
     }
 
     public Organisation updateOrganisation(Organisation organisation) {

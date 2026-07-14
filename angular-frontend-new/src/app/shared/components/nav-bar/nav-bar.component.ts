@@ -1,20 +1,31 @@
-import { Component } from '@angular/core';
-import {MatToolbar} from '@angular/material/toolbar';
-import {MatIcon} from '@angular/material/icon';
-import {MatFabAnchor} from '@angular/material/button';
-import {RouterLink, RouterLinkActive} from '@angular/router';
+import { NgIf } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatIcon } from '@angular/material/icon';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { OrganisationAdminAssignmentService } from '../../../services/api/organisation-admin-assignment.service';
 
 @Component({
   selector: 'app-nav-bar',
   imports: [
     MatToolbar,
     MatIcon,
+    NgIf,
     RouterLink,
     RouterLinkActive
   ],
   templateUrl: './nav-bar.component.html',
   styleUrl: './nav-bar.component.css'
 })
-export class NavBarComponent {
+export class NavBarComponent implements OnInit {
+  hasPlatformAdminAccess = false;
 
+  constructor(private readonly assignmentService: OrganisationAdminAssignmentService) {}
+
+  ngOnInit(): void {
+    this.assignmentService.hasAccess().subscribe({
+      next: hasAccess => this.hasPlatformAdminAccess = hasAccess,
+      error: () => this.hasPlatformAdminAccess = false
+    });
+  }
 }

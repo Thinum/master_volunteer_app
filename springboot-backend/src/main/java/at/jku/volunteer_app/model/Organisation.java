@@ -45,4 +45,15 @@ public class Organisation {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private java.util.Set<OrganisationMember> orgMembers;
+
+    @ManyToMany
+    @JoinTable(
+        name = "organisation_admin_user_assignments",
+        joinColumns = @JoinColumn(name = "organisation_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id"),
+        uniqueConstraints = @UniqueConstraint(columnNames = {"organisation_id", "user_id"})
+    )
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private java.util.Set<User> orgAdmins = new java.util.HashSet<>();
 }

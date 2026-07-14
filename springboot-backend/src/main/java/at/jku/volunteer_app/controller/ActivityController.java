@@ -62,17 +62,35 @@ public class ActivityController {
     }
 
     @PostMapping
-    public ActivityDTO createActivity(@RequestBody ActivityDTO activity) {
-        return ContractMapper.toActivityDTO(activityService.addActivity(ContractMapper.toActivityEntity(activity)));
+    @ResponseStatus(HttpStatus.CREATED)
+    public ActivityDTO createActivity(@RequestBody ActivityDTO activity,
+                                      @AuthenticationPrincipal UserModelDetails userDetails) {
+        return ContractMapper.toActivityDTO(activityService.createActivity(
+                ContractMapper.toActivityEntity(activity), requireUser(userDetails)));
+    }
+
+    @PutMapping("/{id}")
+    public ActivityDTO updateActivity(@PathVariable int id, @RequestBody ActivityDTO activity,
+                                      @AuthenticationPrincipal UserModelDetails userDetails) {
+        return ContractMapper.toActivityDTO(activityService.updateActivity(
+                id, ContractMapper.toActivityEntity(activity), requireUser(userDetails)));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteActivity(@PathVariable int id) {
-        activityService.deleteActivity(id);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteActivity(@PathVariable int id, @AuthenticationPrincipal UserModelDetails userDetails) {
+        activityService.deleteActivity(id, requireUser(userDetails));
     }
 
     @PostMapping( "/join/{id}")
     public boolean joinActivity(@AuthenticationPrincipal UserModelDetails userDetails, @PathVariable int id) {
         return activityService.joinActivity(id, userDetails.getUserId());
+    }
+
+    private int requireUser(UserModelDetails userDetails) {
+        if (userDetails == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
+        }
+        return userDetails.getUserId();
     }
 }

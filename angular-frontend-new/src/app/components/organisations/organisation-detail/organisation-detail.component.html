@@ -88,6 +88,9 @@
     <mat-card class="list-card projects-card">
       <mat-card-header>
         <mat-card-title>Projects</mat-card-title>
+        <button *ngIf="canManage" mat-stroked-button (click)="createProject()">
+          <mat-icon>add</mat-icon> New project
+        </button>
       </mat-card-header>
       <mat-card-content>
         <div class="project-grid" *ngIf="projects.length > 0; else noProjects">
@@ -120,6 +123,9 @@
     <mat-card class="list-card activities-card">
       <mat-card-header>
         <mat-card-title>Activities</mat-card-title>
+        <button *ngIf="canManage" mat-stroked-button (click)="createActivity()">
+          <mat-icon>add</mat-icon> New activity
+        </button>
       </mat-card-header>
       <mat-card-content>
         <div class="activity-grid" *ngIf="activities.length > 0; else noActivities">
@@ -180,6 +186,24 @@
   <mat-card class="members-card">
     <mat-card-content>
       <section class="member-section">
+      <section class="member-section">
+        <h3><mat-icon>admin_panel_settings</mat-icon> Organization administrators</h3>
+        <div class="member-avatars" *ngIf="detailedOrganisation.orgAdmins?.length; else noAdmins">
+          <a
+            *ngFor="let admin of detailedOrganisation.orgAdmins"
+            class="member-avatar"
+            [routerLink]="['/profile', admin.id]"
+            matTooltip="{{ admin.name }}"
+            [attr.aria-label]="admin.name">
+            <img *ngIf="admin.profilePicture" [src]="admin.profilePicture" [alt]="admin.name">
+            <span *ngIf="!admin.profilePicture">{{ (admin.name || admin.username || '?').charAt(0) }}</span>
+          </a>
+        </div>
+        <ng-template #noAdmins>
+          <p class="member-empty">No organization administrators are assigned.</p>
+        </ng-template>
+      </section>
+
         <h3><mat-icon>group</mat-icon> My friends in this organization</h3>
         <div class="member-avatars" *ngIf="friendMembers.length > 0; else noFriendMembers">
           <a

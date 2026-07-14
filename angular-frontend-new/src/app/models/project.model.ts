@@ -7,4 +7,7 @@ export interface Project {
     lon: number;
   };
   closed: boolean;
+  organisationId: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

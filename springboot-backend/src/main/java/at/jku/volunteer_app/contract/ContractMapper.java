@@ -180,7 +180,8 @@ public final class ContractMapper {
                 organisation.getCategory(),
                 cleanStringSet(organisation.getTags()),
                 toUserDTOSet(organisation.getOrgContacts()),
-                toOrganisationMemberDTOSet(organisation.getOrgMembers())
+                toOrganisationMemberDTOSet(organisation.getOrgMembers()),
+                toUserDTOSet(new java.util.LinkedHashSet<>(organisation.getOrgAdmins()))
         );
     }
 

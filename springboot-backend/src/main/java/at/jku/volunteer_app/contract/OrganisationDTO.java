@@ -17,6 +17,7 @@ public record OrganisationDTO(
         OrganisationCategory category,
         Set<String> tags,
         Set<UserDTO> orgContacts,
-        Set<OrganisationMemberDTO> orgMembers
+        Set<OrganisationMemberDTO> orgMembers,
+        Set<UserDTO> orgAdmins
 ) {
 }

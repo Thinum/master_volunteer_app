@@ -1,13 +1,19 @@
 package at.jku.volunteer_app.service;
 
 import at.jku.volunteer_app.model.User;
+import at.jku.volunteer_app.repository.OrganisationRepository;
 import at.jku.volunteer_app.repository.UserRepository;
+import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import at.jku.volunteer_app.model.Activity;
 import at.jku.volunteer_app.model.InterestCategory;
 import at.jku.volunteer_app.model.Organisation;
 import at.jku.volunteer_app.repository.ActivityRepository;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -18,10 +24,16 @@ import java.util.Set;
 public class ActivityService {
     private final ActivityRepository activityRepository;
     private final UserRepository userRepository;
+    private final OrganisationRepository organisationRepository;
+    private final OrganisationAdminService organisationAdminService;
 
-    public ActivityService(ActivityRepository activityRepository, UserRepository userRepository) {
+    public ActivityService(ActivityRepository activityRepository, UserRepository userRepository,
+                           OrganisationRepository organisationRepository,
+                           OrganisationAdminService organisationAdminService) {
         this.activityRepository = activityRepository;
         this.userRepository = userRepository;
+        this.organisationRepository = organisationRepository;
+        this.organisationAdminService = organisationAdminService;
     }
 
     public List<Activity> getAllActivities(){
@@ -81,16 +93,77 @@ public class ActivityService {
         return activityRepository.save(activity);
     }
 
+    @Transactional
+    public Activity createActivity(Activity activity, int userId) {
+        List<Organisation> organisations = resolveAdministeredOrganisations(activity, userId);
+        User creator = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+
+        activity.setId(0);
+        activity.setOrganisations(organisations);
+        activity.setCreatedBy(creator);
+        activity.setParticipants(new ArrayList<>());
+        activity.setAppointments(new ArrayList<>());
+        activity.setCreatedAt(now);
+        activity.setUpdatedAt(now);
+        return addActivity(activity);
+    }
+
+    @Transactional
+    public Activity updateActivity(int id, Activity changes, int userId) {
+        Activity existing = getActivityOrThrow(id);
+        requireAdminOfAll(existing.getOrganisations(), userId);
+        List<Organisation> organisations = resolveAdministeredOrganisations(changes, userId);
+
+        BeanUtils.copyProperties(changes, existing,
+                "id", "organisations", "participants", "appointments", "createdBy", "createdAt", "spotsTaken");
+        existing.setOrganisations(organisations);
+        existing.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+        normalizeActivityProfile(existing);
+        syncSpotsTaken(existing);
+        return activityRepository.save(existing);
+    }
+
+    @Transactional
+    public void deleteActivity(int id, int userId) {
+        Activity existing = getActivityOrThrow(id);
+        requireAdminOfAll(existing.getOrganisations(), userId);
+        activityRepository.delete(existing);
+    }
+
+    private Activity getActivityOrThrow(int id) {
+        return activityRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity not found"));
+    }
+
+    private List<Organisation> resolveAdministeredOrganisations(Activity activity, int userId) {
+        List<Integer> ids = activity == null || activity.getOrganisations() == null
+                ? List.of()
+                : activity.getOrganisations().stream().map(Organisation::getId).distinct().toList();
+        if (ids.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one organisation is required");
+        }
+        ids.forEach(id -> organisationAdminService.requireAdminOf(userId, id));
+        return ids.stream().map(id -> organisationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organisation not found"))).toList();
+    }
+
+    private void requireAdminOfAll(List<Organisation> organisations, int userId) {
+        List<Organisation> owners = safeList(organisations);
+        if (owners.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "An activity without an owning organisation cannot be managed");
+        }
+        owners.forEach(org -> organisationAdminService.requireAdminOf(userId, org.getId()));
+    }
+
     public Activity getActivityByProjectId(int projectId) {
         return activityRepository.findByProjectId(projectId).get();
     }
 
     public List<Activity> getActivitiesForUser(at.jku.volunteer_app.model.User user) {
         return activityRepository.findAllByParticipantsContains(user);
-    }
-
-    public void deleteActivity(int id) {
-        activityRepository.deleteById(id);
     }
 
     public boolean joinActivity(int activityId, int userId) {

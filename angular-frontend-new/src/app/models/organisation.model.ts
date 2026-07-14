@@ -47,6 +47,9 @@ export interface Organisation {
 
   orgMembers?: OrganisationMember[];
 
+  /** Users explicitly assigned as administrators of this organization. */
+  orgAdmins?: User[];
+
   /** General Category of the organisation */
   category: OrganisationCategory;
 
