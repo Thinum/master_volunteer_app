@@ -1631,7 +1631,9 @@ public class DataLoader {
                                         CommunityGoalRepository communityGoalRepository,
                                         InterestRepository interestRepository) {
         List<User> users = userRepository.findAll();
-        List<Organisation> organisations = organisationRepository.findAll();
+        List<Organisation> organisations = organisationRepository.findAll().stream()
+                .map(item -> organisationRepository.findById(item.getId()).orElse(item))
+                .toList();
         if (users.isEmpty() || organisations.isEmpty()) {
             return;
         }
@@ -1647,6 +1649,7 @@ public class DataLoader {
 
         YearMonth month = YearMonth.now();
         Timestamp now = new Timestamp(System.currentTimeMillis());
+        ensureEveryUserHasOrganisation(users, organisations, organisationRepository, now);
 
         Activity meetup = activityRepository.findAll().stream()
                 .filter(activity -> "Community Welcome Meetup".equals(activity.getTitle()))
@@ -1730,25 +1733,6 @@ public class DataLoader {
             );
         }
 
-        CommunityGoal monthlyGoal = communityGoalRepository.findAll().stream()
-                .filter(goal -> "Monthly community challenge".equals(goal.getTitle()))
-                .findFirst()
-                .orElseGet(CommunityGoal::new);
-        monthlyGoal.setTitle("Monthly community challenge");
-        monthlyGoal.setDescription("Complete five community activities together before the end of this month.");
-        monthlyGoal.setTargetValue(5);
-        monthlyGoal.setCurrentValue(2);
-        monthlyGoal.setActivityInterests(resolveSeedInterests(interestRepository, List.of("community")));
-        monthlyGoal.setStartDate(timestamp(month, 1, 0, 0));
-        monthlyGoal.setEndDate(timestamp(month, month.lengthOfMonth(), 23, 59));
-        monthlyGoal.setStatus("ACTIVE");
-        monthlyGoal.setOrganisation(organisation);
-        if (monthlyGoal.getCreatedAt() == null) {
-            monthlyGoal.setCreatedAt(now);
-        }
-        monthlyGoal.setUpdatedAt(now);
-        communityGoalRepository.save(monthlyGoal);
-
         organisation.setReactivationTime(timestamp(month, 25, 9, 0));
         organisationRepository.save(organisation);
 
@@ -1759,6 +1743,119 @@ public class DataLoader {
                 month,
                 now
         );
+        ensureMonthlyGoalsForEveryOrganisation(
+                organisations,
+                communityGoalRepository,
+                interestRepository,
+                month,
+                now
+        );
+        verifyCalendarSampleCoverage(users, organisations, appointmentRepository, communityGoalRepository);
+    }
+
+    private void ensureEveryUserHasOrganisation(List<User> users,
+                                                List<Organisation> organisations,
+                                                OrganisationRepository organisationRepository,
+                                                Timestamp now) {
+        Set<Integer> memberUserIds = new HashSet<>();
+        organisations.forEach(organisation -> {
+            if (organisation.getOrgMembers() != null) {
+                organisation.getOrgMembers().stream()
+                        .filter(member -> member.getUser() != null)
+                        .forEach(member -> memberUserIds.add(member.getUser().getId()));
+            }
+        });
+
+        int organisationIndex = 0;
+        for (User user : users) {
+            if (memberUserIds.contains(user.getId())) {
+                continue;
+            }
+
+            Organisation organisation = organisations.get(organisationIndex % organisations.size());
+            organisationIndex++;
+
+            Set<OrganisationMember> members = organisation.getOrgMembers() == null
+                    ? new HashSet<>()
+                    : new HashSet<>(organisation.getOrgMembers());
+            OrganisationMember membership = new OrganisationMember();
+            membership.setOrganisation(organisation);
+            membership.setUser(user);
+            membership.setEngagementLevel(0);
+            membership.setJoinedAt(now);
+            members.add(membership);
+            organisation.setOrgMembers(members);
+
+            organisationRepository.save(organisation);
+            memberUserIds.add(user.getId());
+        }
+    }
+
+    private void ensureMonthlyGoalsForEveryOrganisation(List<Organisation> organisations,
+                                                         CommunityGoalRepository communityGoalRepository,
+                                                         InterestRepository interestRepository,
+                                                         YearMonth month,
+                                                         Timestamp now) {
+        List<CommunityGoal> goals = communityGoalRepository.findAll();
+        for (int index = 0; index < organisations.size(); index++) {
+            Organisation organisation = organisations.get(index);
+            String title = "Monthly volunteer goal: " + organisation.getOrgName();
+            CommunityGoal goal = goals.stream()
+                    .filter(existing -> title.equals(existing.getTitle()))
+                    .filter(existing -> existing.getOrganisation() != null
+                            && existing.getOrganisation().getId() == organisation.getId())
+                    .findFirst()
+                    .orElseGet(CommunityGoal::new);
+
+            goal.setTitle(title);
+            goal.setDescription("A current-month sample goal for every member of "
+                    + organisation.getOrgName() + ".");
+            goal.setTargetValue(4 + index % 3);
+            goal.setCurrentValue(1 + index % 3);
+            goal.setActivityInterests(resolveSeedInterests(interestRepository, List.of("community")));
+            goal.setStartDate(timestamp(month, 1, 0, 0));
+            goal.setEndDate(timestamp(month, month.lengthOfMonth(), 23, 59));
+            goal.setStatus("ACTIVE");
+            goal.setOrganisation(organisation);
+            if (goal.getCreatedAt() == null) {
+                goal.setCreatedAt(now);
+            }
+            goal.setUpdatedAt(now);
+            communityGoalRepository.save(goal);
+        }
+    }
+
+    private void verifyCalendarSampleCoverage(List<User> users,
+                                              List<Organisation> organisations,
+                                              AppointmentRepository appointmentRepository,
+                                              CommunityGoalRepository communityGoalRepository) {
+        Set<Integer> usersWithPersonalAppointments = new HashSet<>();
+        appointmentRepository.findAll().stream()
+                .filter(appointment -> appointment.getActivity() == null)
+                .forEach(appointment -> usersWithPersonalAppointments.add(appointment.getCreatedBy()));
+
+        Set<Integer> organisationIdsWithGoals = new HashSet<>();
+        communityGoalRepository.findAll().stream()
+                .filter(goal -> goal.getOrganisation() != null)
+                .forEach(goal -> organisationIdsWithGoals.add(goal.getOrganisation().getId()));
+
+        List<String> missingUsers = new java.util.ArrayList<>();
+        for (User user : users) {
+            boolean hasVisibleGoal = organisations.stream()
+                    .filter(organisation -> organisationIdsWithGoals.contains(organisation.getId()))
+                    .anyMatch(organisation -> organisation.getOrgMembers() != null
+                            && organisation.getOrgMembers().stream()
+                            .anyMatch(member -> member.getUser() != null
+                                    && member.getUser().getId() == user.getId()));
+            if (!usersWithPersonalAppointments.contains(user.getId()) || !hasVisibleGoal) {
+                missingUsers.add(user.getUsername());
+            }
+        }
+
+        if (!missingUsers.isEmpty()) {
+            throw new IllegalStateException("Calendar sample coverage is incomplete for users: "
+                    + String.join(", ", missingUsers));
+        }
     }
 
     private void refreshExistingCalendarEntityDates(ActivityRepository activityRepository,

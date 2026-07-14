@@ -1,4 +1,4 @@
-export type CalendarEventType = 'activity' | 'session' | 'personal' | 'goal' | 'deadline' | 'reactivation';
+export type CalendarEventType = 'activity' | 'personal' | 'goal' | 'reactivation';
 
 export interface CalendarEvent {
   id: string;

@@ -48,46 +48,20 @@ export class CalendarDataService {
     const events: CalendarEvent[] = [];
 
     activities.forEach(activity => {
-      const appointments = activity.appointments ?? [];
-      if (appointments.length > 0) {
-        appointments.forEach(appointment => events.push({
-          id: `session-${appointment.id}`,
-          title: appointment.title,
-          type: 'session',
-          start: this.asDate(appointment.startDateTime),
-          end: this.asDate(appointment.endDateTime),
-          allDay: false,
-          location: appointment.location || activity.location,
-          description: appointment.description,
-          route: `/activities/${activity.id}`
-        }));
-      } else if (activity.date) {
-        const start = this.combineDateAndTime(activity.date, activity.startTime);
-        events.push({
-          id: `activity-${activity.id}`,
-          title: activity.title,
-          type: 'activity',
-          start,
-          end: this.activityEnd(start, activity.endTime, activity.duration),
-          allDay: !activity.startTime && this.asDate(activity.date).getHours() === 0,
-          location: activity.location,
-          description: activity.description || activity.body,
-          route: `/activities/${activity.id}`
-        });
-      }
-
-      if (activity.expiresAt) {
-        events.push({
-          id: `deadline-${activity.id}`,
-          title: `${activity.title} expires`,
-          type: 'deadline',
-          start: this.asDate(activity.expiresAt),
-          allDay: true,
-          route: `/activities/${activity.id}`
-        });
-      }
+      if (!activity.date) return;
+      const start = this.combineDateAndTime(activity.date, activity.startTime);
+      events.push({
+        id: `activity-${activity.id}`,
+        title: activity.title,
+        type: 'activity',
+        start,
+        end: this.activityEnd(start, activity.endTime, activity.duration),
+        allDay: !activity.startTime && this.asDate(activity.date).getHours() === 0,
+        location: activity.location,
+        description: activity.description || activity.body,
+        route: `/activities/${activity.id}`
+      });
     });
-
     personalAppointments.forEach(appointment => events.push({
       id: `personal-${appointment.id}`,
       title: appointment.title,
@@ -101,14 +75,14 @@ export class CalendarDataService {
     }));
 
     goals.forEach(goal => {
-      if (!goal.startDate && !goal.endDate) return;
+      const deadline = goal.endDate ?? goal.startDate;
+      if (!deadline) return;
       const organisationId = goal.organisation?.id;
       events.push({
         id: `goal-${goal.id}`,
-        title: goal.title,
+        title: `Goal deadline: ${goal.title}`,
         type: 'goal',
-        start: this.asDate(goal.startDate ?? goal.endDate as Date),
-        end: goal.endDate ? this.endOfDay(this.asDate(goal.endDate)) : undefined,
+        start: this.asDate(deadline),
         allDay: true,
         description: goal.description,
         route: organisationId ? `/community-goals?organisationId=${organisationId}` : undefined
@@ -152,9 +126,4 @@ export class CalendarDataService {
     return Number.isFinite(hours) ? new Date(start.getTime() + hours * 60 * 60 * 1000) : undefined;
   }
 
-  private endOfDay(date: Date): Date {
-    const result = new Date(date);
-    result.setHours(23, 59, 59, 999);
-    return result;
-  }
 }

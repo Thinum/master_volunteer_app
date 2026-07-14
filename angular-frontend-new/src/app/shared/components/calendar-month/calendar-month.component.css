@@ -25,16 +25,12 @@ h2 { margin: 0; color: var(--on-surface); font-family: var(--font-display); font
 .calendar-event mat-icon { width: 12px; height: 12px; flex: 0 0 12px; font-size: 12px; }
 .more-events { padding-left: .25rem; color: var(--on-surface-variant); font-size: .64rem; font-weight: 700; }
 .type-activity { background: #dce9ff; color: #294d7c; }
-.type-session { background: #d9f1e8; color: #17634c; }
 .type-personal { background: #ffe0e5; color: #8c3040; }
 .type-goal { background: #eadffd; color: #62417c; }
-.type-deadline { background: #ffedc7; color: #7a5313; }
 .type-reactivation { background: #dceff2; color: #27606a; }
 .legend-dot.type-activity { background: #5f86bb; }
-.legend-dot.type-session { background: #3d9478; }
 .legend-dot.type-personal { background: #c7586a; }
 .legend-dot.type-goal { background: #8a64a8; }
-.legend-dot.type-deadline { background: #c18a2d; }
 .legend-dot.type-reactivation { background: #4b8791; }
 .compact .calendar-toolbar { padding: 1rem; }
 .compact h2 { font-size: 1.2rem; }

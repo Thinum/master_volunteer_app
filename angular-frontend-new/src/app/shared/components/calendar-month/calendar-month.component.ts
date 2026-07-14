@@ -21,10 +21,8 @@ export class CalendarMonthComponent implements OnChanges {
   readonly weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   readonly eventTypes: { type: CalendarEventType; label: string }[] = [
     { type: 'activity', label: 'Activity' },
-    { type: 'session', label: 'Activity session' },
     { type: 'personal', label: 'My appointment' },
-    { type: 'goal', label: 'Community goal' },
-    { type: 'deadline', label: 'Expiration' },
+    { type: 'goal', label: 'Community goal deadline' },
     { type: 'reactivation', label: 'Reactivation' }
   ];
 
