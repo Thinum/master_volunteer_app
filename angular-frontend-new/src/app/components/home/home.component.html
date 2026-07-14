@@ -29,6 +29,13 @@
     You have <b>{{ requests.length }}</b> new verification requests to review.
   </div>
 
+  <section class="dashboard-calendar">
+    <div class="section-heading">
+      <div><span>Plan ahead</span><h4>This month</h4></div>
+      <a mat-button routerLink="/calendar">Open calendar <mat-icon>arrow_forward</mat-icon></a>
+    </div>
+    <app-calendar-month [events]="calendarEvents" [compact]="true" [allowNavigation]="false"></app-calendar-month>
+  </section>
   <!-- Dynamic Content Layout Grid -->
   <div class="home-grid">
     <!-- Left Column: Highlights (Last Joined, Last Friend) -->

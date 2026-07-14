@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,6 +12,17 @@ import { VolunteerService } from '../../services/api/volunteer.service';
 import { NotificationService } from '../../services/notification.service';
 import { ActivityService } from '../../services/api/activity.service';
 import { NotificationType } from '../../models/notification.model';
+import { CalendarEvent } from '../../models/calendar-event.model';
+import { CalendarDataService } from '../../services/api/calendar-data.service';
+import { CalendarMonthComponent } from '../../shared/components/calendar-month/calendar-month.component';
+
+interface VerificationRequest {
+  id?: number;
+  organisation: string;
+  title: string;
+  hours: number;
+  user: { name: string; avatar: string };
+}
 
 @Component({
   selector: 'app-home',
@@ -22,7 +33,8 @@ import { NotificationType } from '../../models/notification.model';
     MatIconModule,
     MatButtonModule,
     RouterLink,
-    CardComponent
+    CardComponent,
+    CalendarMonthComponent
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
@@ -38,17 +50,25 @@ export class HomeComponent implements OnInit {
   lastFriend: User | null = null;
 
   recommendedActivities: Activity[] = [];
-  requests: any[] = [];
+  requests: VerificationRequest[] = [];
+  calendarEvents: CalendarEvent[] = [];
 
-  constructor(
-    private volunteerService: VolunteerService,
-    private notificationService: NotificationService,
-    private activityService: ActivityService
-  ) {}
+  private readonly volunteerService = inject(VolunteerService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly activityService = inject(ActivityService);
+  private readonly calendarDataService = inject(CalendarDataService);
 
   ngOnInit(): void {
     this.loadUserData();
     this.loadNotifications();
+    this.loadCalendar();
+  }
+
+  private loadCalendar(): void {
+    this.calendarDataService.loadEvents().subscribe({
+      next: events => this.calendarEvents = events,
+      error: err => console.error('Error fetching calendar data:', err)
+    });
   }
 
   loadUserData(): void {

@@ -618,3 +618,33 @@
     padding-inline: 0.75rem;
   }
 }
+
+/* Dashboard calendar */
+.dashboard-calendar {
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: white;
+  box-shadow: 0 4px 12px rgba(70, 96, 138, 0.05);
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: .75rem;
+}
+.section-heading span {
+  color: #46608a;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.section-heading h4 { margin: .15rem 0 0; color: #2f323a; font-size: 1.05rem; }
+.section-heading a { display: inline-flex; align-items: center; color: #46608a; text-decoration: none; }
+.section-heading mat-icon { margin-left: .2rem; font-size: 18px; }
+@container home-content (max-width: 700px) {
+  .dashboard-calendar { margin-bottom: 1rem; padding: .75rem; }
+  .section-heading { padding-inline: .25rem; }
+}

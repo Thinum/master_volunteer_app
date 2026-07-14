@@ -1,0 +1,50 @@
+<section class="calendar-shell" [class.compact]="compact">
+  <header class="calendar-toolbar">
+    <div>
+      <p class="eyebrow">Calendar</p>
+      <h2>{{ monthLabel }}</h2>
+    </div>
+    <div class="calendar-actions" *ngIf="allowNavigation">
+      <button mat-button type="button" (click)="goToToday()">Today</button>
+      <button mat-icon-button type="button" aria-label="Previous month" (click)="previousMonth()"><mat-icon>chevron_left</mat-icon></button>
+      <button mat-icon-button type="button" aria-label="Next month" (click)="nextMonth()"><mat-icon>chevron_right</mat-icon></button>
+    </div>
+  </header>
+
+  <div class="legend" *ngIf="!compact">
+    <span *ngFor="let item of eventTypes"><i [class]="'legend-dot type-' + item.type"></i>{{ item.label }}</span>
+  </div>
+
+  <div class="calendar-grid weekday-row">
+    <div *ngFor="let weekday of weekdays">{{ weekday }}</div>
+  </div>
+  <div class="calendar-grid days-grid">
+    <button
+      *ngFor="let day of days"
+      class="calendar-day"
+      type="button"
+      [class.outside]="!day.inCurrentMonth"
+      [class.today]="day.isToday"
+      (click)="selectDay(day)">
+      <span class="day-number">{{ day.dayNumber }}</span>
+      <span class="day-events">
+        <span
+          *ngFor="let event of visibleEvents(day)"
+          class="calendar-event"
+          [class]="'calendar-event type-' + event.type"
+          [class.has-route]="!!event.route"
+          [attr.role]="event.route ? 'link' : null"
+          [attr.tabindex]="event.route ? 0 : null"
+          [title]="event.route ? event.title + ' — open details' : event.title"
+          (click)="openEvent(event, $event)"
+          (keydown.enter)="openEvent(event, $event)"
+          (keydown.space)="openEvent(event, $event)">
+          <strong>{{ formatTime(event) }}</strong><span class="event-title">{{ event.title }}</span><mat-icon *ngIf="event.route">arrow_outward</mat-icon>
+        </span>
+        <span class="more-events" *ngIf="day.events.length > visibleEvents(day).length">
+          +{{ day.events.length - visibleEvents(day).length }} more
+        </span>
+      </span>
+    </button>
+  </div>
+</section>

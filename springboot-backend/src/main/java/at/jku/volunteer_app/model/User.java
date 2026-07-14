@@ -36,12 +36,14 @@ public class User {
 
     @ElementCollection
     @CollectionTable(name = "user_skills", joinColumns = @JoinColumn(name = "user_id"))
+    @OrderColumn(name = "skill_order")
     private List<UserSkill> skillProfiles;
 
     @ElementCollection
     @CollectionTable(name = "user_interests", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "interest")
     @Convert(converter = InterestCategoryConverter.class)
+    @OrderColumn(name = "interest_order")
     private List<InterestCategory> interestCategories;
 
     @Temporal(TemporalType.TIMESTAMP)

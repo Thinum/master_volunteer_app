@@ -4,6 +4,7 @@ import { VolunteerService } from '../../services/api/volunteer.service';
 import { NotificationService } from '../../services/notification.service';
 import { ActivityService } from '../../services/api/activity.service';
 import { of } from 'rxjs';
+import { CalendarDataService } from '../../services/api/calendar-data.service';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -34,7 +35,8 @@ describe('HomeComponent', () => {
       providers: [
         { provide: VolunteerService, useValue: mockVolunteerService },
         { provide: NotificationService, useValue: mockNotificationService },
-        { provide: ActivityService, useValue: mockActivityService }
+        { provide: ActivityService, useValue: mockActivityService },
+        { provide: CalendarDataService, useValue: { loadEvents: () => of([]) } }
       ]
     })
       .compileComponents();

@@ -9,10 +9,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 @Configuration
@@ -29,6 +36,7 @@ public class DataLoader {
                                    ForumReplyRepository forumReplyRepository,
                                    ChatConversationRepository chatConversationRepository,
                                    ChatMessageRepository chatMessageRepository,
+                                   AppointmentRepository appointmentRepository,
                                    JdbcTemplate jdbcTemplate,
                                    NotificationRepository notificationRepository,
                                    PasswordEncoder passwordEncoder) {
@@ -41,6 +49,7 @@ public class DataLoader {
                 seedGoalDemoData(userRepository, organisationRepository, activityRepository, communityGoalRepository, interestRepository);
                 enrichDemoActivityRecommendationProfiles(activityRepository);
                 seedInterestCatalog(userRepository, organisationRepository, activityRepository, communityGoalRepository, interestRepository);
+                seedCalendarSampleData(userRepository, organisationRepository, activityRepository, appointmentRepository, communityGoalRepository, interestRepository);
                 return; // Data already loaded
             }
 
@@ -918,6 +927,7 @@ public class DataLoader {
             seedCommunityData(forumEntryRepository, forumReplyRepository, chatConversationRepository, chatMessageRepository);
             seedGoalDemoData(userRepository, organisationRepository, activityRepository, communityGoalRepository, interestRepository);
             seedInterestCatalog(userRepository, organisationRepository, activityRepository, communityGoalRepository, interestRepository);
+            seedCalendarSampleData(userRepository, organisationRepository, activityRepository, appointmentRepository, communityGoalRepository, interestRepository);
 
             System.out.println("Database seeded successfully!");
         };
@@ -1614,6 +1624,299 @@ public class DataLoader {
         return ActivitySkillRequirement.preferred(name, minimumProficiency);
     }
 
+    private void seedCalendarSampleData(UserRepository userRepository,
+                                        OrganisationRepository organisationRepository,
+                                        ActivityRepository activityRepository,
+                                        AppointmentRepository appointmentRepository,
+                                        CommunityGoalRepository communityGoalRepository,
+                                        InterestRepository interestRepository) {
+        List<User> users = userRepository.findAll();
+        List<Organisation> organisations = organisationRepository.findAll();
+        if (users.isEmpty() || organisations.isEmpty()) {
+            return;
+        }
+
+        User organiser = findUserByUsername(userRepository, "alice");
+        if (organiser == null) {
+            organiser = users.get(0);
+        }
+        Organisation organisation = findOrganisationByName(organisations, "Green Future Org");
+        if (organisation == null) {
+            organisation = organisations.get(0);
+        }
+
+        YearMonth month = YearMonth.now();
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+
+        Activity meetup = activityRepository.findAll().stream()
+                .filter(activity -> "Community Welcome Meetup".equals(activity.getTitle()))
+                .findFirst()
+                .orElseGet(Activity::new);
+        configureCalendarActivity(
+                meetup,
+                "Community Welcome Meetup",
+                "Meet volunteers, discover current projects and plan how to get involved.",
+                organisation,
+                organiser,
+                timestamp(month, 8, 17, 0),
+                "17:00",
+                "19:00",
+                "Community Center Linz",
+                timestamp(month, 7, 23, 59),
+                now
+        );
+        activityRepository.save(meetup);
+
+        Activity workshop = activityRepository.findAll().stream()
+                .filter(activity -> "Weekend Volunteer Workshop".equals(activity.getTitle()))
+                .findFirst()
+                .orElseGet(Activity::new);
+        configureCalendarActivity(
+                workshop,
+                "Weekend Volunteer Workshop",
+                "A practical workshop covering project planning and field preparation.",
+                organisation,
+                organiser,
+                timestamp(month, 16, 9, 0),
+                "09:00",
+                "13:00",
+                "Green Future Community Site",
+                timestamp(month, 14, 23, 59),
+                now
+        );
+        workshop = activityRepository.save(workshop);
+
+        upsertCalendarAppointment(
+                appointmentRepository,
+                "Workshop: Project Planning",
+                "Turn a volunteer idea into an actionable project plan.",
+                "Green Future Community Site",
+                timestamp(month, 16, 9, 0),
+                timestamp(month, 16, 11, 0),
+                organiser.getId(),
+                workshop
+        );
+        upsertCalendarAppointment(
+                appointmentRepository,
+                "Workshop: Field Preparation",
+                "Prepare equipment, roles and safety checklists for field work.",
+                "Green Future Community Site",
+                timestamp(month, 16, 11, 30),
+                timestamp(month, 16, 13, 0),
+                organiser.getId(),
+                workshop
+        );
+
+        for (User user : users) {
+            upsertCalendarAppointment(
+                    appointmentRepository,
+                    "Personal planning time",
+                    "Review upcoming volunteer activities and set priorities.",
+                    "Home",
+                    timestamp(month, 5, 10, 0),
+                    timestamp(month, 5, 11, 0),
+                    user.getId(),
+                    null
+            );
+            upsertCalendarAppointment(
+                    appointmentRepository,
+                    "Volunteer orientation call",
+                    "Short personal onboarding call with the volunteer team.",
+                    "Online",
+                    timestamp(month, 12, 16, 30),
+                    timestamp(month, 12, 17, 0),
+                    user.getId(),
+                    null
+            );
+        }
+
+        CommunityGoal monthlyGoal = communityGoalRepository.findAll().stream()
+                .filter(goal -> "Monthly community challenge".equals(goal.getTitle()))
+                .findFirst()
+                .orElseGet(CommunityGoal::new);
+        monthlyGoal.setTitle("Monthly community challenge");
+        monthlyGoal.setDescription("Complete five community activities together before the end of this month.");
+        monthlyGoal.setTargetValue(5);
+        monthlyGoal.setCurrentValue(2);
+        monthlyGoal.setActivityInterests(resolveSeedInterests(interestRepository, List.of("community")));
+        monthlyGoal.setStartDate(timestamp(month, 1, 0, 0));
+        monthlyGoal.setEndDate(timestamp(month, month.lengthOfMonth(), 23, 59));
+        monthlyGoal.setStatus("ACTIVE");
+        monthlyGoal.setOrganisation(organisation);
+        if (monthlyGoal.getCreatedAt() == null) {
+            monthlyGoal.setCreatedAt(now);
+        }
+        monthlyGoal.setUpdatedAt(now);
+        communityGoalRepository.save(monthlyGoal);
+
+        organisation.setReactivationTime(timestamp(month, 25, 9, 0));
+        organisationRepository.save(organisation);
+
+        refreshExistingCalendarEntityDates(
+                activityRepository,
+                appointmentRepository,
+                communityGoalRepository,
+                month,
+                now
+        );
+    }
+
+    private void refreshExistingCalendarEntityDates(ActivityRepository activityRepository,
+                                                    AppointmentRepository appointmentRepository,
+                                                    CommunityGoalRepository communityGoalRepository,
+                                                    YearMonth currentMonth,
+                                                    Timestamp now) {
+        Map<Integer, LocalDateTime> activityDates = new HashMap<>();
+        List<Activity> existingActivities = activityRepository.findAll().stream()
+                .filter(activity -> !"Community Welcome Meetup".equals(activity.getTitle()))
+                .filter(activity -> !"Weekend Volunteer Workshop".equals(activity.getTitle()))
+                .sorted(Comparator.comparingInt(Activity::getId))
+                .toList();
+
+        for (int index = 0; index < existingActivities.size(); index++) {
+            Activity activity = existingActivities.get(index);
+            YearMonth scheduledMonth = currentMonth.plusMonths((index % 3) - 1L);
+            int day = 3 + (index * 3) % Math.min(22, scheduledMonth.lengthOfMonth() - 2);
+            LocalTime time = calendarTime(activity.getStartTime(), activity.getDate(), LocalTime.of(9, 0));
+            LocalDateTime scheduled = scheduledMonth.atDay(day).atTime(time);
+
+            activity.setDate(Timestamp.valueOf(scheduled));
+            activity.setExpiresAt(Timestamp.valueOf(scheduled.minusDays(2).withHour(18).withMinute(0)));
+            activity.setUpdatedAt(now);
+            activityRepository.save(activity);
+            activityDates.put(activity.getId(), scheduled);
+        }
+
+        Map<Integer, Integer> sessionIndexes = new HashMap<>();
+        appointmentRepository.findAll().stream()
+                .filter(appointment -> appointment.getActivity() != null)
+                .filter(appointment -> !appointment.getTitle().startsWith("Workshop:"))
+                .sorted(Comparator.comparingInt(Appointment::getId))
+                .forEach(appointment -> {
+                    Activity activity = appointment.getActivity();
+                    LocalDateTime base = activityDates.get(activity.getId());
+                    if (base == null) {
+                        return;
+                    }
+
+                    int sessionIndex = sessionIndexes.getOrDefault(activity.getId(), 0);
+                    sessionIndexes.put(activity.getId(), sessionIndex + 1);
+                    LocalTime startTime = appointment.getStartDateTime() == null
+                            ? base.toLocalTime()
+                            : appointment.getStartDateTime().toLocalDateTime().toLocalTime();
+                    long durationMinutes = appointment.getStartDateTime() != null && appointment.getEndDateTime() != null
+                            ? Duration.between(
+                                    appointment.getStartDateTime().toLocalDateTime(),
+                                    appointment.getEndDateTime().toLocalDateTime()
+                            ).toMinutes()
+                            : 120;
+                    durationMinutes = Math.max(30, durationMinutes);
+                    LocalDateTime sessionStart = base.toLocalDate().plusDays(sessionIndex * 4L).atTime(startTime);
+
+                    appointment.setStartDateTime(Timestamp.valueOf(sessionStart));
+                    appointment.setEndDateTime(Timestamp.valueOf(sessionStart.plusMinutes(durationMinutes)));
+                    appointmentRepository.save(appointment);
+                });
+
+        List<CommunityGoal> existingGoals = communityGoalRepository.findAll().stream()
+                .filter(goal -> !"Monthly community challenge".equals(goal.getTitle()))
+                .sorted(Comparator.comparingInt(CommunityGoal::getId))
+                .toList();
+        for (int index = 0; index < existingGoals.size(); index++) {
+            CommunityGoal goal = existingGoals.get(index);
+            YearMonth goalMonth = currentMonth.plusMonths((index % 4) - 1L);
+            goal.setStartDate(timestamp(goalMonth, 1, 0, 0));
+            goal.setEndDate(timestamp(goalMonth, goalMonth.lengthOfMonth(), 23, 59));
+            goal.setUpdatedAt(now);
+            communityGoalRepository.save(goal);
+        }
+    }
+
+    private LocalTime calendarTime(String storedTime, Timestamp fallback, LocalTime defaultTime) {
+        if (storedTime != null && !storedTime.isBlank()) {
+            try {
+                return LocalTime.parse(storedTime);
+            } catch (java.time.format.DateTimeParseException ignored) {
+                // Fall through to the timestamp or default time.
+            }
+        }
+        return fallback == null ? defaultTime : fallback.toLocalDateTime().toLocalTime();
+    }
+    private void configureCalendarActivity(Activity activity,
+                                           String title,
+                                           String description,
+                                           Organisation organisation,
+                                           User organiser,
+                                           Timestamp date,
+                                           String startTime,
+                                           String endTime,
+                                           String location,
+                                           Timestamp expiresAt,
+                                           Timestamp now) {
+        activity.setTitle(title);
+        activity.setBody(description);
+        activity.setDescription(description);
+        activity.setProjectId(0);
+        activity.setOrganisations(List.of(organisation));
+        activity.setDate(date);
+        activity.setStartTime(startTime);
+        activity.setEndTime(endTime);
+        activity.setDuration("2 hours");
+        activity.setExpiresAt(expiresAt);
+        activity.setLocation(location);
+        activity.setCoordinates(new Coordinates(48.3069, 14.2858));
+        activity.setParticipants(List.of(organiser));
+        activity.setCreatedBy(organiser);
+        setActivityProfile(
+                activity,
+                List.of(InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS),
+                List.of(requiredSkill("Teamwork", SkillProficiency.BEGINNER)),
+                List.of("community", "social", "beginner-friendly")
+        );
+        activity.setQualifications(List.of());
+        activity.setPrerequisites(List.of());
+        activity.setCapacity(20);
+        activity.setSpotsTaken(1);
+        activity.setEquipmentProvided(List.of());
+        activity.setDifficulty("easy");
+        activity.setPublic(true);
+        activity.setStatus(ActivityStatus.upcoming);
+        if (activity.getCreatedAt() == null) {
+            activity.setCreatedAt(now);
+        }
+        activity.setUpdatedAt(now);
+    }
+
+    private void upsertCalendarAppointment(AppointmentRepository appointmentRepository,
+                                           String title,
+                                           String description,
+                                           String location,
+                                           Timestamp start,
+                                           Timestamp end,
+                                           int createdBy,
+                                           Activity activity) {
+        Appointment appointment = appointmentRepository.findAll().stream()
+                .filter(item -> title.equals(item.getTitle()))
+                .filter(item -> item.getCreatedBy() == createdBy)
+                .filter(item -> activity == null
+                        ? item.getActivity() == null
+                        : item.getActivity() != null && item.getActivity().getId() == activity.getId())
+                .findFirst()
+                .orElseGet(Appointment::new);
+        appointment.setTitle(title);
+        appointment.setDescription(description);
+        appointment.setLocation(location);
+        appointment.setStartDateTime(start);
+        appointment.setEndDateTime(end);
+        appointment.setCreatedBy(createdBy);
+        appointment.setActivity(activity);
+        appointmentRepository.save(appointment);
+    }
+
+    private Timestamp timestamp(YearMonth month, int day, int hour, int minute) {
+        LocalDateTime dateTime = month.atDay(Math.min(day, month.lengthOfMonth())).atTime(hour, minute);
+        return Timestamp.valueOf(dateTime);
+    }
     private void seedCommunityData(ForumEntryRepository forumEntryRepository,
                                    ForumReplyRepository forumReplyRepository,
                                    ChatConversationRepository chatConversationRepository,

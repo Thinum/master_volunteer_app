@@ -18,6 +18,7 @@ import { ReportsComponent } from './components/reports/reports.component';
 import { ForumDetailComponent } from './components/community/forum/forum-detail/forum-detail.component';
 import { ChatDetailComponent } from './components/community/chat/chat-detail/chat-detail.component';
 import { UserProfileEditComponent } from './components/user/user-profile/user-profile-edit.component';
+import { CalendarComponent } from './components/calendar/calendar.component';
 
 export const routes: Routes = [
   {path: '', component: LoginComponent, data: {title: 'Login'}},
@@ -38,6 +39,7 @@ export const routes: Routes = [
   {path: 'createOrganisation', component: CreateOrganisationComponent, data: {title: 'Create Organization'}, canActivate: [authGuard] },
   {path: 'notifications', component: NotificationsListComponent, data: {title: 'Notifications List'}, canActivate: [authGuard]},
   {path: 'reports', component: ReportsComponent, data: {title: 'Reports'}, canActivate: [authGuard]},
+  {path: 'calendar', component: CalendarComponent, data: {title: 'Calendar'}, canActivate: [authGuard]},
   {path: 'register', component: RegisterComponent, data: {title: 'Register'}},
   {path: 'community-goals', component: CommunityGoalsComponent}
 ]

@@ -1,0 +1,56 @@
+<main class="calendar-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Plan your time</p>
+      <h1>Calendar</h1>
+      <p>Activities, sessions, community goals, deadlines and your personal appointments in one place.</p>
+    </div>
+    <button mat-flat-button color="primary" type="button" (click)="openAppointmentForm()">
+      <mat-icon>add</mat-icon> New appointment
+    </button>
+  </header>
+
+  <section class="appointment-panel" *ngIf="showAppointmentForm">
+    <div class="panel-heading">
+      <div><p class="eyebrow">Personal calendar</p><h2>New appointment</h2></div>
+      <button mat-icon-button type="button" aria-label="Close form" (click)="closeAppointmentForm()"><mat-icon>close</mat-icon></button>
+    </div>
+    <form [formGroup]="appointmentForm" (ngSubmit)="saveAppointment()">
+      <mat-form-field appearance="outline" class="field-title">
+        <mat-label>Title</mat-label><input matInput formControlName="title" />
+        <mat-error *ngIf="appointmentForm.controls.title.hasError('required')">A title is required.</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Starts</mat-label><input matInput type="datetime-local" formControlName="startDateTime" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Ends</mat-label><input matInput type="datetime-local" formControlName="endDateTime" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Location</mat-label><input matInput formControlName="location" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="field-description">
+        <mat-label>Description</mat-label><textarea matInput rows="2" formControlName="description"></textarea>
+      </mat-form-field>
+      <p class="form-error" *ngIf="formError">{{ formError }}</p>
+      <div class="form-actions">
+        <button mat-button type="button" (click)="closeAppointmentForm()">Cancel</button>
+        <button mat-flat-button color="primary" type="submit" [disabled]="saving">
+          <mat-icon>event_available</mat-icon>{{ saving ? 'Saving…' : 'Add appointment' }}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <div class="loading-state" *ngIf="loading"><mat-spinner diameter="42"></mat-spinner><span>Loading calendar…</span></div>
+  <app-calendar-month *ngIf="!loading" [events]="events" (daySelected)="selectDay($event)"></app-calendar-month>
+
+  <section class="personal-list" *ngIf="!loading && personalEvents.length">
+    <div class="list-heading"><div><p class="eyebrow">Private</p><h2>My appointments</h2></div><span>{{ personalEvents.length }}</span></div>
+    <article *ngFor="let event of personalEvents">
+      <div class="appointment-date"><strong>{{ event.start | date:'d' }}</strong><span>{{ event.start | date:'MMM' }}</span></div>
+      <div class="appointment-copy"><h3>{{ event.title }}</h3><p>{{ event.start | date:'medium' }}<span *ngIf="event.location"> · {{ event.location }}</span></p></div>
+      <button mat-icon-button type="button" aria-label="Delete appointment" (click)="deleteAppointment(event)"><mat-icon>delete_outline</mat-icon></button>
+    </article>
+  </section>
+</main>

@@ -409,7 +409,7 @@ public final class ContractMapper {
         return notifications == null ? List.of() : notifications.stream().map(ContractMapper::toNotificationDTO).toList();
     }
 
-    private static AppointmentDTO toAppointmentDTO(Appointment appointment) {
+    public static AppointmentDTO toAppointmentDTO(Appointment appointment) {
         if (appointment == null) {
             return null;
         }
