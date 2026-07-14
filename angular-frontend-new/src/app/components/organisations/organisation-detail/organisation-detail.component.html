@@ -88,8 +88,14 @@
     <mat-card class="list-card projects-card">
       <mat-card-header>
         <mat-card-title>Projects</mat-card-title>
-        <button *ngIf="canManage" mat-stroked-button (click)="createProject()">
-          <mat-icon>add</mat-icon> New project
+        <button
+          *ngIf="canManage"
+          mat-icon-button
+          class="goals-add-btn"
+          type="button"
+          (click)="createProject()"
+          aria-label="Add project">
+          <mat-icon>add</mat-icon>
         </button>
       </mat-card-header>
       <mat-card-content>
@@ -123,8 +129,14 @@
     <mat-card class="list-card activities-card">
       <mat-card-header>
         <mat-card-title>Activities</mat-card-title>
-        <button *ngIf="canManage" mat-stroked-button (click)="createActivity()">
-          <mat-icon>add</mat-icon> New activity
+        <button
+          *ngIf="canManage"
+          mat-icon-button
+          class="goals-add-btn"
+          type="button"
+          (click)="createActivity()"
+          aria-label="Add activity">
+          <mat-icon>add</mat-icon>
         </button>
       </mat-card-header>
       <mat-card-content>
@@ -186,7 +198,6 @@
   <mat-card class="members-card">
     <mat-card-content>
       <section class="member-section">
-      <section class="member-section">
         <h3><mat-icon>admin_panel_settings</mat-icon> Organization administrators</h3>
         <div class="member-avatars" *ngIf="detailedOrganisation.orgAdmins?.length; else noAdmins">
           <a
@@ -204,6 +215,7 @@
         </ng-template>
       </section>
 
+      <section class="member-section">
         <h3><mat-icon>group</mat-icon> My friends in this organization</h3>
         <div class="member-avatars" *ngIf="friendMembers.length > 0; else noFriendMembers">
           <a

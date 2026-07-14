@@ -2,14 +2,16 @@
 
   <div class="header-card">
   <!-- Heading -->
-  <h1 class="activity-title">{{ activity?.title }}</h1>
-  <div class="admin-actions" *ngIf="canManage">
-    <button mat-stroked-button (click)="editActivity()">
-      <mat-icon>edit</mat-icon> Edit
-    </button>
-    <button mat-stroked-button color="warn" (click)="onDelete()">
-      <mat-icon>delete</mat-icon> Delete
-    </button>
+  <div class="detail-heading">
+    <h1 class="activity-title">{{ activity?.title }}</h1>
+    <div class="admin-actions" *ngIf="canManage">
+      <button mat-stroked-button class="management-button" type="button" (click)="editActivity()">
+        <mat-icon>edit</mat-icon> Edit
+      </button>
+      <button mat-stroked-button class="management-button management-button--danger" type="button" (click)="onDelete()">
+        <mat-icon>delete</mat-icon> Delete
+      </button>
+    </div>
   </div>
 
   <!-- Location & Time -->

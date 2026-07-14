@@ -5,10 +5,10 @@
       <span class="status">{{ detailedProject?.closed ? 'Closed' : 'Open' }}</span>
     </div>
     <div class="admin-actions" *ngIf="canManage">
-      <button mat-stroked-button (click)="editProject()">
+      <button mat-stroked-button class="management-button" type="button" (click)="editProject()">
         <mat-icon>edit</mat-icon> Edit
       </button>
-      <button mat-stroked-button color="warn" (click)="deleteProject()">
+      <button mat-stroked-button class="management-button management-button--danger" type="button" (click)="deleteProject()">
         <mat-icon>delete</mat-icon> Delete
       </button>
     </div>
