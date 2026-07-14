@@ -1743,6 +1743,7 @@ public class DataLoader {
                 month,
                 now
         );
+        ensureEveryUserHasJoinedActivity(users, activityRepository, month);
         ensureMonthlyGoalsForEveryOrganisation(
                 organisations,
                 communityGoalRepository,
@@ -1750,7 +1751,7 @@ public class DataLoader {
                 month,
                 now
         );
-        verifyCalendarSampleCoverage(users, organisations, appointmentRepository, communityGoalRepository);
+        verifyCalendarSampleCoverage(users, organisations, activityRepository, appointmentRepository, communityGoalRepository, month);
     }
 
     private void ensureEveryUserHasOrganisation(List<User> users,
@@ -1791,6 +1792,46 @@ public class DataLoader {
         }
     }
 
+    private void ensureEveryUserHasJoinedActivity(List<User> users,
+                                                  ActivityRepository activityRepository,
+                                                  YearMonth month) {
+        List<Activity> datedActivities = activityRepository.findAll().stream()
+                .filter(activity -> isActivityInMonth(activity, month))
+                .sorted(Comparator.comparingInt(Activity::getId))
+                .toList();
+        if (datedActivities.isEmpty()) {
+            return;
+        }
+
+        int assignmentIndex = 0;
+        for (User user : users) {
+            boolean alreadyHasCurrentMonthActivity = activityRepository.findAllByParticipantsContains(user).stream()
+                    .anyMatch(activity -> isActivityInMonth(activity, month));
+            if (alreadyHasCurrentMonthActivity) {
+                continue;
+            }
+
+            Activity candidate = datedActivities.get(assignmentIndex % datedActivities.size());
+            assignmentIndex++;
+            Activity activity = activityRepository.findById(candidate.getId()).orElse(candidate);
+            List<User> participants = activity.getParticipants() == null
+                    ? new java.util.ArrayList<>()
+                    : new java.util.ArrayList<>(activity.getParticipants());
+            participants.add(user);
+            activity.setParticipants(participants);
+            activity.setSpotsTaken(participants.size());
+            if (activity.getCapacity() > 0 && activity.getCapacity() < participants.size()) {
+                activity.setCapacity(participants.size());
+            }
+            activityRepository.save(activity);
+        }
+    }
+
+    private boolean isActivityInMonth(Activity activity, YearMonth month) {
+        return activity.getDate() != null
+                && YearMonth.from(activity.getDate().toLocalDateTime()).equals(month);
+    }
+
     private void ensureMonthlyGoalsForEveryOrganisation(List<Organisation> organisations,
                                                          CommunityGoalRepository communityGoalRepository,
                                                          InterestRepository interestRepository,
@@ -1827,8 +1868,10 @@ public class DataLoader {
 
     private void verifyCalendarSampleCoverage(List<User> users,
                                               List<Organisation> organisations,
+                                              ActivityRepository activityRepository,
                                               AppointmentRepository appointmentRepository,
-                                              CommunityGoalRepository communityGoalRepository) {
+                                              CommunityGoalRepository communityGoalRepository,
+                                              YearMonth month) {
         Set<Integer> usersWithPersonalAppointments = new HashSet<>();
         appointmentRepository.findAll().stream()
                 .filter(appointment -> appointment.getActivity() == null)
@@ -1841,13 +1884,15 @@ public class DataLoader {
 
         List<String> missingUsers = new java.util.ArrayList<>();
         for (User user : users) {
+            boolean hasJoinedCurrentMonthActivity = activityRepository.findAllByParticipantsContains(user).stream()
+                    .anyMatch(activity -> isActivityInMonth(activity, month));
             boolean hasVisibleGoal = organisations.stream()
                     .filter(organisation -> organisationIdsWithGoals.contains(organisation.getId()))
                     .anyMatch(organisation -> organisation.getOrgMembers() != null
                             && organisation.getOrgMembers().stream()
                             .anyMatch(member -> member.getUser() != null
                                     && member.getUser().getId() == user.getId()));
-            if (!usersWithPersonalAppointments.contains(user.getId()) || !hasVisibleGoal) {
+            if (!hasJoinedCurrentMonthActivity || !usersWithPersonalAppointments.contains(user.getId()) || !hasVisibleGoal) {
                 missingUsers.add(user.getUsername());
             }
         }

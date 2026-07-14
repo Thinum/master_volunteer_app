@@ -12,6 +12,7 @@ public interface ActivityRepository extends JpaRepository<Activity, Integer> {
     @EntityGraph(attributePaths = {"tags"})
     List<Activity> findAll();
 
+    @EntityGraph(attributePaths = {"participants"})
     Optional<Activity> findById(int id);
     Optional<Activity> findByProjectId(int projectId);
     List<Activity> findAllByParticipantsContains(at.jku.volunteer_app.model.User user);

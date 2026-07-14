@@ -224,6 +224,7 @@ export class HomeComponent implements OnInit {
       next: (success) => {
         if (success) {
           this.loadUserData();
+          this.loadCalendar();
         }
       },
       error: (err) => console.error('Error joining activity:', err)

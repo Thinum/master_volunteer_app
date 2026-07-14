@@ -18,15 +18,21 @@ export class CalendarDataService {
   private readonly volunteerService = inject(VolunteerService);
 
   loadEvents(): Observable<CalendarEvent[]> {
-    return forkJoin({
-      activities: this.activityService.getAllActivities().pipe(catchError(() => of([] as Activity[]))),
-      personalAppointments: this.appointmentService.getPersonalAppointments().pipe(catchError(() => of([] as Appointment[]))),
-      user: this.volunteerService.getCurrentUser()
-    }).pipe(
-      switchMap(base => this.volunteerService.getOrganisations(base.user.id).pipe(
-        catchError(() => of([] as Organisation[])),
-        switchMap(organisations => this.loadGoals(organisations).pipe(
-          map(goals => this.toCalendarEvents(base.activities, base.personalAppointments, organisations, goals))
+    return this.volunteerService.getCurrentUser().pipe(
+      switchMap(user => forkJoin({
+        activities: this.activityService.getActivitiesByUserParticipation(user.id)
+          .pipe(catchError(() => of([] as Activity[]))),
+        personalAppointments: this.appointmentService.getPersonalAppointments()
+          .pipe(catchError(() => of([] as Appointment[]))),
+        organisations: this.volunteerService.getOrganisations(user.id)
+          .pipe(catchError(() => of([] as Organisation[])))
+      })),
+      switchMap(base => this.loadGoals(base.organisations).pipe(
+        map(goals => this.toCalendarEvents(
+          base.activities,
+          base.personalAppointments,
+          base.organisations,
+          goals
         ))
       ))
     );
