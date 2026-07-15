@@ -7,8 +7,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 import { Appointment } from '../../models/appointment.model';
-import { CalendarEvent } from '../../models/calendar-event.model';
+import { CalendarEvent, CalendarEventType } from '../../models/calendar-event.model';
 import { AppointmentService } from '../../services/api/appointment.service';
 import { CalendarDataService } from '../../services/api/calendar-data.service';
 import { CalendarMonthComponent } from '../../shared/components/calendar-month/calendar-month.component';
@@ -36,12 +37,14 @@ export class CalendarComponent implements OnInit {
   saving = false;
   showAppointmentForm = false;
   formError = '';
-  appointmentFilter: 'all' | 'upcoming' | 'past' = 'all';
+  eventFilter: 'all' | 'personal' | 'organisation' = 'all';
+  timeframeFilter: 'all' | 'upcoming' | 'past' = 'all';
 
   private readonly fb = inject(FormBuilder);
   private readonly calendarDataService = inject(CalendarDataService);
   private readonly appointmentService = inject(AppointmentService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly router = inject(Router);
 
   readonly appointmentForm = this.fb.nonNullable.group({
     title: ['', Validators.required],
@@ -58,10 +61,10 @@ export class CalendarComponent implements OnInit {
     this.loadEvents();
   }
 
-  get personalEvents(): CalendarEvent[] {
+  get scheduledEvents(): CalendarEvent[] {
     const now = new Date();
     return this.events
-      .filter(event => event.type === 'personal')
+      .slice()
       .sort((left, right) => {
         const leftPast = this.isPast(left, now);
         const rightPast = this.isPast(right, now);
@@ -73,21 +76,32 @@ export class CalendarComponent implements OnInit {
       });
   }
 
-  get filteredPersonalEvents(): CalendarEvent[] {
-    if (this.appointmentFilter === 'all') return this.personalEvents;
+  get filteredScheduledEvents(): CalendarEvent[] {
     const now = new Date();
-    return this.personalEvents.filter(event =>
-      this.appointmentFilter === 'past' ? this.isPast(event, now) : !this.isPast(event, now)
-    );
+    return this.scheduledEvents.filter(event => {
+      const matchesType = this.eventFilter === 'all'
+        || (this.eventFilter === 'personal' ? event.type === 'personal' : event.type !== 'personal');
+      const matchesTimeframe = this.timeframeFilter === 'all'
+        || (this.timeframeFilter === 'past' ? this.isPast(event, now) : !this.isPast(event, now));
+      return matchesType && matchesTimeframe;
+    });
   }
 
-  get upcomingAppointmentCount(): number {
-    const now = new Date();
-    return this.personalEvents.filter(event => !this.isPast(event, now)).length;
+  get personalEventCount(): number {
+    return this.events.filter(event => event.type === 'personal').length;
   }
 
-  get pastAppointmentCount(): number {
-    return this.personalEvents.length - this.upcomingAppointmentCount;
+  get organisationEventCount(): number {
+    return this.events.length - this.personalEventCount;
+  }
+
+  get upcomingEventCount(): number {
+    const now = new Date();
+    return this.events.filter(event => !this.isPast(event, now)).length;
+  }
+
+  get pastEventCount(): number {
+    return this.events.length - this.upcomingEventCount;
   }
 
   get minimumEndDate(): string {
@@ -169,8 +183,12 @@ export class CalendarComponent implements OnInit {
     });
   }
 
-  setAppointmentFilter(filter: 'all' | 'upcoming' | 'past'): void {
-    this.appointmentFilter = filter;
+  setEventFilter(filter: 'all' | 'personal' | 'organisation'): void {
+    this.eventFilter = filter;
+  }
+
+  setTimeframeFilter(filter: 'all' | 'upcoming' | 'past'): void {
+    this.timeframeFilter = filter;
   }
 
   appointmentStatus(event: CalendarEvent): 'past' | 'today' | 'upcoming' {
@@ -185,6 +203,30 @@ export class CalendarComponent implements OnInit {
     if (status === 'past') return 'Past';
     if (status === 'today') return 'Today';
     return 'Upcoming';
+  }
+
+  eventTypeLabel(type: CalendarEventType): string {
+    const labels: Record<CalendarEventType, string> = {
+      personal: 'My appointment',
+      activity: 'Organisation activity',
+      goal: 'Community goal',
+      reactivation: 'Organisation update'
+    };
+    return labels[type];
+  }
+
+  eventTypeIcon(type: CalendarEventType): string {
+    const icons: Record<CalendarEventType, string> = {
+      personal: 'person',
+      activity: 'volunteer_activism',
+      goal: 'flag',
+      reactivation: 'domain'
+    };
+    return icons[type];
+  }
+
+  openEvent(event: CalendarEvent): void {
+    if (event.route) void this.router.navigateByUrl(event.route);
   }
 
   trackEvent(_: number, event: CalendarEvent): string {
@@ -224,6 +266,11 @@ export class CalendarComponent implements OnInit {
   }
 
   private isPast(event: CalendarEvent, now = new Date()): boolean {
+    if (event.allDay) {
+      const endOfDay = new Date(event.end ?? event.start);
+      endOfDay.setHours(23, 59, 59, 999);
+      return endOfDay.getTime() < now.getTime();
+    }
     return (event.end ?? event.start).getTime() < now.getTime();
   }
 
