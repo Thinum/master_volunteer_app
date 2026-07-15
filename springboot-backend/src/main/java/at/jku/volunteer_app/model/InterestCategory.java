@@ -31,6 +31,7 @@ public enum InterestCategory {
     ORGANISATION_AND_LEADERSHIP("Organisation and Leadership", null, "organisation", "organization", "leadership", "coordination", "event planning");
 
     private static final Map<String, InterestCategory> LOOKUP = buildLookup();
+    public static final String CONCEPT_SCHEME_URI = "urn:volunteer-app:taxonomy:interests";
 
     private final String label;
     private final String escoConceptUri;
@@ -52,6 +53,44 @@ public enum InterestCategory {
 
     public String getEscoConceptUri() {
         return escoConceptUri;
+    }
+
+    /**
+     * Fields of interest are application concepts, not ESCO skills. Give them a
+     * stable local URI and keep any future ESCO crosswalk separate.
+     */
+    public String getConceptUri() {
+        return CONCEPT_SCHEME_URI + ":" + name().toLowerCase(Locale.ROOT).replace('_', '-');
+    }
+
+    public String getConceptSchemeUri() {
+        return CONCEPT_SCHEME_URI;
+    }
+
+    public List<String> getBroaderConceptUris() {
+        return List.of(CONCEPT_SCHEME_URI);
+    }
+
+    public List<String> getRelatedSkillLabels() {
+        return switch (this) {
+            case ANIMALS -> List.of("Animal Care");
+            case ENVIRONMENT_AND_NATURE -> List.of("Environmental Work");
+            case EDUCATION_AND_TUTORING -> List.of("Teaching", "Mentoring", "Mathematics");
+            case CHILDREN_AND_YOUTH -> List.of("Teaching", "Mentoring");
+            case ELDERLY_SUPPORT -> List.of("Communication", "First Aid");
+            case HEALTH_AND_WELL_BEING -> List.of("First Aid", "Communication");
+            case EMERGENCY_AND_RESCUE_SERVICES -> List.of("Emergency Response", "First Aid");
+            case SPORTS_AND_FITNESS -> List.of("Physical Fitness", "Physical activity");
+            case OUTDOOR_ACTIVITIES -> List.of("Physical activity", "Environmental Work");
+            case ARTS_AND_CULTURE, MUSIC -> List.of("Event Support", "Event Planning");
+            case TECHNOLOGY -> List.of("Programming", "Problem-Solving", "Social Media");
+            case CRAFTS_AND_REPAIR -> List.of("Problem-Solving", "Cleaning");
+            case FOOD_AND_COOKING -> List.of("Cooking", "Food Distribution");
+            case COMMUNITY_AND_SOCIAL_EVENTS -> List.of("Teamwork", "Communication", "Event Support", "Community Outreach");
+            case HUMANITARIAN_AID -> List.of("Fundraising", "Food Distribution", "Community Outreach");
+            case ACCESSIBILITY_AND_INCLUSION -> List.of("Communication", "Responsibility");
+            case ORGANISATION_AND_LEADERSHIP -> List.of("Organization", "Event Planning", "Teamwork");
+        };
     }
 
     public List<String> getAliases() {

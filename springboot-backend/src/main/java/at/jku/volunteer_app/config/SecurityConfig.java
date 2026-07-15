@@ -51,6 +51,8 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/community-goals/**").permitAll()
                         .requestMatchers("/interests/**").permitAll()
+                        .requestMatchers("/skills/catalog").permitAll()
+                        .requestMatchers("/skills/import").authenticated()
                         .requestMatchers("/forum-entries/**").permitAll()
                         .requestMatchers("/chat-conversations/**").permitAll()
                         .requestMatchers("/auth/register").permitAll()// .authenticated()

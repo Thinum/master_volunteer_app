@@ -15,6 +15,28 @@ import { InterestCategory } from '../../../models/activity.model';
 import { User } from '../../../models/user.model';
 import { VolunteerService } from '../../../services/api/volunteer.service';
 import { InterestService } from '../../../services/api/interest.service';
+import { SkillCatalogService } from '../../../services/api/skill-catalog.service';
+
+const DEFAULT_INTERESTS = [
+  'Animals',
+  'Environment and Nature',
+  'Education and Tutoring',
+  'Children and Youth',
+  'Elderly Support',
+  'Health and Well-being',
+  'Emergency and Rescue Services',
+  'Sports and Fitness',
+  'Outdoor Activities',
+  'Arts and Culture',
+  'Music',
+  'Technology',
+  'Crafts and Repair',
+  'Food and Cooking',
+  'Community and Social Events',
+  'Humanitarian Aid',
+  'Accessibility and Inclusion',
+  'Organisation and Leadership',
+];
 
 @Component({
   selector: 'app-user-profile-edit',
@@ -37,11 +59,12 @@ export class UserProfileEditComponent implements OnInit {
   private fb = inject(FormBuilder);
   private volunteerService = inject(VolunteerService);
   private interestService = inject(InterestService);
+  private skillCatalogService = inject(SkillCatalogService);
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
 
-  protected readonly availableSkills: Skill[] = MOCK_SKILLS;
-  protected availableInterests: string[] = MOCK_SKILLS.map(skill => this.normalizeInterestName(skill.name));
+  protected availableSkills: Skill[] = [...MOCK_SKILLS];
+  protected availableInterests: string[] = [...DEFAULT_INTERESTS];
   private interestCatalog: InterestCategory[] = [];
   protected currentUser?: User;
   protected selectedSkills: string[] = [];
@@ -56,6 +79,17 @@ export class UserProfileEditComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.skillCatalogService.getSkillCatalog().subscribe({
+      next: skills => {
+        if (skills.length) {
+          this.availableSkills = this.mergeSkills(skills, this.selectedSkills);
+        }
+      },
+      error: () => {
+        this.availableSkills = this.mergeSkills(MOCK_SKILLS, this.selectedSkills);
+      }
+    });
+
     this.interestService.getInterestCatalog().subscribe({
       next: interests => {
         this.interestCatalog = interests;
@@ -71,7 +105,7 @@ export class UserProfileEditComponent implements OnInit {
               : this.availableInterests);
           },
           error: () => {
-            this.setAvailableInterests(MOCK_SKILLS.map(skill => this.normalizeInterestName(skill.name)));
+            this.setAvailableInterests(DEFAULT_INTERESTS);
           }
         });
       }
@@ -80,6 +114,7 @@ export class UserProfileEditComponent implements OnInit {
     this.volunteerService.getCurrentUser().subscribe(user => {
       this.currentUser = user;
       this.selectedSkills = this.uniqueLabels(this.getSelectedSkillNames(user));
+      this.availableSkills = this.mergeSkills(this.availableSkills, this.selectedSkills);
       this.selectedInterests = this.uniqueLabels(this.getSelectedInterestLabels(user));
       this.setAvailableInterests(this.availableInterests);
       this.profileForm.patchValue({
@@ -144,6 +179,7 @@ export class UserProfileEditComponent implements OnInit {
       skills: this.uniqueLabels(this.selectedSkills),
       skillProfiles: this.uniqueLabels(this.selectedSkills).map(skill => ({
         name: skill,
+        escoSkillUri: this.findSkillConceptUri(skill),
         proficiency: this.currentUser?.skillProfiles?.find(profile =>
           this.normalizeForComparison(profile.name) === this.normalizeForComparison(skill)
         )?.proficiency ?? 'INTERMEDIATE'
@@ -232,6 +268,30 @@ export class UserProfileEditComponent implements OnInit {
       this.normalizeForComparison(interest.label) === normalizedLabel ||
       this.normalizeForComparison(interest.code) === normalizedLabel
     );
+  }
+
+  private findSkillConceptUri(label: string): string | undefined {
+    const normalizedLabel = this.normalizeForComparison(label);
+    const catalogSkill = this.availableSkills.find(skill =>
+      this.normalizeForComparison(skill.name) === normalizedLabel ||
+      (skill.alternativeLabels ?? []).some(alias => this.normalizeForComparison(alias) === normalizedLabel)
+    );
+    const existingProfile = this.currentUser?.skillProfiles?.find(skill =>
+      this.normalizeForComparison(skill.name) === normalizedLabel
+    );
+    return catalogSkill?.conceptUri ?? existingProfile?.escoSkillUri;
+  }
+
+  private mergeSkills(catalog: Skill[], selectedLabels: string[]): Skill[] {
+    const skills = new Map<string, Skill>();
+    catalog.forEach(skill => skills.set(this.normalizeForComparison(skill.name), skill));
+    selectedLabels.forEach((label, index) => {
+      const key = this.normalizeForComparison(label);
+      if (!skills.has(key)) {
+        skills.set(key, { id: -(index + 1), name: label, category: 'Custom' });
+      }
+    });
+    return Array.from(skills.values());
   }
 
   private normalizeForComparison(value: string): string {

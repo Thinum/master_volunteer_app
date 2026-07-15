@@ -1,5 +1,6 @@
 package at.jku.volunteer_app.service;
 
+import at.jku.volunteer_app.contract.TagConceptDTO;
 import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.repository.OrganisationRepository;
 import at.jku.volunteer_app.repository.UserRepository;
@@ -17,6 +18,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
@@ -74,7 +76,43 @@ public class ActivityService {
                         .forEach(tags::add)
         );
 
+        if (organisationRepository != null) {
+            organisationRepository.findAll().forEach(organisation ->
+                    safeSet(organisation.getTags()).stream()
+                            .map(this::cleanTag)
+                            .filter(tag -> tag != null && !tag.isBlank())
+                            .forEach(tags::add)
+            );
+        }
+
         return new ArrayList<>(tags);
+    }
+
+    public List<TagConceptDTO> getActivityTagConceptCatalog() {
+        return getActivityTagCatalog().stream()
+                .map(this::toTagConcept)
+                .toList();
+    }
+
+    private TagConceptDTO toTagConcept(String tag) {
+        List<InterestCategory> categories = InterestCategory.fromFreeText(tag);
+        List<String> interestCodes = categories.stream()
+                .map(InterestCategory::getCode)
+                .distinct()
+                .toList();
+        List<String> relatedSkills = categories.stream()
+                .flatMap(category -> category.getRelatedSkillLabels().stream())
+                .distinct()
+                .toList();
+
+        return new TagConceptDTO(
+                "urn:volunteer-app:taxonomy:tags:" + slug(tag),
+                tag,
+                List.of(),
+                interestCodes,
+                relatedSkills,
+                "LOCAL"
+        );
     }
 
     public Activity getActivityById(int id) {
@@ -238,6 +276,10 @@ public class ActivityService {
         return values == null ? List.of() : values;
     }
 
+    private <T> Set<T> safeSet(Set<T> values) {
+        return values == null ? Set.of() : values;
+    }
+
     private String cleanTag(String value) {
         if (value == null || value.isBlank()) {
             return null;
@@ -255,7 +297,7 @@ public class ActivityService {
                 .forEach(tag -> {
                     String key = tag.replace('_', ' ')
                             .replace('-', ' ')
-                            .toLowerCase()
+                            .toLowerCase(Locale.ROOT)
                             .replaceAll("\\s+", " ");
                     if (seen.add(key)) {
                         cleaned.add(tag);
@@ -263,6 +305,13 @@ public class ActivityService {
                 });
 
         return cleaned;
+    }
+
+    private String slug(String value) {
+        return value.trim()
+                .toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("(^-+|-+$)", "");
     }
 
 //    public List<Activity> getCompletedActivitiesForOrganisation(

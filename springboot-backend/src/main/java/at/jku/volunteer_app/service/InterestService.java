@@ -21,8 +21,12 @@ public class InterestService {
                 .map(category -> new InterestCategoryDTO(
                         category.getCode(),
                         category.getLabel(),
+                        category.getConceptUri(),
+                        category.getConceptSchemeUri(),
                         category.getEscoConceptUri(),
-                        category.getAliases()
+                        category.getAliases(),
+                        category.getBroaderConceptUris(),
+                        category.getRelatedSkillLabels()
                 ))
                 .toList();
     }

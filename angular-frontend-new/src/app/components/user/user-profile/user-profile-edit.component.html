@@ -43,7 +43,7 @@
       <section class="choice-section">
         <h3>Skills</h3>
         <mat-chip-listbox multiple aria-label="Select skills">
-          @for (skill of availableSkills; track skill.id) {
+          @for (skill of availableSkills; track skill.name) {
           <mat-chip-option
             [selected]="isSkillSelected(skill.name)"
             (selectionChange)="setSkillSelection(skill.name, $event)">

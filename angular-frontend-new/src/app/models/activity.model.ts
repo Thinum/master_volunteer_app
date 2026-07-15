@@ -9,8 +9,21 @@ import type { ActivitySkillRequirement } from './skill.model';
 export interface InterestCategory {
   code: string;
   label: string;
+  conceptUri?: string;
+  conceptSchemeUri?: string;
   escoConceptUri?: string;
   aliases?: string[];
+  broaderConceptUris?: string[];
+  relatedSkillLabels?: string[];
+}
+
+export interface TagConcept {
+  conceptUri: string;
+  preferredLabel: string;
+  alternativeLabels?: string[];
+  relatedInterestCodes?: string[];
+  relatedSkillLabels?: string[];
+  source?: string;
 }
 
 export type RecommendationReasonType = 'INTEREST' | 'REQUIRED_SKILL' | 'PREFERRED_SKILL' | 'TAG' | 'CATEGORY';

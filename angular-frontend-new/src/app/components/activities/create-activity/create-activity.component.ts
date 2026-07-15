@@ -20,6 +20,8 @@ import { MOCK_SKILLS } from '../../../mock/mock-skills';
 import { ActivityService } from '../../../services/api/activity.service';
 import { InterestService } from '../../../services/api/interest.service';
 import { OrganisationService } from '../../../services/api/organisation.service';
+import { SkillCatalogService } from '../../../services/api/skill-catalog.service';
+import { ActivitySkillRequirement, Skill } from '../../../models/skill.model';
 
 const DEFAULT_ACTIVITY_TAGS = [
   'outdoor',
@@ -69,13 +71,14 @@ const DEFAULT_ACTIVITY_TAGS = [
 })
 export class CreateActivityComponent implements OnInit {
   activityForm: FormGroup;
-  availableSkills = MOCK_SKILLS;
+  availableSkills: Skill[] = [...MOCK_SKILLS];
   availableTags: string[] = [...DEFAULT_ACTIVITY_TAGS];
   availableCategories: InterestCategory[] = [];
   selectedCategoryCodes = new Set<string>();
   isSubmitting = false;
   administeredOrganisations: Organisation[] = [];
   activityId?: number;
+  private loadedSkillRequirements = new Map<string, ActivitySkillRequirement>();
 
 
   center = { lat: 48.3069, lng: 14.2858 };
@@ -97,6 +100,7 @@ export class CreateActivityComponent implements OnInit {
     private fb: FormBuilder,
     private activityService: ActivityService,
     private interestService: InterestService,
+    private skillCatalogService: SkillCatalogService,
     private route: ActivatedRoute,
     private organisationService: OrganisationService,
     private router: Router,
@@ -109,7 +113,8 @@ export class CreateActivityComponent implements OnInit {
       description: [''],
       duration: [''],
       capacity: [1, [Validators.required, Validators.min(1)]],
-      skills: this.fb.array([]),
+      requiredSkills: this.fb.array([]),
+      preferredSkills: this.fb.array([]),
       tags: this.fb.array([]),
       qualifications: this.fb.array([]),
       prerequisites: this.fb.array([]),
@@ -156,6 +161,23 @@ export class CreateActivityComponent implements OnInit {
       }
     });
 
+    this.skillCatalogService.getSkillCatalog().subscribe({
+      next: skills => {
+        if (skills.length) {
+          this.availableSkills = this.mergeSkills(skills, [
+            ...this.formArrayValues(this.requiredSkills),
+            ...this.formArrayValues(this.preferredSkills),
+          ]);
+        }
+      },
+      error: () => {
+        this.availableSkills = this.mergeSkills(MOCK_SKILLS, [
+          ...this.formArrayValues(this.requiredSkills),
+          ...this.formArrayValues(this.preferredSkills),
+        ]);
+      }
+    });
+
     this.interestService.getInterestCatalog().subscribe({
       next: categories => {
         this.availableCategories = categories || [];
@@ -166,29 +188,31 @@ export class CreateActivityComponent implements OnInit {
     });
   }
 
-  get skills(): FormArray { return this.activityForm.get('skills') as FormArray; }
+  get requiredSkills(): FormArray { return this.activityForm.get('requiredSkills') as FormArray; }
+  get preferredSkills(): FormArray { return this.activityForm.get('preferredSkills') as FormArray; }
   get tags(): FormArray { return this.activityForm.get('tags') as FormArray; }
   get qualifications(): FormArray { return this.activityForm.get('qualifications') as FormArray; }
   get prerequisites(): FormArray { return this.activityForm.get('prerequisites') as FormArray; }
 
-  addSkill(skillInput: HTMLInputElement): void {
+  addSkill(skillInput: HTMLInputElement, required: boolean): void {
     const value = skillInput.value.trim();
-    if (value && !this.hasFormArrayValue(this.skills, value)) {
-      this.skills.push(this.fb.control(value));
+    if (value) {
+      this.setSkillSelection(value, required, true);
+      this.availableSkills = this.mergeSkills(this.availableSkills, [value]);
     }
     skillInput.value = '';
   }
 
-  removeSkill(index: number): void {
-    this.skills.removeAt(index);
+  removeSkill(index: number, required: boolean): void {
+    this.skillArray(required).removeAt(index);
   }
 
-  toggleSkill(skill: string, event: MatChipSelectionChange): void {
-    this.setFormArraySelection(this.skills, skill, event.selected);
+  toggleSkill(skill: string, required: boolean, event: MatChipSelectionChange): void {
+    this.setSkillSelection(skill, required, event.selected);
   }
 
-  isSkillSelected(skill: string): boolean {
-    return this.hasFormArrayValue(this.skills, skill);
+  isSkillSelected(skill: string, required: boolean): boolean {
+    return this.hasFormArrayValue(this.skillArray(required), skill);
   }
 
   addTag(tagInput: HTMLInputElement): void {
@@ -265,7 +289,9 @@ export class CreateActivityComponent implements OnInit {
     this.isSubmitting = true;
     const raw = this.activityForm.getRawValue();
     const now = new Date();
-    const skills = this.formArrayValues(this.skills);
+    const requiredSkillNames = this.formArrayValues(this.requiredSkills);
+    const preferredSkillNames = this.formArrayValues(this.preferredSkills);
+    const skills = this.uniqueLabels([...requiredSkillNames, ...preferredSkillNames]);
 
     const activity: Activity = {
       id: 0,
@@ -282,12 +308,8 @@ export class CreateActivityComponent implements OnInit {
       location: raw.location || '',
       coordinates: this.markerPosition || undefined,
       skills,
-      requiredSkills: skills.map(skill => ({
-        name: skill,
-        minimumProficiency: 'BEGINNER',
-        required: true
-      })),
-      preferredSkills: [],
+      requiredSkills: requiredSkillNames.map(skill => this.toSkillRequirement(skill, true)),
+      preferredSkills: preferredSkillNames.map(skill => this.toSkillRequirement(skill, false)),
       categories: this.availableCategories.filter(category => this.selectedCategoryCodes.has(category.code)),
       qualifications: this.formArrayValues(this.qualifications),
       prerequisites: this.formArrayValues(this.prerequisites),
@@ -344,7 +366,24 @@ export class CreateActivityComponent implements OnInit {
           expiresAt: activity.expiresAt ? new Date(activity.expiresAt) : ''
         });
         this.markerPosition = activity.coordinates ?? null;
-        this.replaceFormArray(this.skills, activity.skills ?? []);
+        const requiredSkills = activity.requiredSkills?.length
+          ? activity.requiredSkills
+          : (activity.skills ?? []).map(name => ({
+              name,
+              minimumProficiency: 'BEGINNER' as const,
+              required: true,
+            }));
+        const preferredSkills = activity.preferredSkills ?? [];
+        this.loadedSkillRequirements = new Map(
+          [...requiredSkills, ...preferredSkills]
+            .map(requirement => [this.normalizeChip(requirement.name), requirement])
+        );
+        this.replaceFormArray(this.requiredSkills, requiredSkills.map(skill => skill.name));
+        this.replaceFormArray(this.preferredSkills, preferredSkills.map(skill => skill.name));
+        this.availableSkills = this.mergeSkills(
+          this.availableSkills,
+          [...requiredSkills, ...preferredSkills].map(skill => skill.name)
+        );
         this.replaceFormArray(this.tags, activity.tags ?? []);
         this.replaceFormArray(this.qualifications, activity.qualifications ?? []);
         this.replaceFormArray(this.prerequisites, activity.prerequisites ?? []);
@@ -370,6 +409,45 @@ export class CreateActivityComponent implements OnInit {
     if (!selected && existingIndex !== -1) {
       array.removeAt(existingIndex);
     }
+  }
+
+  private setSkillSelection(value: string, required: boolean, selected: boolean): void {
+    this.setFormArraySelection(this.skillArray(required), value, selected);
+    if (selected) {
+      this.setFormArraySelection(this.skillArray(!required), value, false);
+    }
+  }
+
+  private skillArray(required: boolean): FormArray {
+    return required ? this.requiredSkills : this.preferredSkills;
+  }
+
+  private toSkillRequirement(name: string, required: boolean): ActivitySkillRequirement {
+    const key = this.normalizeChip(name);
+    const loaded = this.loadedSkillRequirements.get(key);
+    const catalog = this.availableSkills.find(skill =>
+      this.normalizeChip(skill.name) === key ||
+      (skill.alternativeLabels ?? []).some(alias => this.normalizeChip(alias) === key)
+    );
+
+    return {
+      name,
+      escoSkillUri: catalog?.conceptUri ?? loaded?.escoSkillUri,
+      minimumProficiency: loaded?.minimumProficiency ?? 'BEGINNER',
+      required,
+    };
+  }
+
+  private mergeSkills(catalog: Skill[], selectedLabels: string[]): Skill[] {
+    const skills = new Map<string, Skill>();
+    catalog.forEach(skill => skills.set(this.normalizeChip(skill.name), skill));
+    selectedLabels.forEach((label, index) => {
+      const key = this.normalizeChip(label);
+      if (!skills.has(key)) {
+        skills.set(key, { id: -(index + 1), name: label, category: 'Custom' });
+      }
+    });
+    return Array.from(skills.values());
   }
 
   private hasFormArrayValue(array: FormArray, value: string): boolean {

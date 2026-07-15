@@ -31,7 +31,7 @@ public class CommunityGoalController {
 
     @GetMapping("/activity-interests")
     public List<String> getActivityInterestsByOrganisation(@RequestParam("organisationId") int organisationId) {
-        return communityGoalService.getActivityTagsForOrganisation(organisationId);
+        return communityGoalService.getActivityInterestsForOrganisation(organisationId);
     }
 
     @GetMapping("/{id}")

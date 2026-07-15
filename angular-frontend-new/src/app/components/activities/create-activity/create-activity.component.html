@@ -79,17 +79,34 @@
 
       <!-- Dynamic fields -->
       <section class="chips-section">
-        <h3>Skills</h3>
-        <mat-chip-listbox multiple aria-label="Select activity skills">
+        <h3>Required skills</h3>
+        <mat-chip-listbox multiple aria-label="Select required activity skills">
           <mat-chip-option
             *ngFor="let skill of availableSkills"
-            [selected]="isSkillSelected(skill.name)"
-            (selectionChange)="toggleSkill(skill.name, $event)">
+            [selected]="isSkillSelected(skill.name, true)"
+            (selectionChange)="toggleSkill(skill.name, true, $event)">
             {{ skill.name }}
           </mat-chip-option>
         </mat-chip-listbox>
         <div class="chip-input-row">
-          <input placeholder="Add skill..." #skillInput (keyup.enter)="addSkill(skillInput)" />
+          <input placeholder="Add required skill..." #requiredSkillInput
+                 (keyup.enter)="addSkill(requiredSkillInput, true)" />
+        </div>
+      </section>
+
+      <section class="chips-section">
+        <h3>Preferred skills</h3>
+        <mat-chip-listbox multiple aria-label="Select preferred activity skills">
+          <mat-chip-option
+            *ngFor="let skill of availableSkills"
+            [selected]="isSkillSelected(skill.name, false)"
+            (selectionChange)="toggleSkill(skill.name, false, $event)">
+            {{ skill.name }}
+          </mat-chip-option>
+        </mat-chip-listbox>
+        <div class="chip-input-row">
+          <input placeholder="Add preferred skill..." #preferredSkillInput
+                 (keyup.enter)="addSkill(preferredSkillInput, false)" />
         </div>
       </section>
 

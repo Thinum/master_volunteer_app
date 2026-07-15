@@ -3,6 +3,7 @@ package at.jku.volunteer_app.controller;
 import at.jku.volunteer_app.contract.ActivityDTO;
 import at.jku.volunteer_app.contract.ActivityRecommendationDTO;
 import at.jku.volunteer_app.contract.ContractMapper;
+import at.jku.volunteer_app.contract.TagConceptDTO;
 import at.jku.volunteer_app.model.UserModelDetails;
 import at.jku.volunteer_app.service.ActivityRecommendationService;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,11 @@ public class ActivityController {
     @GetMapping("/tags/catalog")
     public List<String> getActivityTagCatalog() {
         return activityService.getActivityTagCatalog();
+    }
+
+    @GetMapping("/tags/concepts")
+    public List<TagConceptDTO> getActivityTagConceptCatalog() {
+        return activityService.getActivityTagConceptCatalog();
     }
 
     @GetMapping("/{id}")

@@ -8,6 +8,7 @@ import at.jku.volunteer_app.model.Activity;
 import at.jku.volunteer_app.model.ActivityStatus;
 import at.jku.volunteer_app.model.CommunityGoal;
 import at.jku.volunteer_app.model.Interest;
+import at.jku.volunteer_app.model.InterestCategory;
 import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.repository.ActivityRepository;
 import at.jku.volunteer_app.repository.CommunityGoalRepository;
@@ -95,6 +96,15 @@ public class CommunityGoalService {
     }
 
     @Transactional(readOnly = true)
+    public List<String> getActivityInterestsForOrganisation(int organisationId) {
+        return activityRepository.findAllByOrganisations_Id(organisationId).stream()
+                .flatMap(activity -> getActivityInterestNames(activity).stream())
+                .distinct()
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public CommunityGoalDTO toGoalDTOWithProgress(CommunityGoal goal) {
         if (goal == null) {
             return null;
@@ -134,19 +144,34 @@ public class CommunityGoalService {
             return List.of();
         }
 
-        Set<String> selectedTags = getGoalActivityInterestNames(goal).stream()
-                .filter(tag -> tag != null && !tag.isBlank())
+        Set<String> selectedInterests = getGoalActivityInterestNames(goal).stream()
+                .filter(interest -> interest != null && !interest.isBlank())
                 .map(this::normalizeInterestName)
                 .collect(Collectors.toSet());
 
         return activityRepository.findAllByOrganisations_Id(goal.getOrganisation().getId()).stream()
                 .filter(activity -> activity.getStatus() == ActivityStatus.finished)
                 .filter(activity -> isWithinGoalDates(activity, goal))
-                .filter(activity -> selectedTags.isEmpty() || safeList(activity.getTags()).stream()
-                        .filter(Objects::nonNull)
+                .filter(activity -> selectedInterests.isEmpty() || getActivityInterestNames(activity).stream()
                         .map(this::normalizeInterestName)
-                        .anyMatch(selectedTags::contains))
+                        .anyMatch(selectedInterests::contains))
                 .toList();
+    }
+
+    private List<String> getActivityInterestNames(Activity activity) {
+        if (activity == null) {
+            return List.of();
+        }
+
+        Map<String, String> labels = new LinkedHashMap<>();
+        safeList(activity.getCategories()).stream()
+                .filter(Objects::nonNull)
+                .forEach(category -> labels.put(category.getCode(), category.getLabel()));
+        safeList(activity.getTags()).stream()
+                .filter(Objects::nonNull)
+                .flatMap(tag -> InterestCategory.fromFreeText(tag).stream())
+                .forEach(category -> labels.put(category.getCode(), category.getLabel()));
+        return new ArrayList<>(labels.values());
     }
 
     private List<String> getGoalActivityInterestNames(CommunityGoal goal) {
@@ -155,27 +180,16 @@ public class CommunityGoalService {
         }
 
         if (goal.getActivityInterests() != null && !goal.getActivityInterests().isEmpty()) {
-            return goal.getActivityInterests().stream()
+            return canonicalizeInterestNames(goal.getActivityInterests().stream()
                     .map(Interest::getName)
-                    .map(this::normalizeInterestName)
-                    .filter(Objects::nonNull)
-                    .distinct()
-                    .toList();
+                    .toList());
         }
 
-        return safeList(goal.getActivityTags()).stream()
-                .map(this::normalizeInterestName)
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
+        return canonicalizeInterestNames(goal.getActivityTags());
     }
 
     private List<Interest> resolveInterests(List<String> names) {
-        List<String> normalizedNames = safeList(names).stream()
-                .map(this::normalizeInterestName)
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
+        List<String> normalizedNames = canonicalizeInterestNames(names);
 
         if (normalizedNames.isEmpty()) {
             return List.of();
@@ -207,6 +221,25 @@ public class CommunityGoalService {
         });
 
         return resolvedInterests;
+    }
+
+    private List<String> canonicalizeInterestNames(List<String> values) {
+        Map<String, String> canonical = new LinkedHashMap<>();
+        safeList(values).stream()
+                .filter(Objects::nonNull)
+                .forEach(value -> {
+                    List<InterestCategory> categories = InterestCategory.fromFreeText(value);
+                    if (!categories.isEmpty()) {
+                        categories.forEach(category -> canonical.put(category.getCode(), category.getLabel()));
+                        return;
+                    }
+
+                    String fallback = normalizeInterestName(value);
+                    if (fallback != null) {
+                        canonical.put(fallback.toLowerCase(Locale.ROOT), fallback);
+                    }
+                });
+        return new ArrayList<>(canonical.values());
     }
 
     private String normalizeInterestName(String value) {

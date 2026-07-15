@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Activity, ActivityRecommendation } from '../../models/activity.model';
+import { Activity, ActivityRecommendation, TagConcept } from '../../models/activity.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -24,6 +24,10 @@ export class ActivityService {
 
   getActivityTagCatalog() {
     return this.http.get<string[]>(`${this.apiUrl}/tags/catalog`);
+  }
+
+  getActivityTagConceptCatalog() {
+    return this.http.get<TagConcept[]>(`${this.apiUrl}/tags/concepts`);
   }
 
 
