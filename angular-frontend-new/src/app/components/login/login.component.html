@@ -126,22 +126,26 @@
         </mat-form-field>
 
         <button
-          mat-mini-fab
-          color="primary"
-          (click)="showFilters = !showFilters"
-          class="filter-btn">
-          <mat-icon>filter_alt</mat-icon>
+          mat-stroked-button
+          type="button"
+          class="app-filter-button"
+          aria-controls="login-organisation-filters"
+          [attr.aria-expanded]="showFilters"
+          (click)="showFilters = !showFilters">
+          <mat-icon>tune</mat-icon>
+          <span>Filter</span>
+          <span *ngIf="activeFilterCount" class="app-filter-count">{{ activeFilterCount }}</span>
         </button>
       </div>
 
       <!-- Filter Panel -->
-      <div *ngIf="showFilters" class="filter-panel">
+      <div *ngIf="showFilters" id="login-organisation-filters" class="filter-panel">
         <h4>Categories</h4>
         <mat-chip-listbox>
           <mat-chip-option
             *ngFor="let cat of categories"
             [selected]="selectedCategory === cat"
-            (selectionChange)="toggleCategory(cat)">
+            (click)="toggleCategory(cat)">
             {{ cat }}
           </mat-chip-option>
         </mat-chip-listbox>
@@ -150,8 +154,8 @@
         <mat-chip-listbox multiple>
           <mat-chip-option
             *ngFor="let tag of tags"
-            [selected]="selectedTags.includes(tag)"
-            (selectionChange)="toggleTag(tag)">
+            [selected]="isTagSelected(tag)"
+            (click)="toggleTag(tag)">
             {{ tag }}
           </mat-chip-option>
         </mat-chip-listbox>

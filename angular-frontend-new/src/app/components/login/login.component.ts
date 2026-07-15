@@ -154,12 +154,20 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   toggleTag(tag: string): void {
-    if (this.selectedTags.some(selectedTag => this.normalizeTag(selectedTag) === this.normalizeTag(tag))) {
+    if (this.isTagSelected(tag)) {
       this.selectedTags = this.selectedTags.filter(t => this.normalizeTag(t) !== this.normalizeTag(tag));
     } else {
-      this.selectedTags.push(tag);
+      this.selectedTags = [...this.selectedTags, tag];
     }
     this.applyFilters();
+  }
+
+  protected isTagSelected(tag: string): boolean {
+    return this.selectedTags.some(selectedTag => this.normalizeTag(selectedTag) === this.normalizeTag(tag));
+  }
+
+  protected get activeFilterCount(): number {
+    return (this.selectedCategory ? 1 : 0) + this.selectedTags.length;
   }
 
   toggleCategory(category: OrganisationCategory): void {

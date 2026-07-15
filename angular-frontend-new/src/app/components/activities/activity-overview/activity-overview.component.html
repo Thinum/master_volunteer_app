@@ -29,24 +29,30 @@
       <button mat-icon-button matSuffix type="button" aria-label="Search"><mat-icon>search</mat-icon></button>
     </mat-form-field>
 
-    <button mat-stroked-button type="button" class="filter-button" (click)="showFilters = !showFilters">
+    <button
+      mat-stroked-button
+      type="button"
+      class="app-filter-button"
+      aria-controls="activity-filters"
+      [attr.aria-expanded]="showFilters"
+      (click)="showFilters = !showFilters">
       <mat-icon>tune</mat-icon>
-      Filter
-      <span *ngIf="activeFilterCount" class="filter-count">{{ activeFilterCount }}</span>
+      <span>Filter</span>
+      <span *ngIf="activeFilterCount" class="app-filter-count">{{ activeFilterCount }}</span>
     </button>
   </section>
 
-  <section *ngIf="showFilters" class="filter-panel">
+  <section *ngIf="showFilters" id="activity-filters" class="filter-panel">
     <div class="filter-header">
       <div><h3>Filter</h3><p>Narrow the list by activity status and tags.</p></div>
       <button mat-button type="button" *ngIf="selectedStatus || selectedTags.length || searchTerm" (click)="clearFilters()">Reset</button>
     </div>
     <h4>Status</h4>
     <mat-chip-listbox>
-      <mat-chip-option [selected]="selectedStatus === 'open'" (selectionChange)="toggleStatus('open')">Open</mat-chip-option>
-      <mat-chip-option [selected]="selectedStatus === 'upcoming'" (selectionChange)="toggleStatus('upcoming')">Upcoming</mat-chip-option>
-      <mat-chip-option [selected]="selectedStatus === 'finished'" (selectionChange)="toggleStatus('finished')">Finished</mat-chip-option>
-      <mat-chip-option [selected]="selectedStatus === 'canceled'" (selectionChange)="toggleStatus('canceled')">Canceled</mat-chip-option>
+      <mat-chip-option [selected]="selectedStatus === 'open'" (click)="toggleStatus('open')">Open</mat-chip-option>
+      <mat-chip-option [selected]="selectedStatus === 'upcoming'" (click)="toggleStatus('upcoming')">Upcoming</mat-chip-option>
+      <mat-chip-option [selected]="selectedStatus === 'finished'" (click)="toggleStatus('finished')">Finished</mat-chip-option>
+      <mat-chip-option [selected]="selectedStatus === 'canceled'" (click)="toggleStatus('canceled')">Canceled</mat-chip-option>
     </mat-chip-listbox>
     <ng-container *ngIf="tagOptions.length">
       <h4>Tags</h4>
@@ -54,7 +60,7 @@
         <mat-chip-option
           *ngFor="let tag of tagOptions"
           [selected]="isTagSelected(tag)"
-          (selectionChange)="toggleTag(tag)">
+          (click)="toggleTag(tag)">
           {{ tag }}
         </mat-chip-option>
       </mat-chip-listbox>

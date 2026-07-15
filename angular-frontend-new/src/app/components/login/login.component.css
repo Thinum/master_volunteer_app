@@ -523,10 +523,6 @@ mat-icon {
   width: 100%;
 }
 
-.filter-btn {
-  transform: translateY(-10px);
-}
-
 .filter-panel {
   background-color: var(--surface-container-lowest);
   border: 1px solid rgba(175, 178, 187, 0.1);

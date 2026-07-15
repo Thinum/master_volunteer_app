@@ -86,6 +86,35 @@ button, input, textarea, select {
   font: inherit;
 }
 
+/* Shared filter trigger used by all expandable list filters. */
+.app-filter-button {
+  height: 56px;
+  min-width: 112px;
+  flex: 0 0 auto;
+  border-radius: var(--radius-sm) !important;
+  white-space: nowrap;
+}
+
+.app-filter-button .mat-icon {
+  margin-right: var(--spacing-1);
+}
+
+.app-filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  margin-left: var(--spacing-1);
+  padding: 0 0.3rem;
+  border-radius: var(--radius-full);
+  background-color: var(--primary);
+  color: var(--on-primary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
 /* Routed Angular components should always be allowed to shrink with the viewport. */
 router-outlet + *, app-root, app-root > *, mat-card, mat-form-field {
   min-width: 0;

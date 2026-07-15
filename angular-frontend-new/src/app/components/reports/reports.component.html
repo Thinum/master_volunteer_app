@@ -23,8 +23,13 @@
   </div>
 
   @if (selectedCategory) {
-    <button type="button" mat-stroked-button class="category-filter" (click)="clearCategoryFilter()">
-      <mat-icon>filter_alt_off</mat-icon>
+    <button
+      type="button"
+      mat-stroked-button
+      class="category-filter"
+      aria-label="Clear category filter"
+      (click)="clearCategoryFilter()">
+      <mat-icon>close</mat-icon>
       {{ selectedCategory }}
     </button>
   }

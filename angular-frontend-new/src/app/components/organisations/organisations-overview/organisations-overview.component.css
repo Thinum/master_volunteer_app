@@ -91,32 +91,6 @@
   display: none;
 }
 
-.filter-button {
-  height: 56px;
-  min-width: 104px;
-  border-radius: 0.5rem;
-  align-self: center;
-  white-space: nowrap;
-}
-
-.filter-button mat-icon {
-  margin-right: 0.35rem;
-}
-
-.filter-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.25rem;
-  height: 1.25rem;
-  margin-left: 0.35rem;
-  border-radius: 999px;
-  background-color: #46608a;
-  color: #ffffff;
-  font-size: 0.72rem;
-  font-weight: 800;
-}
-
 .filter-panel {
   display: flex;
   flex-direction: column;
@@ -197,7 +171,7 @@
     flex-direction: column;
   }
 
-  .filter-button {
+  .app-filter-button {
     width: 100%;
   }
 }

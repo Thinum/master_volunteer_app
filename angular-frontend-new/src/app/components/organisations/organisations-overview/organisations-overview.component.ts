@@ -144,7 +144,7 @@ export class OrganisationsOverviewComponent implements OnInit {
     if (this.isTagSelected(tag)) {
       this.selectedTags = this.selectedTags.filter(t => this.normalizeTag(t) !== this.normalizeTag(tag));
     } else {
-      this.selectedTags.push(tag);
+      this.selectedTags = [...this.selectedTags, tag];
     }
     this.applyFilters();
   }
@@ -154,8 +154,7 @@ export class OrganisationsOverviewComponent implements OnInit {
   }
 
   toggleCategory(category: OrganisationCategory): void {
-    this.selectedCategory =
-      this.selectedCategory === category ? null : category;
+    this.selectedCategory = this.selectedCategory === category ? null : category;
     this.applyFilters();
   }
 
