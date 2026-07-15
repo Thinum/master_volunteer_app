@@ -2,7 +2,7 @@
   <header>
     <div>
       <h1>Organization admin assignments</h1>
-      <p>Choose any registered user to manage each organization.</p>
+      <p>Choose organization members to manage each organization.</p>
     </div>
     <mat-icon>admin_panel_settings</mat-icon>
   </header>
@@ -21,8 +21,11 @@
 
       <mat-card-content>
         <div class="admin-list">
+          <p *ngIf="assignment.availableAdmins.length === 0">
+            This organization has no members available for assignment.
+          </p>
           <mat-checkbox
-            *ngFor="let admin of availableAdmins"
+            *ngFor="let admin of assignment.availableAdmins"
             [checked]="isSelected(assignment.organisationId, admin.id)"
             (change)="toggleAdmin(assignment.organisationId, admin.id, $event)">
             <span>{{ adminLabel(admin) }}</span>

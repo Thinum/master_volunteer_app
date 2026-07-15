@@ -2,6 +2,7 @@ package at.jku.volunteer_app.repository;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import at.jku.volunteer_app.model.Organisation;
 
 import java.util.List;
@@ -12,6 +13,10 @@ public interface OrganisationRepository extends JpaRepository<Organisation, Inte
     @Override
     @EntityGraph(attributePaths = {"tags", "orgContacts", "orgAdmins"})
     List<Organisation> findAll();
+
+    @EntityGraph(attributePaths = {"orgMembers", "orgMembers.user", "orgAdmins"})
+    @Query("select distinct organisation from Organisation organisation")
+    List<Organisation> findAllWithAdminAssignments();
 
     @EntityGraph(attributePaths = {"tags", "orgContacts", "orgMembers", "orgMembers.user", "orgAdmins"})
     Optional<Organisation> findById(int id);

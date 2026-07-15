@@ -5,6 +5,7 @@ import java.util.List;
 public record OrganisationAdminAssignmentDTO(
         int organisationId,
         String organisationName,
-        List<UserDTO> admins
+        List<UserDTO> admins,
+        List<UserDTO> availableAdmins
 ) {
 }

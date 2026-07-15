@@ -4,4 +4,5 @@ export interface OrganisationAdminAssignment {
   organisationId: number;
   organisationName: string;
   admins: User[];
+  availableAdmins: User[];
 }

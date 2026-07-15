@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class OrganisationAdminService {
@@ -39,12 +40,7 @@ public class OrganisationAdminService {
 
     public List<Organisation> getAllOrganisations(int userId) {
         requirePlatformAdmin(userId);
-        return organisationRepository.findAll();
-    }
-
-    public List<User> getAllUsers(int userId) {
-        requirePlatformAdmin(userId);
-        return userRepository.findAll();
+        return organisationRepository.findAllWithAdminAssignments();
     }
 
     @Transactional
@@ -53,8 +49,23 @@ public class OrganisationAdminService {
         Organisation organisation = organisationRepository.findById(organisationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organisation not found"));
 
-        Set<Integer> adminIds = requestedAdminIds == null ? new HashSet<>() : new HashSet<>(requestedAdminIds);
+        Set<Integer> requestedIds = requestedAdminIds == null ? new HashSet<>() : new HashSet<>(requestedAdminIds);
         List<Org_Admin> platformAdmins = adminRepository.findAllByPlatformAdminTrue();
+        Set<Integer> platformAdminIds = platformAdmins.stream()
+                .map(Org_Admin::getId)
+                .collect(Collectors.toSet());
+        Set<Integer> memberIds = organisation.getOrgMembers().stream()
+                .map(member -> member.getUser().getId())
+                .collect(Collectors.toSet());
+
+        if (requestedIds.stream().anyMatch(id -> !memberIds.contains(id) && !platformAdminIds.contains(id))) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Organisation admins must be members of the organisation"
+            );
+        }
+
+        Set<Integer> adminIds = new HashSet<>(requestedIds);
         platformAdmins.forEach(admin -> adminIds.add(admin.getId()));
 
         List<User> selectedUsers = userRepository.findAllById(adminIds);

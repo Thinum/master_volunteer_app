@@ -5,7 +5,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { forkJoin } from 'rxjs';
 import { OrganisationAdminAssignment } from '../../../models/organisation-admin-assignment.model';
 import { User } from '../../../models/user.model';
 import { OrganisationAdminAssignmentService } from '../../../services/api/organisation-admin-assignment.service';
@@ -26,7 +25,6 @@ import { OrganisationAdminAssignmentService } from '../../../services/api/organi
 })
 export class OrganisationAdminAssignmentsComponent implements OnInit {
   assignments: OrganisationAdminAssignment[] = [];
-  availableAdmins: User[] = [];
   selectedAdminIds = new Map<number, Set<number>>();
   savingOrganisationId?: number;
   loading = true;
@@ -37,13 +35,9 @@ export class OrganisationAdminAssignmentsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    forkJoin({
-      assignments: this.assignmentService.getAssignments(),
-      admins: this.assignmentService.getAvailableAdmins()
-    }).subscribe({
-      next: ({ assignments, admins }) => {
+    this.assignmentService.getAssignments().subscribe({
+      next: assignments => {
         this.assignments = assignments;
-        this.availableAdmins = admins;
         assignments.forEach(assignment => this.setSelection(assignment));
         this.loading = false;
       },
@@ -92,9 +86,12 @@ export class OrganisationAdminAssignmentsComponent implements OnInit {
   }
 
   private setSelection(assignment: OrganisationAdminAssignment): void {
+    const availableAdminIds = new Set(assignment.availableAdmins.map(admin => admin.id));
     this.selectedAdminIds.set(
       assignment.organisationId,
-      new Set(assignment.admins.map(admin => admin.id))
+      new Set(assignment.admins
+        .filter(admin => availableAdminIds.has(admin.id))
+        .map(admin => admin.id))
     );
   }
 }

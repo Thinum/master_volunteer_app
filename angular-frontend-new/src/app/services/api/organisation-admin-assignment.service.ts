@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { OrganisationAdminAssignment } from '../../models/organisation-admin-assignment.model';
-import { User } from '../../models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrganisationAdminAssignmentService {
@@ -17,10 +16,6 @@ export class OrganisationAdminAssignmentService {
 
   getAssignments(): Observable<OrganisationAdminAssignment[]> {
     return this.http.get<OrganisationAdminAssignment[]>(this.apiUrl);
-  }
-
-  getAvailableAdmins(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/admins`);
   }
 
   updateAssignments(organisationId: number, adminIds: number[]): Observable<OrganisationAdminAssignment> {

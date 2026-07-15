@@ -3,8 +3,8 @@ package at.jku.volunteer_app.controller;
 import at.jku.volunteer_app.contract.ContractMapper;
 import at.jku.volunteer_app.contract.OrganisationAdminAssignmentDTO;
 import at.jku.volunteer_app.contract.UpdateOrganisationAdminsRequest;
-import at.jku.volunteer_app.contract.UserDTO;
 import at.jku.volunteer_app.model.Organisation;
+import at.jku.volunteer_app.model.OrganisationMember;
 import at.jku.volunteer_app.model.UserModelDetails;
 import at.jku.volunteer_app.service.OrganisationAdminService;
 import org.springframework.http.HttpStatus;
@@ -37,13 +37,6 @@ public class OrganisationAdminAssignmentController {
                 .toList();
     }
 
-    @GetMapping("/admins")
-    public List<UserDTO> getAvailableAdmins(@AuthenticationPrincipal UserModelDetails userDetails) {
-        return organisationAdminService.getAllUsers(requireUser(userDetails)).stream()
-                .map(ContractMapper::toUserDTO)
-                .toList();
-    }
-
     @PutMapping("/{organisationId}")
     public OrganisationAdminAssignmentDTO updateAssignments(
             @PathVariable int organisationId,
@@ -58,7 +51,11 @@ public class OrganisationAdminAssignmentController {
         return new OrganisationAdminAssignmentDTO(
                 organisation.getId(),
                 organisation.getOrgName(),
-                organisation.getOrgAdmins().stream().map(ContractMapper::toUserDTO).toList()
+                organisation.getOrgAdmins().stream().map(ContractMapper::toUserDTO).toList(),
+                organisation.getOrgMembers().stream()
+                        .map(OrganisationMember::getUser)
+                        .map(ContractMapper::toUserDTO)
+                        .toList()
         );
     }
 
