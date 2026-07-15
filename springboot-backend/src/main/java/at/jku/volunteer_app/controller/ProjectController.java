@@ -2,6 +2,8 @@ package at.jku.volunteer_app.controller;
 
 import at.jku.volunteer_app.contract.LocationDTO;
 import at.jku.volunteer_app.contract.ProjectDTO;
+import at.jku.volunteer_app.contract.ActivityDTO;
+import at.jku.volunteer_app.contract.ContractMapper;
 import at.jku.volunteer_app.model.Project;
 import at.jku.volunteer_app.model.UserModelDetails;
 import at.jku.volunteer_app.service.ProjectService;
@@ -29,6 +31,11 @@ public class ProjectController {
     @GetMapping("/{id}")
     public ProjectDTO getProject(@PathVariable int id) {
         return toDTO(projectService.getProject(id));
+    }
+
+    @GetMapping("/{id}/activities")
+    public List<ActivityDTO> getProjectActivities(@PathVariable int id) {
+        return ContractMapper.toActivityDTOList(projectService.getProjectActivities(id));
     }
 
     @PostMapping
@@ -67,8 +74,12 @@ public class ProjectController {
                 project.getLocation() == null
                         ? null
                         : new LocationDTO(project.getLocation().getLat(), project.getLocation().getLon()),
+                project.getStartDate(),
+                project.getEndDate(),
                 project.isClosed(),
                 project.getOrganisation().getId(),
+                project.getOrganisation().getOrgName(),
+                Math.toIntExact(projectService.getActivityCount(project.getId())),
                 project.getCreatedAt(),
                 project.getUpdatedAt()
         );

@@ -22,6 +22,8 @@ import { InterestService } from '../../../services/api/interest.service';
 import { OrganisationService } from '../../../services/api/organisation.service';
 import { SkillCatalogService } from '../../../services/api/skill-catalog.service';
 import { ActivitySkillRequirement, Skill } from '../../../models/skill.model';
+import { Project } from '../../../models/project.model';
+import { ProjectService } from '../../../services/api/project.service';
 
 const DEFAULT_ACTIVITY_TAGS = [
   'outdoor',
@@ -77,7 +79,9 @@ export class CreateActivityComponent implements OnInit {
   selectedCategoryCodes = new Set<string>();
   isSubmitting = false;
   administeredOrganisations: Organisation[] = [];
+  availableProjects: Project[] = [];
   activityId?: number;
+  private requestedProjectId = 0;
   private loadedSkillRequirements = new Map<string, ActivitySkillRequirement>();
 
 
@@ -103,6 +107,7 @@ export class CreateActivityComponent implements OnInit {
     private skillCatalogService: SkillCatalogService,
     private route: ActivatedRoute,
     private organisationService: OrganisationService,
+    private projectService: ProjectService,
     private router: Router,
     private snackBar: MatSnackBar
   ) {
@@ -119,6 +124,7 @@ export class CreateActivityComponent implements OnInit {
       qualifications: this.fb.array([]),
       prerequisites: this.fb.array([]),
       organization: [0, Validators.min(1)],
+      project: [0],
       expiresAt: [''],
       friends: this.fb.array([]),
       contacts: this.fb.array([]),
@@ -130,6 +136,7 @@ export class CreateActivityComponent implements OnInit {
     const routeId = Number(this.route.snapshot.paramMap.get('id'));
     this.activityId = routeId > 0 ? routeId : undefined;
     const requestedOrganisationId = Number(this.route.snapshot.queryParamMap.get('organisationId'));
+    this.requestedProjectId = Number(this.route.snapshot.queryParamMap.get('projectId'));
 
     this.organisationService.getAdministeredOrganisations().subscribe({
       next: organisations => {
@@ -149,6 +156,7 @@ export class CreateActivityComponent implements OnInit {
           ? requestedOrganisationId
           : this.administeredOrganisations[0].id;
         this.activityForm.patchValue({ organization: selectedId });
+        this.loadProjects(selectedId, this.requestedProjectId);
       },
       error: () => this.router.navigate(['/activities'])
     });
@@ -306,7 +314,7 @@ export class CreateActivityComponent implements OnInit {
       title: raw.title,
       body: raw.description || raw.title,
       description: raw.description || raw.title,
-      projectId: 0,
+      projectId: Number(raw.project) || 0,
       organisations: this.administeredOrganisations.filter(org => org.id === Number(raw.organization)),
       appointments: [],
       participants: [],
@@ -339,7 +347,10 @@ export class CreateActivityComponent implements OnInit {
     request.subscribe({
       next: createdActivity => {
         this.snackBar.open(`Activity ${this.activityId ? 'updated' : 'created'}`, 'Close', { duration: 2500 });
-        this.router.navigate(['/activities', createdActivity.id]);
+        const projectId = Number(raw.project) || 0;
+        this.router.navigate(!this.activityId && projectId
+          ? ['/projects', projectId]
+          : ['/activities', createdActivity.id]);
       },
       error: err => {
         console.error(err);
@@ -357,8 +368,15 @@ export class CreateActivityComponent implements OnInit {
     return !!this.activityId;
   }
 
+  onOrganisationChange(organisationId: number): void {
+    this.activityForm.patchValue({ project: 0 });
+    this.loadProjects(Number(organisationId));
+  }
+
   cancel(): void {
-    this.router.navigate(this.activityId ? ['/activities', this.activityId] : ['/activities']);
+    this.router.navigate(this.activityId
+      ? ['/activities', this.activityId]
+      : this.requestedProjectId ? ['/projects', this.requestedProjectId] : ['/activities']);
   }
 
   private loadActivity(id: number): void {
@@ -379,8 +397,10 @@ export class CreateActivityComponent implements OnInit {
           duration: activity.duration ?? '',
           capacity: activity.capacity ?? 1,
           organization: organisationId,
+          project: activity.projectId ?? 0,
           expiresAt: activity.expiresAt ? new Date(activity.expiresAt) : ''
         });
+        this.loadProjects(organisationId, activity.projectId ?? 0);
         this.markerPosition = activity.coordinates ?? null;
         const requiredSkills = activity.requiredSkills?.length
           ? activity.requiredSkills
@@ -406,6 +426,27 @@ export class CreateActivityComponent implements OnInit {
         this.selectedCategoryCodes = new Set((activity.categories ?? []).map(category => category.code));
       },
       error: () => this.router.navigate(['/activities'])
+    });
+  }
+
+  private loadProjects(organisationId: number, selectedProjectId = 0): void {
+    if (!organisationId) {
+      this.availableProjects = [];
+      this.activityForm.patchValue({ project: 0 });
+      return;
+    }
+    this.projectService.getAllProjects(organisationId).subscribe({
+      next: projects => {
+        this.availableProjects = (projects ?? []).filter(project => !project.closed);
+        const selected = this.availableProjects.some(project => project.id === selectedProjectId)
+          ? selectedProjectId
+          : 0;
+        this.activityForm.patchValue({ project: selected });
+      },
+      error: () => {
+        this.availableProjects = [];
+        this.activityForm.patchValue({ project: 0 });
+      }
     });
   }
 

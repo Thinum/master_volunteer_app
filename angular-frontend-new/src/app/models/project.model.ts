@@ -6,8 +6,12 @@ export interface Project {
     lat: number;
     lon: number;
   };
+  startDate?: string;
+  endDate?: string;
   closed: boolean;
   organisationId: number;
+  organisationName?: string;
+  activityCount?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }

@@ -46,12 +46,24 @@
 
         <mat-form-field appearance="outline">
           <mat-label>Organization</mat-label>
-          <mat-select formControlName="organization" required>
+          <mat-select formControlName="organization" required (selectionChange)="onOrganisationChange($event.value)">
             <mat-option *ngFor="let organisation of administeredOrganisations" [value]="organisation.id">
               {{ organisation.orgName }}
             </mat-option>
           </mat-select>
           <mat-icon matSuffix>apartment</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Project (optional)</mat-label>
+          <mat-select formControlName="project">
+            <mat-option [value]="0">No project · organization activity</mat-option>
+            <mat-option *ngFor="let project of availableProjects" [value]="project.id">
+              {{ project.title }} · {{ project.startDate | date:'mediumDate' }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>workspaces</mat-icon>
+          <mat-hint>Group this activity under a focused project.</mat-hint>
         </mat-form-field>
 
         <mat-form-field appearance="outline">

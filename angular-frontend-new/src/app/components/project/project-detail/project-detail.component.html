@@ -1,26 +1,110 @@
-<mat-card class="detail-card">
-  <div class="detail-heading">
-    <div>
-      <h1 class="title">{{ detailedProject?.title }}</h1>
-      <span class="status">{{ detailedProject?.closed ? 'Closed' : 'Open' }}</span>
-    </div>
-    <div class="admin-actions" *ngIf="canManage">
-      <button mat-stroked-button class="management-button" type="button" (click)="editProject()">
-        <mat-icon>edit</mat-icon> Edit
-      </button>
-      <button mat-stroked-button class="management-button management-button--danger" type="button" (click)="deleteProject()">
-        <mat-icon>delete</mat-icon> Delete
-      </button>
-    </div>
-  </div>
+<main class="project-page" *ngIf="detailedProject as project">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a [routerLink]="['/organisations', project.organisationId]">
+      <mat-icon>arrow_back</mat-icon>
+      {{ project.organisationName || 'Organization' }}
+    </a>
+  </nav>
 
-  <div class="info-row">
-    <mat-icon>place</mat-icon>
-    <span>{{ locationLabel }}</span>
-  </div>
+  <header class="project-hero">
+    <div class="hero-main">
+      <div class="hero-topline">
+        <span class="status-pill" [class.status-pill--closed]="project.closed">
+          <span></span>{{ statusLabel }}
+        </span>
+        <span class="project-type"><mat-icon>workspaces</mat-icon> Focused project</span>
+      </div>
+      <h1>{{ project.title }}</h1>
+      <p>{{ project.description || 'No project brief has been added yet.' }}</p>
+      <div class="hero-meta">
+        <span *ngIf="project.startDate && project.endDate"><mat-icon>date_range</mat-icon>{{ project.startDate | date:'mediumDate' }} — {{ project.endDate | date:'mediumDate' }}</span>
+        <span><mat-icon>location_on</mat-icon>{{ locationLabel }}</span>
+      </div>
+    </div>
 
-  <div class="section">
-    <h3><mat-icon>description</mat-icon> Description</h3>
-    <p>{{ detailedProject?.description || 'No description provided.' }}</p>
-  </div>
-</mat-card>
+    <div class="hero-actions" *ngIf="canManage">
+      <button mat-flat-button type="button" class="add-activity" (click)="createActivity()" [disabled]="project.closed">
+        <mat-icon>add</mat-icon>Add activity
+      </button>
+      <button mat-icon-button type="button" class="icon-action" aria-label="Edit project" (click)="editProject()">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button type="button" class="icon-action icon-action--danger" aria-label="Delete project" (click)="deleteProject()">
+        <mat-icon>delete_outline</mat-icon>
+      </button>
+    </div>
+  </header>
+
+  <section class="summary-grid">
+    <article class="summary-card progress-card" *ngIf="project.startDate && project.endDate">
+      <div class="card-label"><mat-icon>timeline</mat-icon>Project timeframe</div>
+      <div class="progress-value">{{ timeframeProgress | number:'1.0-0' }}<small>%</small></div>
+      <div class="progress-track"><span [style.width.%]="timeframeProgress"></span></div>
+      <div class="progress-dates">
+        <span>{{ project.startDate | date:'MMM d' }}</span>
+        <span>{{ project.endDate | date:'MMM d, y' }}</span>
+      </div>
+    </article>
+
+    <article class="summary-card metric-card">
+      <span class="metric-icon"><mat-icon>event_note</mat-icon></span>
+      <div><strong>{{ activities.length }}</strong><span>Total activities</span></div>
+    </article>
+
+    <article class="summary-card metric-card">
+      <span class="metric-icon metric-icon--done"><mat-icon>task_alt</mat-icon></span>
+      <div><strong>{{ completedActivities }}</strong><span>Completed</span></div>
+    </article>
+  </section>
+
+  <section class="activities-section">
+    <div class="section-title">
+      <div>
+        <span class="eyebrow">Project work</span>
+        <h2>Activities</h2>
+        <p>The concrete volunteer actions that move this project forward.</p>
+      </div>
+      <button *ngIf="canManage" mat-stroked-button type="button" (click)="createActivity()" [disabled]="project.closed">
+        <mat-icon>add</mat-icon>New activity
+      </button>
+    </div>
+
+    <div class="activity-list" *ngIf="activities.length; else noActivities">
+      <a class="activity-card" *ngFor="let activity of activities" [routerLink]="['/activities', activity.id]">
+        <div class="activity-date">
+          <span>{{ activity.date | date:'d' }}</span>
+          <small>{{ activity.date | date:'MMM' }}</small>
+        </div>
+        <div class="activity-copy">
+          <div class="activity-heading">
+            <h3>{{ activity.title }}</h3>
+            <span class="activity-status">{{ activity.status || 'open' }}</span>
+          </div>
+          <p>{{ activity.description || activity.body }}</p>
+          <div class="activity-meta">
+            <span><mat-icon>place</mat-icon>{{ activity.location || 'Location to be confirmed' }}</span>
+            <span *ngIf="activity.capacity"><mat-icon>group</mat-icon>{{ getSpotsTaken(activity) }} / {{ activity.capacity }}</span>
+            <span *ngIf="activity.duration"><mat-icon>schedule</mat-icon>{{ activity.duration }}</span>
+          </div>
+        </div>
+        <mat-icon class="card-arrow">arrow_forward</mat-icon>
+      </a>
+    </div>
+
+    <ng-template #noActivities>
+      <div class="empty-state">
+        <span><mat-icon>event_busy</mat-icon></span>
+        <h3>No activities yet</h3>
+        <p>Break this project into clear, schedulable opportunities for volunteers.</p>
+        <button *ngIf="canManage" mat-flat-button type="button" (click)="createActivity()" [disabled]="project.closed">
+          <mat-icon>add_circle</mat-icon>Create the first activity
+        </button>
+      </div>
+    </ng-template>
+  </section>
+</main>
+
+<div class="loading-state" *ngIf="isLoading">
+  <mat-icon>workspaces</mat-icon>
+  <span>Loading project…</span>
+</div>

@@ -115,6 +115,16 @@
                 <span class="status-pill" [class.closed]="project.closed">{{ getProjectStatus(project) }}</span>
               </div>
               <p>{{ project.description }}</p>
+              <div class="activity-meta project-meta">
+                <span *ngIf="project.startDate && project.endDate">
+                  <mat-icon>date_range</mat-icon>
+                  {{ project.startDate | date:'MMM d' }} – {{ project.endDate | date:'MMM d, y' }}
+                </span>
+                <span>
+                  <mat-icon>event_note</mat-icon>
+                  {{ project.activityCount || 0 }} activities
+                </span>
+              </div>
             </div>
             <mat-icon class="item-arrow">chevron_right</mat-icon>
           </a>

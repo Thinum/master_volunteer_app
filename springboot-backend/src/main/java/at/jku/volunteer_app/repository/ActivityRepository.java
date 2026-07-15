@@ -14,7 +14,8 @@ public interface ActivityRepository extends JpaRepository<Activity, Integer> {
 
     @EntityGraph(attributePaths = {"participants"})
     Optional<Activity> findById(int id);
-    Optional<Activity> findByProjectId(int projectId);
+    List<Activity> findAllByProjectIdOrderByDateAsc(int projectId);
+    long countByProjectId(int projectId);
     List<Activity> findAllByParticipantsContains(at.jku.volunteer_app.model.User user);
     List<Activity> findAllByOrganisations_Id(int organisationId);
 }

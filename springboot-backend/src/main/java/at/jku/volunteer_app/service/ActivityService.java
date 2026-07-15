@@ -3,6 +3,7 @@ package at.jku.volunteer_app.service;
 import at.jku.volunteer_app.contract.TagConceptDTO;
 import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.repository.OrganisationRepository;
+import at.jku.volunteer_app.repository.ProjectRepository;
 import at.jku.volunteer_app.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -30,14 +31,17 @@ public class ActivityService {
     private final UserRepository userRepository;
     private final OrganisationRepository organisationRepository;
     private final OrganisationAdminService organisationAdminService;
+    private final ProjectRepository projectRepository;
 
     public ActivityService(ActivityRepository activityRepository, UserRepository userRepository,
                            OrganisationRepository organisationRepository,
-                           OrganisationAdminService organisationAdminService) {
+                           OrganisationAdminService organisationAdminService,
+                           ProjectRepository projectRepository) {
         this.activityRepository = activityRepository;
         this.userRepository = userRepository;
         this.organisationRepository = organisationRepository;
         this.organisationAdminService = organisationAdminService;
+        this.projectRepository = projectRepository;
     }
 
     public List<Activity> getAllActivities(){
@@ -142,6 +146,7 @@ public class ActivityService {
 
         activity.setId(0);
         activity.setOrganisations(organisations);
+        resolveProject(activity.getProjectId(), organisations, activity.getDate());
         activity.setCreatedBy(creator);
         activity.setParticipants(new ArrayList<>());
         activity.setAppointments(new ArrayList<>());
@@ -158,6 +163,8 @@ public class ActivityService {
 
         applyChanges(existing, changes);
         existing.setOrganisations(organisations);
+        resolveProject(changes.getProjectId(), organisations, changes.getDate());
+        existing.setProjectId(changes.getProjectId());
         existing.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
         normalizeActivityProfile(existing);
         syncSpotsTaken(existing);
@@ -216,7 +223,6 @@ public class ActivityService {
         existing.setTitle(changes.getTitle());
         existing.setBody(changes.getBody());
         existing.setDescription(changes.getDescription());
-        existing.setProjectId(changes.getProjectId());
         existing.setDate(changes.getDate());
         existing.setStartTime(changes.getStartTime());
         existing.setEndTime(changes.getEndTime());
@@ -265,8 +271,33 @@ public class ActivityService {
         }
     }
 
-    public Activity getActivityByProjectId(int projectId) {
-        return activityRepository.findByProjectId(projectId).get();
+    public List<Activity> getActivitiesByProjectId(int projectId) {
+        return activityRepository.findAllByProjectIdOrderByDateAsc(projectId);
+    }
+
+    private void resolveProject(int projectId, List<Organisation> organisations, Timestamp activityDate) {
+        if (projectId <= 0) {
+            return;
+        }
+
+        at.jku.volunteer_app.model.Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
+        boolean belongsToSelectedOrganisation = safeList(organisations).stream()
+                .anyMatch(organisation -> organisation != null
+                        && organisation.getId() == project.getOrganisation().getId());
+        if (!belongsToSelectedOrganisation) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Project must belong to one of the activity organisations");
+        }
+
+        if (activityDate != null && project.getStartDate() != null && project.getEndDate() != null) {
+            java.time.LocalDate scheduledDate = activityDate.toLocalDateTime().toLocalDate();
+            if (scheduledDate.isBefore(project.getStartDate()) || scheduledDate.isAfter(project.getEndDate())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Activity date must be within the project timeframe");
+            }
+        }
+
     }
 
     public List<Activity> getActivitiesForUser(at.jku.volunteer_app.model.User user) {

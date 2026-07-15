@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -19,11 +20,15 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 120)
     private String title;
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    private LocalDate startDate;
+
+    private LocalDate endDate;
 
     @Embedded
     private Location location;

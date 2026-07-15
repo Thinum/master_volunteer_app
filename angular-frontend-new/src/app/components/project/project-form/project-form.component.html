@@ -1,50 +1,177 @@
-<mat-card class="form-card">
-  <mat-card-header>
-    <mat-card-title>{{ isEditing ? 'Edit project' : 'Create project' }}</mat-card-title>
-  </mat-card-header>
+<main class="project-page">
+  <header class="page-hero">
+    <button class="back-button" mat-button type="button" (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon>
+      Back
+    </button>
+    <div class="hero-copy">
+      <span class="eyebrow">{{ isEditing ? 'Project settings' : 'New focused initiative' }}</span>
+      <h1>{{ isEditing ? 'Shape your project' : 'Create a project' }}</h1>
+      <p>Turn an important, time-bound goal into a clear home for related volunteer activities.</p>
+    </div>
+    <div class="hero-mark" aria-hidden="true">
+      <mat-icon>rocket_launch</mat-icon>
+    </div>
+  </header>
 
-  <mat-card-content>
-    <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
-      <mat-form-field appearance="outline">
-        <mat-label>Title</mat-label>
-        <input matInput formControlName="title" required>
-        <mat-error>A title is required.</mat-error>
-      </mat-form-field>
+  <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" class="project-layout">
+    <div class="form-column">
+      <section class="form-panel">
+        <div class="section-heading">
+          <span class="section-icon"><mat-icon>edit_note</mat-icon></span>
+          <div>
+            <span class="section-step">01 · Identity</span>
+            <h2>What is this project about?</h2>
+            <p>Keep it compact and specific so volunteers understand the outcome at a glance.</p>
+          </div>
+        </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Description</mat-label>
-        <textarea matInput formControlName="description" rows="5"></textarea>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Organization</mat-label>
-        <mat-select formControlName="organisationId" required>
-          <mat-option *ngFor="let organisation of administeredOrganisations" [value]="organisation.id">
-            {{ organisation.orgName }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <div class="coordinates">
         <mat-form-field appearance="outline">
-          <mat-label>Latitude</mat-label>
-          <input matInput type="number" formControlName="latitude">
+          <mat-label>Project title</mat-label>
+          <input matInput formControlName="title" maxlength="120" required placeholder="e.g. Restore the riverside trail">
+          <mat-icon matSuffix>flag</mat-icon>
+          <mat-hint align="end">{{ projectForm.controls.title.value?.length || 0 }}/120</mat-hint>
+          <mat-error *ngIf="projectForm.controls.title.hasError('required')">Please enter a project title.</mat-error>
+          <mat-error *ngIf="projectForm.controls.title.hasError('maxlength')">Use no more than 120 characters.</mat-error>
         </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Longitude</mat-label>
-          <input matInput type="number" formControlName="longitude">
-        </mat-form-field>
-      </div>
 
-      <mat-checkbox formControlName="closed">Project is closed</mat-checkbox>
+        <mat-form-field appearance="outline">
+          <mat-label>Short project brief</mat-label>
+          <textarea matInput formControlName="description" rows="6" maxlength="2000"
+                    placeholder="Describe the goal, expected impact, and what will be completed during this project."></textarea>
+          <mat-hint>Focused, practical, and easy to scan.</mat-hint>
+          <mat-hint align="end">{{ descriptionLength }}/2000</mat-hint>
+        </mat-form-field>
+      </section>
+
+      <section class="form-panel">
+        <div class="section-heading">
+          <span class="section-icon section-icon--calendar"><mat-icon>date_range</mat-icon></span>
+          <div>
+            <span class="section-step">02 · Timeframe</span>
+            <h2>When will the project happen?</h2>
+            <p>Activities assigned to this project must fall within these dates.</p>
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Start date</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="startDate" required>
+            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+            <mat-error>Choose a start date.</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>End date</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate" required>
+            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+            <mat-error>Choose an end date.</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="range-error" *ngIf="projectForm.hasError('dateRange')">
+          <mat-icon>error_outline</mat-icon>
+          The end date must be on or after the start date.
+        </div>
+      </section>
+
+      <section class="form-panel">
+        <div class="section-heading">
+          <span class="section-icon section-icon--place"><mat-icon>location_on</mat-icon></span>
+          <div>
+            <span class="section-step">03 · Place</span>
+            <h2>Does it have a central location?</h2>
+            <p>Choose an optional meeting point or the central place for the project.</p>
+          </div>
+        </div>
+
+        <div class="location-card" [class.location-card--selected]="markerPosition">
+          <div class="location-map">
+            <google-map
+              height="320px"
+              width="100%"
+              [center]="mapCenter"
+              [zoom]="mapZoom"
+              (mapClick)="onMapClick($event)">
+              <map-marker *ngIf="markerPosition" [position]="markerPosition"></map-marker>
+            </google-map>
+            <div class="map-instruction" *ngIf="!markerPosition">
+              <mat-icon>touch_app</mat-icon>
+              Click anywhere on the map to select the project location
+            </div>
+          </div>
+
+          <div class="location-summary">
+            <span class="location-state">
+              <span class="location-state__icon">
+                <mat-icon>{{ markerPosition ? 'location_on' : 'location_off' }}</mat-icon>
+              </span>
+              <span>
+                <strong>{{ markerPosition ? 'Project location selected' : 'Location is optional' }}</strong>
+                <small>{{ coordinateLabel }}</small>
+              </span>
+            </span>
+            <button *ngIf="markerPosition" mat-button type="button" class="clear-location" (click)="clearLocation()">
+              <mat-icon>close</mat-icon>Clear
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="side-column">
+      <section class="ownership-card">
+        <span class="side-label">Project owner</span>
+        <mat-form-field appearance="outline">
+          <mat-label>Organization</mat-label>
+          <mat-select formControlName="organisationId" required (selectionChange)="onOrganisationChange($event.value)">
+            <mat-option *ngFor="let organisation of administeredOrganisations" [value]="organisation.id">
+              {{ organisation.orgName }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>apartment</mat-icon>
+          <mat-error>Select an organization.</mat-error>
+        </mat-form-field>
+
+        <div class="owner-preview" *ngIf="selectedOrganisation as organisation">
+          <div class="owner-avatar">
+            <img *ngIf="organisation.profilePicture" [src]="organisation.profilePicture" [alt]="organisation.orgName">
+            <span *ngIf="!organisation.profilePicture">{{ organisation.orgName.charAt(0) }}</span>
+          </div>
+          <div>
+            <strong>{{ organisation.orgName }}</strong>
+            <span>Activities inherit this organization</span>
+          </div>
+          <mat-icon>verified</mat-icon>
+        </div>
+      </section>
+
+      <section class="tip-card">
+        <mat-icon>lightbulb</mat-icon>
+        <div>
+          <strong>A project is intentionally lightweight</strong>
+          <p>Create the project first, then add individual activities with their own dates, capacity, and volunteer requirements.</p>
+        </div>
+      </section>
+
+      <section class="status-card" *ngIf="isEditing">
+        <div>
+          <strong>Project status</strong>
+          <span>Close it when the work is complete.</span>
+        </div>
+        <mat-checkbox formControlName="closed">Closed</mat-checkbox>
+      </section>
 
       <div class="actions">
-        <button mat-button type="button" (click)="router.navigate(['/organisations'])">Cancel</button>
-        <button mat-raised-button color="primary" type="submit"
+        <button mat-button type="button" (click)="cancel()">Cancel</button>
+        <button mat-flat-button color="primary" type="submit"
                 [disabled]="projectForm.invalid || isSubmitting">
-          {{ isEditing ? 'Save changes' : 'Create project' }}
+          <mat-icon>{{ isEditing ? 'save' : 'add_circle' }}</mat-icon>
+          {{ isSubmitting ? 'Saving…' : (isEditing ? 'Save project' : 'Create project') }}
         </button>
       </div>
-    </form>
-  </mat-card-content>
-</mat-card>
+    </aside>
+  </form>
+</main>
