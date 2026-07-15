@@ -25,6 +25,7 @@
       type="button"
       [class.outside]="!day.inCurrentMonth"
       [class.today]="day.isToday"
+      [attr.aria-label]="dayAriaLabel(day)"
       (click)="selectDay(day)">
       <span class="day-number">{{ day.dayNumber }}</span>
       <span class="day-events">
@@ -33,6 +34,7 @@
           class="calendar-event"
           [class]="'calendar-event type-' + event.type"
           [class.has-route]="!!event.route"
+          [class.past-event]="isPastEvent(event)"
           [attr.role]="event.route ? 'link' : null"
           [attr.tabindex]="event.route ? 0 : null"
           [title]="event.route ? event.title + ' — open details' : event.title"

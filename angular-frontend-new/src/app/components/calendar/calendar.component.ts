@@ -36,6 +36,7 @@ export class CalendarComponent implements OnInit {
   saving = false;
   showAppointmentForm = false;
   formError = '';
+  appointmentFilter: 'all' | 'upcoming' | 'past' = 'all';
 
   private readonly fb = inject(FormBuilder);
   private readonly calendarDataService = inject(CalendarDataService);
@@ -44,8 +45,10 @@ export class CalendarComponent implements OnInit {
 
   readonly appointmentForm = this.fb.nonNullable.group({
     title: ['', Validators.required],
-    startDateTime: ['', Validators.required],
-    endDateTime: ['', Validators.required],
+    startDate: ['', Validators.required],
+    startTime: ['', Validators.required],
+    endDate: ['', Validators.required],
+    endTime: ['', Validators.required],
     location: [''],
     description: ['']
   });
@@ -56,7 +59,39 @@ export class CalendarComponent implements OnInit {
   }
 
   get personalEvents(): CalendarEvent[] {
-    return this.events.filter(event => event.type === 'personal');
+    const now = new Date();
+    return this.events
+      .filter(event => event.type === 'personal')
+      .sort((left, right) => {
+        const leftPast = this.isPast(left, now);
+        const rightPast = this.isPast(right, now);
+
+        if (leftPast !== rightPast) return leftPast ? 1 : -1;
+        return leftPast
+          ? right.start.getTime() - left.start.getTime()
+          : left.start.getTime() - right.start.getTime();
+      });
+  }
+
+  get filteredPersonalEvents(): CalendarEvent[] {
+    if (this.appointmentFilter === 'all') return this.personalEvents;
+    const now = new Date();
+    return this.personalEvents.filter(event =>
+      this.appointmentFilter === 'past' ? this.isPast(event, now) : !this.isPast(event, now)
+    );
+  }
+
+  get upcomingAppointmentCount(): number {
+    const now = new Date();
+    return this.personalEvents.filter(event => !this.isPast(event, now)).length;
+  }
+
+  get pastAppointmentCount(): number {
+    return this.personalEvents.length - this.upcomingAppointmentCount;
+  }
+
+  get minimumEndDate(): string {
+    return this.appointmentForm.controls.startDate.value;
   }
 
   openAppointmentForm(date = new Date()): void {
@@ -65,8 +100,10 @@ export class CalendarComponent implements OnInit {
     const end = new Date(start.getTime() + 60 * 60 * 1000);
     this.appointmentForm.reset({
       title: '',
-      startDateTime: this.toLocalInput(start),
-      endDateTime: this.toLocalInput(end),
+      startDate: this.toLocalDate(start),
+      startTime: this.toLocalTime(start),
+      endDate: this.toLocalDate(end),
+      endTime: this.toLocalTime(end),
       location: '',
       description: ''
     });
@@ -88,8 +125,8 @@ export class CalendarComponent implements OnInit {
     if (this.appointmentForm.invalid) return;
 
     const value = this.appointmentForm.getRawValue();
-    const start = new Date(value.startDateTime);
-    const end = new Date(value.endDateTime);
+    const start = this.combineLocalDateAndTime(value.startDate, value.startTime);
+    const end = this.combineLocalDateAndTime(value.endDate, value.endTime);
     if (end <= start) {
       this.formError = 'End time must be after start time.';
       return;
@@ -132,6 +169,28 @@ export class CalendarComponent implements OnInit {
     });
   }
 
+  setAppointmentFilter(filter: 'all' | 'upcoming' | 'past'): void {
+    this.appointmentFilter = filter;
+  }
+
+  appointmentStatus(event: CalendarEvent): 'past' | 'today' | 'upcoming' {
+    const now = new Date();
+    if (this.isPast(event, now)) return 'past';
+    if (this.isSameDay(event.start, now)) return 'today';
+    return 'upcoming';
+  }
+
+  appointmentStatusLabel(event: CalendarEvent): string {
+    const status = this.appointmentStatus(event);
+    if (status === 'past') return 'Past';
+    if (status === 'today') return 'Today';
+    return 'Upcoming';
+  }
+
+  trackEvent(_: number, event: CalendarEvent): string {
+    return event.id;
+  }
+
   private loadEvents(): void {
     this.loading = true;
     this.calendarDataService.loadEvents().subscribe({
@@ -147,8 +206,30 @@ export class CalendarComponent implements OnInit {
     });
   }
 
-  private toLocalInput(date: Date): string {
-    const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
-    return offsetDate.toISOString().slice(0, 16);
+  private toLocalDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private toLocalTime(date: Date): string {
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  private combineLocalDateAndTime(date: string, time: string): Date {
+    return new Date(`${date}T${time}:00`);
+  }
+
+  private isPast(event: CalendarEvent, now = new Date()): boolean {
+    return (event.end ?? event.start).getTime() < now.getTime();
+  }
+
+  private isSameDay(left: Date, right: Date): boolean {
+    return left.getFullYear() === right.getFullYear()
+      && left.getMonth() === right.getMonth()
+      && left.getDate() === right.getDate();
   }
 }

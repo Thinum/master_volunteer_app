@@ -20,13 +20,23 @@
         <mat-label>Title</mat-label><input matInput formControlName="title" />
         <mat-error *ngIf="appointmentForm.controls.title.hasError('required')">A title is required.</mat-error>
       </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Starts</mat-label><input matInput type="datetime-local" formControlName="startDateTime" />
+      <mat-form-field appearance="outline" class="date-field">
+        <mat-label>Start date</mat-label><input matInput type="date" formControlName="startDate" />
+        <mat-error *ngIf="appointmentForm.controls.startDate.hasError('required')">Choose a start date.</mat-error>
       </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Ends</mat-label><input matInput type="datetime-local" formControlName="endDateTime" />
+      <mat-form-field appearance="outline" class="time-field">
+        <mat-label>Start time</mat-label><input matInput type="time" formControlName="startTime" />
+        <mat-error *ngIf="appointmentForm.controls.startTime.hasError('required')">Choose a start time.</mat-error>
       </mat-form-field>
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" class="date-field">
+        <mat-label>End date</mat-label><input matInput type="date" formControlName="endDate" [min]="minimumEndDate" />
+        <mat-error *ngIf="appointmentForm.controls.endDate.hasError('required')">Choose an end date.</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="time-field">
+        <mat-label>End time</mat-label><input matInput type="time" formControlName="endTime" />
+        <mat-error *ngIf="appointmentForm.controls.endTime.hasError('required')">Choose an end time.</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="field-location">
         <mat-label>Location</mat-label><input matInput formControlName="location" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="field-description">
@@ -45,12 +55,50 @@
   <div class="loading-state" *ngIf="loading"><mat-spinner diameter="42"></mat-spinner><span>Loading calendar…</span></div>
   <app-calendar-month *ngIf="!loading" [events]="events" (daySelected)="selectDay($event)"></app-calendar-month>
 
-  <section class="personal-list" *ngIf="!loading && personalEvents.length">
-    <div class="list-heading"><div><p class="eyebrow">Private</p><h2>My appointments</h2></div><span>{{ personalEvents.length }}</span></div>
-    <article *ngFor="let event of personalEvents">
-      <div class="appointment-date"><strong>{{ event.start | date:'d' }}</strong><span>{{ event.start | date:'MMM' }}</span></div>
-      <div class="appointment-copy"><h3>{{ event.title }}</h3><p>{{ event.start | date:'medium' }}<span *ngIf="event.location"> · {{ event.location }}</span></p></div>
-      <button mat-icon-button type="button" aria-label="Delete appointment" (click)="deleteAppointment(event)"><mat-icon>delete_outline</mat-icon></button>
-    </article>
+  <section class="personal-list" *ngIf="!loading">
+    <div class="list-heading">
+      <div>
+        <p class="eyebrow">Private</p>
+        <h2>My appointments</h2>
+        <p class="list-summary" *ngIf="personalEvents.length">{{ upcomingAppointmentCount }} ahead · {{ pastAppointmentCount }} past</p>
+      </div>
+      <span class="appointment-count">{{ personalEvents.length }}</span>
+    </div>
+
+    <div class="appointment-filters" *ngIf="personalEvents.length" aria-label="Filter appointments">
+      <button type="button" [class.active]="appointmentFilter === 'all'" [attr.aria-pressed]="appointmentFilter === 'all'" (click)="setAppointmentFilter('all')">All <span>{{ personalEvents.length }}</span></button>
+      <button type="button" [class.active]="appointmentFilter === 'upcoming'" [attr.aria-pressed]="appointmentFilter === 'upcoming'" (click)="setAppointmentFilter('upcoming')">Upcoming <span>{{ upcomingAppointmentCount }}</span></button>
+      <button type="button" [class.active]="appointmentFilter === 'past'" [attr.aria-pressed]="appointmentFilter === 'past'" (click)="setAppointmentFilter('past')">Past <span>{{ pastAppointmentCount }}</span></button>
+    </div>
+
+    <div class="appointment-items" *ngIf="filteredPersonalEvents.length; else emptyAppointments">
+      <article
+        *ngFor="let event of filteredPersonalEvents; trackBy: trackEvent"
+        [class]="'appointment-item status-' + appointmentStatus(event)">
+        <div class="appointment-date">
+          <strong>{{ event.start | date:'d' }}</strong>
+          <span>{{ event.start | date:'MMM' }}</span>
+        </div>
+        <div class="appointment-copy">
+          <div class="appointment-title-row">
+            <h3>{{ event.title }}</h3>
+            <span class="status-chip">{{ appointmentStatusLabel(event) }}</span>
+          </div>
+          <p class="appointment-time"><mat-icon>schedule</mat-icon>{{ event.start | date:'EEE, d MMM · HH:mm' }}–{{ event.end | date:'HH:mm' }}</p>
+          <p class="appointment-location" *ngIf="event.location"><mat-icon>location_on</mat-icon>{{ event.location }}</p>
+          <p class="appointment-description" *ngIf="event.description">{{ event.description }}</p>
+        </div>
+        <button class="delete-button" mat-icon-button type="button" [attr.aria-label]="'Delete ' + event.title" title="Delete appointment" (click)="deleteAppointment(event)"><mat-icon>delete_outline</mat-icon></button>
+      </article>
+    </div>
+
+    <ng-template #emptyAppointments>
+      <div class="appointments-empty">
+        <mat-icon>{{ personalEvents.length ? 'filter_alt_off' : 'event_available' }}</mat-icon>
+        <h3>{{ personalEvents.length ? 'No appointments in this view' : 'Your schedule is clear' }}</h3>
+        <p>{{ personalEvents.length ? 'Try another filter to see your appointments.' : 'Add an appointment or select a day in the calendar to get started.' }}</p>
+        <button *ngIf="!personalEvents.length" mat-stroked-button type="button" (click)="openAppointmentForm()"><mat-icon>add</mat-icon>Add appointment</button>
+      </div>
+    </ng-template>
   </section>
 </main>

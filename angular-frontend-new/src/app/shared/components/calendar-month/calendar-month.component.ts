@@ -79,6 +79,21 @@ export class CalendarMonthComponent implements OnChanges {
     return new Intl.DateTimeFormat('en', { hour: '2-digit', minute: '2-digit' }).format(event.start);
   }
 
+  dayAriaLabel(day: CalendarDay): string {
+    const date = new Intl.DateTimeFormat('en', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    }).format(day.date);
+    const eventCount = day.events.length;
+    return `${date}. ${eventCount ? `${eventCount} ${eventCount === 1 ? 'event' : 'events'}.` : 'No events.'} Select to add an appointment.`;
+  }
+
+  isPastEvent(event: CalendarEvent): boolean {
+    return (event.end ?? event.start).getTime() < Date.now();
+  }
+
   private rebuildDays(): void {
     const first = this.startOfMonth(this.viewDate);
     const mondayOffset = (first.getDay() + 6) % 7;
