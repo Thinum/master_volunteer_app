@@ -1,91 +1,159 @@
-﻿<div class="container">
-  <form [formGroup]="orgForm" (ngSubmit)="onSubmit()" class="p-4">
-    <!-- Organization Name -->
-    <mat-form-field appearance="fill" class="w-full mb-3">
-      <mat-label>Organization Name</mat-label>
-      <input matInput formControlName="orgName"/>
-    </mat-form-field>
-
-    <!-- Description -->
-    <mat-form-field appearance="fill" class="w-full mb-3">
-      <mat-label>Description</mat-label>
-      <textarea matInput rows="4" formControlName="body"></textarea>
-    </mat-form-field>
-
-    <!-- Profile Picture -->
-    <mat-form-field appearance="fill" class="w-full mb-3">
-      <mat-label>Profile Picture URL</mat-label>
-      <input matInput formControlName="profilePicture"/>
-    </mat-form-field>
-
-    <!-- Google Map -->
-    <h3>Select Location</h3>
-    <google-map
-      height="300px"
-      width="100%"
-      [center]="center"
-      [zoom]="zoom"
-      (mapClick)="onMapClick($event)"
-    >
-      <map-marker *ngIf="marker" [position]="marker"></map-marker>
-    </google-map>
-
-    <div class="coords" *ngIf="marker">
-      Selected: {{ marker.lat.toFixed(4) }}, {{ marker.lng.toFixed(4) }}
+﻿<main class="form-page">
+  <header class="page-header">
+    <div class="header-icon"><mat-icon>diversity_3</mat-icon></div>
+    <div>
+      <span class="eyebrow">Organization profile</span>
+      <h1>Create an organization</h1>
+      <p>Build a welcoming profile that helps volunteers understand your mission.</p>
     </div>
+  </header>
 
-    <br/><br/><br/>
-    <!-- User + Role selection -->
-    <div class="flex gap-4 mb-4 mt-4">
+  <form [formGroup]="orgForm" (ngSubmit)="onSubmit()" class="organisation-form">
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-number">1</span>
+        <div><h2>About the organization</h2><p>Introduce your organization and the work it does.</p></div>
+      </div>
 
-      <mat-form-field appearance="fill" class="flex-1">
-        <mat-label>Select User</mat-label>
-        <mat-select #userSelect>
-          <mat-option *ngFor="let u of availableUsers" [value]="u.id">
-            {{ u.name }} ({{ u.email }})
-          </mat-option>
+      <div class="profile-grid">
+        <div class="profile-preview" aria-hidden="true">
+          <img *ngIf="orgForm.get('profilePicture')?.value; else orgPlaceholder"
+               [src]="orgForm.get('profilePicture')?.value" alt="" />
+          <ng-template #orgPlaceholder><mat-icon>apartment</mat-icon></ng-template>
+        </div>
+        <div class="profile-fields">
+          <mat-form-field appearance="outline">
+            <mat-label>Organization name</mat-label>
+            <input matInput formControlName="orgName" required />
+            <mat-icon matSuffix>badge</mat-icon>
+            <mat-error *ngIf="orgForm.get('orgName')?.hasError('required')">Please enter a name.</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Profile picture URL</mat-label>
+            <input matInput type="url" formControlName="profilePicture" placeholder="https://…" />
+            <mat-icon matSuffix>image</mat-icon>
+            <mat-hint>Optional — use a square logo or photo.</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <mat-form-field appearance="outline" class="description-field">
+        <mat-label>Description</mat-label>
+        <textarea matInput rows="5" formControlName="body" required
+                  placeholder="Describe your mission, community, and the impact volunteers can make."></textarea>
+        <mat-hint>A short, friendly overview works best.</mat-hint>
+        <mat-error *ngIf="orgForm.get('body')?.hasError('required')">Please add a description.</mat-error>
+      </mat-form-field>
+    </section>
+
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-number">2</span>
+        <div><h2>Focus and discovery</h2><p>Help volunteers understand and find your organization.</p></div>
+      </div>
+
+      <mat-form-field appearance="outline" class="category-field">
+        <mat-label>Organization category</mat-label>
+        <mat-select formControlName="category" required>
+          <mat-option *ngFor="let category of categories" [value]="category">{{ category }}</mat-option>
         </mat-select>
+        <mat-icon matSuffix>category</mat-icon>
+        <mat-error *ngIf="orgForm.get('category')?.hasError('required')">Please choose a category.</mat-error>
       </mat-form-field>
 
-      <mat-form-field appearance="fill" class="flex-1">
-        <mat-label>Assign Role</mat-label>
-        <mat-select #roleSelect>
-          <mat-option *ngFor="let r of roles" [value]="r">
-            {{ r }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+      <section class="chips-section">
+        <h3><mat-icon>sell</mat-icon> Tags</h3>
+        <p>Select relevant tags or add your own. Their colors stay consistent throughout the app.</p>
+        <mat-chip-listbox multiple aria-label="Select organization tags">
+          <mat-chip-option
+            *ngFor="let tag of availableTags"
+            class="colored-tag"
+            [style.--tag-hue]="tagHue(tag)"
+            [selected]="isTagSelected(tag)"
+            (selectionChange)="toggleTag(tag, $event)">
+            {{ tag }}
+          </mat-chip-option>
+        </mat-chip-listbox>
+        <div class="chip-input-row">
+          <mat-icon>add</mat-icon>
+          <input placeholder="Add a custom tag..." #tagInput
+                 (keydown.enter)="$event.preventDefault(); addTag(tagInput)" />
+        </div>
+      </section>
+    </section>
 
-      <button
-        mat-flat-button
-        color="primary"
-        type="button"
-        (click)="addUserRole(userSelect.value, roleSelect.value)"
-        [disabled]="!userSelect.value || !roleSelect.value"
-      >
-        Add
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-number">3</span>
+        <div><h2>Home base</h2><p>Click the map to set the organization’s main location.</p></div>
+      </div>
+      <google-map height="320px" width="100%" [center]="center" [zoom]="zoom" (mapClick)="onMapClick($event)">
+        <map-marker *ngIf="marker" [position]="marker"></map-marker>
+      </google-map>
+      <div class="location-status" [class.location-status--selected]="marker">
+        <mat-icon>{{ marker ? 'check_circle' : 'touch_app' }}</mat-icon>
+        <span *ngIf="marker; else noLocation">Selected: {{ marker.lat.toFixed(4) }}, {{ marker.lng.toFixed(4) }}</span>
+        <ng-template #noLocation>Choose a point on the map</ng-template>
+      </div>
+      <p class="field-error" *ngIf="orgForm.touched && orgForm.get('locationLat')?.invalid">
+        <mat-icon>error_outline</mat-icon> A location is required.
+      </p>
+    </section>
+
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-number">4</span>
+        <div><h2>Team access</h2><p>Add teammates and choose what role they will have.</p></div>
+      </div>
+
+      <div class="role-picker">
+        <mat-form-field appearance="outline">
+          <mat-label>Select user</mat-label>
+          <mat-select #userSelect>
+            <mat-option *ngFor="let u of availableUsers" [value]="u.id">
+              <span class="user-option">{{ u.name }} · {{ u.email }}</span>
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>person_search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Assign role</mat-label>
+          <mat-select #roleSelect>
+            <mat-option *ngFor="let r of roles" [value]="r">{{ r }}</mat-option>
+          </mat-select>
+          <mat-icon matSuffix>admin_panel_settings</mat-icon>
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" type="button"
+                (click)="addUserRole(userSelect.value, roleSelect.value)"
+                [disabled]="!userSelect.value || !roleSelect.value">
+          <mat-icon>person_add</mat-icon> Add person
+        </button>
+      </div>
+
+      <div class="assigned-team" *ngIf="selectedUserRoles.length; else emptyTeam">
+        <span class="assigned-label">Assigned team</span>
+        <mat-chip-set aria-label="Assigned team members">
+          <mat-chip *ngFor="let entry of selectedUserRoles; let i = index" (removed)="removeEntry(i)">
+            <mat-icon matChipAvatar>person</mat-icon>
+            {{ getUserName(entry.userId) }} · {{ entry.role }}
+            <button matChipRemove [attr.aria-label]="'Remove ' + getUserName(entry.userId)"><mat-icon>close</mat-icon></button>
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+      <ng-template #emptyTeam>
+        <div class="empty-team"><mat-icon>group_add</mat-icon><span>You can add team members now or manage them later.</span></div>
+      </ng-template>
+    </section>
+
+    <div class="submit-container">
+      <span><mat-icon>info</mat-icon> Required fields must be completed</span>
+      <button mat-flat-button color="primary" type="submit" [disabled]="orgForm.invalid || isSubmitting">
+        <mat-icon>{{ isSubmitting ? 'hourglass_top' : 'add_circle' }}</mat-icon>
+        {{ isSubmitting ? 'Creating…' : 'Create organization' }}
       </button>
     </div>
-
-    <!-- Assigned Users Chips -->
-    <mat-chip-set>
-      <mat-chip
-        *ngFor="let entry of selectedUserRoles; let i = index"
-        color="primary"
-        selected
-        (removed)="removeEntry(i)"
-      >
-        {{ getUserName(entry.userId) }} - {{ entry.role }}
-        <button matChipRemove>
-          <mat-icon>close</mat-icon>
-        </button>
-      </mat-chip>
-    </mat-chip-set>
-
-    <br/>
-    <!-- Submit -->
-    <button mat-raised-button color="accent" class="mt-4 w-full">
-      Create Organization
-    </button>
   </form>
-</div>
+</main>

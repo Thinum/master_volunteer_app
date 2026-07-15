@@ -1,31 +1,85 @@
-<mat-card class="activity-card">
-  <mat-card-title>{{ isEditing ? 'Edit Activity' : 'Create New Activity' }}</mat-card-title>
-  <mat-card-content>
-    <form [formGroup]="activityForm" (ngSubmit)="onSubmit()" class="activity-form">
+<main class="form-page">
+  <header class="page-header">
+    <div class="header-icon"><mat-icon>{{ isEditing ? 'edit_calendar' : 'event_available' }}</mat-icon></div>
+    <div>
+      <span class="eyebrow">Activity setup</span>
+      <h1>{{ isEditing ? 'Edit activity' : 'Create an activity' }}</h1>
+      <p>Share the essentials so volunteers know what to expect and how they can help.</p>
+    </div>
+  </header>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Title</mat-label>
-        <input matInput formControlName="title" required />
-      </mat-form-field>
+  <form [formGroup]="activityForm" (ngSubmit)="onSubmit()" class="activity-form">
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-number">1</span>
+        <div><h2>Activity basics</h2><p>Name the activity and set its schedule.</p></div>
+      </div>
+      <div class="field-grid">
+        <mat-form-field appearance="outline" class="field-wide">
+          <mat-label>Activity title</mat-label>
+          <input matInput formControlName="title" required />
+          <mat-icon matSuffix>title</mat-icon>
+          <mat-error *ngIf="activityForm.get('title')?.hasError('required')">Please enter a title.</mat-error>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Date</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="date" />
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="date" required />
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="activityForm.get('date')?.hasError('required')">Please choose a date.</mat-error>
+        </mat-form-field>
 
+        <mat-form-field appearance="outline">
+          <mat-label>Duration</mat-label>
+          <input matInput formControlName="duration" placeholder="e.g. 3 hours" />
+          <mat-icon matSuffix>schedule</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Maximum participants</mat-label>
+          <input matInput type="number" min="1" formControlName="capacity" required />
+          <mat-icon matSuffix>groups</mat-icon>
+          <mat-error *ngIf="activityForm.get('capacity')?.hasError('required')">Please enter a maximum.</mat-error>
+          <mat-error *ngIf="activityForm.get('capacity')?.hasError('min')">The maximum must be at least 1.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Organization</mat-label>
+          <mat-select formControlName="organization" required>
+            <mat-option *ngFor="let organisation of administeredOrganisations" [value]="organisation.id">
+              {{ organisation.orgName }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>apartment</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Application closes</mat-label>
+          <input matInput [matDatepicker]="expPicker" formControlName="expiresAt" />
+          <mat-datepicker-toggle matSuffix [for]="expPicker"></mat-datepicker-toggle>
+          <mat-datepicker #expPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="field-wide">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" rows="5" placeholder="What will volunteers do, and what impact will it have?"></textarea>
+          <mat-hint>Keep it clear, friendly, and action-oriented.</mat-hint>
+        </mat-form-field>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-number">2</span>
+        <div><h2>Location</h2><p>Click the map to place the activity marker.</p></div>
+      </div>
       <div class="map-container">
-        <h3>Select Location</h3>
         <google-map height="300px" width="100%"
                     [center]="center"
                     [zoom]="zoom"
                     (mapClick)="onMapClick($event)">
-
-          <!-- User-selected marker -->
           <map-marker *ngIf="markerPosition" [position]="markerPosition!"></map-marker>
-
-          <!-- Organization markers -->
           <map-marker
             *ngFor="let m of orgMarkers"
             [position]="m.position"
@@ -34,52 +88,26 @@
           </map-marker>
 
         </google-map>
-        <mat-form-field class="invisible" appearance="outline" style="margin-top: 0.5rem;">
+        <div class="location-status" [class.location-status--selected]="markerPosition">
+          <mat-icon>{{ markerPosition ? 'check_circle' : 'touch_app' }}</mat-icon>
+          <span>{{ markerPosition ? 'Location selected' : 'Choose a point on the map' }}</span>
+        </div>
+        <mat-form-field class="invisible" appearance="outline">
           <mat-label>Selected Location</mat-label>
           <input matInput formControlName="location" readonly />
         </mat-form-field>
       </div>
+    </section>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Description</mat-label>
-        <textarea matInput formControlName="description" rows="3"></textarea>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Duration</mat-label>
-        <input matInput formControlName="duration" />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Maximum participants</mat-label>
-        <input matInput type="number" min="1" formControlName="capacity" required />
-        <mat-error *ngIf="activityForm.get('capacity')?.hasError('required')">
-          Please enter a maximum number of participants.
-        </mat-error>
-        <mat-error *ngIf="activityForm.get('capacity')?.hasError('min')">
-          The maximum must be at least 1.
-        </mat-error>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Organization</mat-label>
-        <mat-select formControlName="organization" required>
-          <mat-option *ngFor="let organisation of administeredOrganisations" [value]="organisation.id">
-            {{ organisation.orgName }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Expires At</mat-label>
-        <input matInput [matDatepicker]="expPicker" formControlName="expiresAt" />
-        <mat-datepicker-toggle matSuffix [for]="expPicker"></mat-datepicker-toggle>
-        <mat-datepicker #expPicker></mat-datepicker>
-      </mat-form-field>
-
-      <!-- Dynamic fields -->
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-number">3</span>
+        <div><h2>Volunteer fit</h2><p>Add skills and labels that help the right people find this activity.</p></div>
+      </div>
+      <div class="chip-sections-grid">
       <section class="chips-section">
-        <h3>Required skills</h3>
+        <h3><mat-icon>verified</mat-icon> Required skills</h3>
+        <p>Volunteers need these skills to participate.</p>
         <mat-chip-listbox multiple aria-label="Select required activity skills">
           <mat-chip-option
             *ngFor="let skill of availableSkills"
@@ -88,14 +116,15 @@
             {{ skill.name }}
           </mat-chip-option>
         </mat-chip-listbox>
-        <div class="chip-input-row">
+        <div class="chip-input-row"><mat-icon>add</mat-icon>
           <input placeholder="Add required skill..." #requiredSkillInput
-                 (keyup.enter)="addSkill(requiredSkillInput, true)" />
+                 (keydown.enter)="$event.preventDefault(); addSkill(requiredSkillInput, true)" />
         </div>
       </section>
 
       <section class="chips-section">
-        <h3>Preferred skills</h3>
+        <h3><mat-icon>thumb_up</mat-icon> Preferred skills</h3>
+        <p>Helpful experience, but not a requirement.</p>
         <mat-chip-listbox multiple aria-label="Select preferred activity skills">
           <mat-chip-option
             *ngFor="let skill of availableSkills"
@@ -104,29 +133,33 @@
             {{ skill.name }}
           </mat-chip-option>
         </mat-chip-listbox>
-        <div class="chip-input-row">
+        <div class="chip-input-row"><mat-icon>add</mat-icon>
           <input placeholder="Add preferred skill..." #preferredSkillInput
-                 (keyup.enter)="addSkill(preferredSkillInput, false)" />
+                 (keydown.enter)="$event.preventDefault(); addSkill(preferredSkillInput, false)" />
         </div>
       </section>
 
       <section class="chips-section">
-        <h3>Tags</h3>
+        <h3><mat-icon>sell</mat-icon> Tags</h3>
+        <p>Tags use consistent colors to make activities easier to scan.</p>
         <mat-chip-listbox multiple aria-label="Select activity tags">
           <mat-chip-option
             *ngFor="let tag of availableTags"
+            class="colored-tag"
+            [style.--tag-hue]="tagHue(tag)"
             [selected]="isTagSelected(tag)"
             (selectionChange)="toggleTag(tag, $event)">
             {{ tag }}
           </mat-chip-option>
         </mat-chip-listbox>
-        <div class="chip-input-row">
-          <input placeholder="Add tag..." #tagInput (keyup.enter)="addTag(tagInput)" />
+        <div class="chip-input-row"><mat-icon>add</mat-icon>
+          <input placeholder="Add tag..." #tagInput (keydown.enter)="$event.preventDefault(); addTag(tagInput)" />
         </div>
       </section>
 
       <section class="chips-section" *ngIf="availableCategories.length">
-        <h3>Activity categories</h3>
+        <h3><mat-icon>category</mat-icon> Categories</h3>
+        <p>Choose the causes this activity supports.</p>
         <mat-chip-listbox multiple aria-label="Select activity categories">
           <mat-chip-option
             *ngFor="let category of availableCategories"
@@ -138,33 +171,37 @@
       </section>
 
       <section class="chips-section">
-        <h3>Qualifications</h3>
+        <h3><mat-icon>workspace_premium</mat-icon> Qualifications</h3>
+        <p>Add any certificates or formal requirements.</p>
         <mat-chip-listbox>
           <mat-chip *ngFor="let q of qualifications.controls; let i = index" (removed)="removeQualification(i)">
             {{ q.value }}
             <button matChipRemove><mat-icon>cancel</mat-icon></button>
           </mat-chip>
-          <input placeholder="Add qualification..." #qInput (keyup.enter)="addQualification(qInput)" />
+          <div class="chip-input-row"><mat-icon>add</mat-icon><input placeholder="Add qualification..." #qInput (keydown.enter)="$event.preventDefault(); addQualification(qInput)" /></div>
         </mat-chip-listbox>
       </section>
 
       <section class="chips-section">
-        <h3>Prerequisites</h3>
+        <h3><mat-icon>checklist</mat-icon> Prerequisites</h3>
+        <p>Note anything volunteers should do beforehand.</p>
         <mat-chip-listbox>
           <mat-chip *ngFor="let p of prerequisites.controls; let i = index" (removed)="removePrerequisite(i)">
             {{ p.value }}
             <button matChipRemove><mat-icon>cancel</mat-icon></button>
           </mat-chip>
-          <input placeholder="Add prerequisite..." #pInput (keyup.enter)="addPrerequisite(pInput)" />
+          <div class="chip-input-row"><mat-icon>add</mat-icon><input placeholder="Add prerequisite..." #pInput (keydown.enter)="$event.preventDefault(); addPrerequisite(pInput)" /></div>
         </mat-chip-listbox>
       </section>
-
-      <div class="submit-container">
-        <button mat-raised-button color="primary" type="submit" [disabled]="activityForm.invalid || isSubmitting">
-          {{ isEditing ? 'Save Changes' : 'Create Activity' }}
-        </button>
       </div>
+    </section>
 
-    </form>
-  </mat-card-content>
-</mat-card>
+    <div class="submit-container">
+      <button mat-button type="button" (click)="cancel()">Cancel</button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="activityForm.invalid || isSubmitting">
+        <mat-icon>{{ isEditing ? 'save' : 'add_circle' }}</mat-icon>
+        {{ isSubmitting ? 'Saving…' : (isEditing ? 'Save changes' : 'Create activity') }}
+      </button>
+    </div>
+  </form>
+</main>

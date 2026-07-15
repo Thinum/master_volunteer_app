@@ -111,16 +111,16 @@ public class Activity {
 
     public void setSkills(List<String> skills) {
         if (skills == null) {
-            this.skillRequirements = List.of();
+            this.skillRequirements = new ArrayList<>();
             return;
         }
 
-        this.skillRequirements = skills.stream()
+        this.skillRequirements = new ArrayList<>(skills.stream()
                 .filter(skill -> skill != null && !skill.isBlank())
                 .map(String::trim)
                 .distinct()
                 .map(ActivitySkillRequirement::required)
-                .toList();
+                .toList());
     }
 
     @Transient

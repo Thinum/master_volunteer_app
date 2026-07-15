@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { NgFor, NgIf, DatePipe } from '@angular/common';
@@ -13,23 +11,13 @@ import { User } from '../../../models/user.model';
 import {VolunteerService} from '../../../services/api/volunteer.service';
 import {ActivityService} from '../../../services/api/activity.service';
 import {OrganisationService} from '../../../services/api/organisation.service';
-import {MatListItem} from '@angular/material/list';
 import {ShareButtonComponent} from '../../../shared/components/share-button/share-button.component';
-
-interface Contact {
-  name: string;
-  role: string;
-  phone: string;
-  email: string;
-}
 
 @Component({
   selector: 'app-activity-detail',
   standalone: true,
   imports: [
-    MatCardModule,
     MatButtonModule,
-    MatChipsModule,
     MatIconModule,
     MatExpansionModule,
     NgFor,
@@ -37,7 +25,6 @@ interface Contact {
     DatePipe,
     MatTooltipModule,
     MatSnackBarModule,
-    MatListItem,
     RouterLink,
     ShareButtonComponent
   ],
@@ -51,6 +38,7 @@ export class ActivityDetailComponent implements OnInit {
   currentUser: User | null = null;
   canManage = false;
   private friendIds = new Set<number>();
+  private administeredOrganisationIds = new Set<number>();
 
   constructor(private route: ActivatedRoute, private volunteerService: VolunteerService,
               private activityService: ActivityService,
@@ -64,10 +52,16 @@ export class ActivityDetailComponent implements OnInit {
       next: activity => {
         this.activity = activity;
         this.updateJoinState();
+        this.updateManageState();
         this.organisationService.getAdministeredOrganisations().subscribe({
-          next: organisations => this.canManage = activity.organisations.some(
-            activityOrg => organisations.some(adminOrg => adminOrg.id === activityOrg.id)),
-          error: () => this.canManage = false
+          next: organisations => {
+            this.administeredOrganisationIds = new Set((organisations || []).map(org => org.id));
+            this.updateManageState();
+          },
+          error: () => {
+            this.administeredOrganisationIds.clear();
+            this.updateManageState();
+          }
         });
       },
       error: err => console.error('Could not load activity', err)
@@ -76,6 +70,7 @@ export class ActivityDetailComponent implements OnInit {
     this.volunteerService.getCurrentUser().subscribe(user => {
       this.currentUser = user;
       this.updateJoinState();
+      this.updateManageState();
       this.volunteerService.getFriends(user.id).subscribe({
         next: friends => this.friendIds = new Set((friends || []).map(friend => friend.id)),
         error: err => console.error('Could not load friends', err)
@@ -106,6 +101,13 @@ export class ActivityDetailComponent implements OnInit {
     return this.hasParticipantLimit && this.availableSlots === 0;
   }
 
+  get slotProgress(): number {
+    if (!this.hasParticipantLimit) {
+      return 0;
+    }
+    return Math.min((this.spotsTaken / this.capacity) * 100, 100);
+  }
+
   get allParticipants(): User[] {
     return this.uniqueUsers(this.activity?.participants || []);
   }
@@ -122,8 +124,24 @@ export class ActivityDetailComponent implements OnInit {
     return this.uniqueLabels(this.activity?.skills || []);
   }
 
+  tagHue(tag: string): string {
+    let hash = 0;
+    for (const character of this.normalizeLabel(tag)) {
+      hash = ((hash << 5) - hash + character.charCodeAt(0)) | 0;
+    }
+    return String(Math.abs(hash) % 360);
+  }
+
   private updateJoinState(): void {
     this.hasJoined = !!this.currentUser && (this.activity?.participants?.some((usr) => usr.id === this.currentUser?.id) ?? false);
+  }
+
+  private updateManageState(): void {
+    const isCreator = !!this.currentUser && this.activity?.createdBy?.id === this.currentUser.id;
+    const administersLinkedOrganisation = this.activity?.organisations?.some(
+      organisation => this.administeredOrganisationIds.has(organisation.id)
+    ) ?? false;
+    this.canManage = isCreator || administersLinkedOrganisation;
   }
 
   onShare() {
@@ -199,5 +217,9 @@ export class ActivityDetailComponent implements OnInit {
       });
 
     return Array.from(labels.values());
+  }
+
+  private normalizeLabel(value: string): string {
+    return value.trim().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').toLowerCase();
   }
 }

@@ -4,7 +4,6 @@ import at.jku.volunteer_app.contract.TagConceptDTO;
 import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.repository.OrganisationRepository;
 import at.jku.volunteer_app.repository.UserRepository;
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,8 +18,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ActivityService {
@@ -151,22 +153,22 @@ public class ActivityService {
     @Transactional
     public Activity updateActivity(int id, Activity changes, int userId) {
         Activity existing = getActivityOrThrow(id);
-        requireAdminOfAll(existing.getOrganisations(), userId);
-        List<Organisation> organisations = resolveAdministeredOrganisations(changes, userId);
+        requireCanManage(existing, userId);
+        List<Organisation> organisations = resolveUpdateOrganisations(existing, changes, userId);
 
-        BeanUtils.copyProperties(changes, existing,
-                "id", "organisations", "participants", "appointments", "createdBy", "createdAt", "spotsTaken");
+        applyChanges(existing, changes);
         existing.setOrganisations(organisations);
         existing.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
         normalizeActivityProfile(existing);
         syncSpotsTaken(existing);
-        return activityRepository.save(existing);
+        activityRepository.flush();
+        return existing;
     }
 
     @Transactional
     public void deleteActivity(int id, int userId) {
         Activity existing = getActivityOrThrow(id);
-        requireAdminOfAll(existing.getOrganisations(), userId);
+        requireCanManage(existing, userId);
         activityRepository.delete(existing);
     }
 
@@ -183,17 +185,84 @@ public class ActivityService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one organisation is required");
         }
         ids.forEach(id -> organisationAdminService.requireAdminOf(userId, id));
-        return ids.stream().map(id -> organisationRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organisation not found"))).toList();
+        Map<Integer, Organisation> organisationsById = organisationRepository.findAllById(ids).stream()
+                .collect(Collectors.toMap(Organisation::getId, organisation -> organisation));
+        return ids.stream()
+                .map(id -> Optional.ofNullable(organisationsById.get(id))
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organisation not found")))
+                .toList();
     }
 
-    private void requireAdminOfAll(List<Organisation> organisations, int userId) {
-        List<Organisation> owners = safeList(organisations);
+    private List<Organisation> resolveUpdateOrganisations(Activity existing, Activity changes, int userId) {
+        List<Integer> requestedIds = organisationIds(changes == null ? null : changes.getOrganisations());
+        if (requestedIds.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one organisation is required");
+        }
+
+        Set<Integer> existingIds = new LinkedHashSet<>(organisationIds(existing.getOrganisations()));
+        Set<Integer> updatedIds = new LinkedHashSet<>(requestedIds);
+        if (!existingIds.equals(updatedIds)) {
+            return resolveAdministeredOrganisations(changes, userId);
+        }
+
+        return safeList(existing.getOrganisations());
+    }
+
+    private void applyChanges(Activity existing, Activity changes) {
+        if (changes == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Activity changes are required");
+        }
+
+        existing.setTitle(changes.getTitle());
+        existing.setBody(changes.getBody());
+        existing.setDescription(changes.getDescription());
+        existing.setProjectId(changes.getProjectId());
+        existing.setDate(changes.getDate());
+        existing.setStartTime(changes.getStartTime());
+        existing.setEndTime(changes.getEndTime());
+        existing.setDuration(changes.getDuration());
+        existing.setExpiresAt(changes.getExpiresAt());
+        existing.setLocation(changes.getLocation());
+        existing.setCoordinates(changes.getCoordinates());
+        existing.setSkillRequirements(new ArrayList<>(safeList(changes.getSkillRequirements())));
+        existing.setCategories(new ArrayList<>(safeList(changes.getCategories())));
+        existing.setQualifications(new ArrayList<>(safeList(changes.getQualifications())));
+        existing.setPrerequisites(new ArrayList<>(safeList(changes.getPrerequisites())));
+        existing.setCapacity(changes.getCapacity());
+        existing.setEquipmentProvided(new ArrayList<>(safeList(changes.getEquipmentProvided())));
+        existing.setTags(new ArrayList<>(safeList(changes.getTags())));
+        existing.setDifficulty(changes.getDifficulty());
+        existing.setPublic(changes.isPublic());
+        existing.setStatus(changes.getStatus());
+    }
+
+    private List<Integer> organisationIds(List<Organisation> organisations) {
+        return safeList(organisations).stream()
+                .filter(Objects::nonNull)
+                .map(Organisation::getId)
+                .filter(id -> id > 0)
+                .distinct()
+                .toList();
+    }
+
+    private void requireCanManage(Activity activity, int userId) {
+        if (activity.getCreatedBy() != null && activity.getCreatedBy().getId() == userId) {
+            return;
+        }
+
+        List<Organisation> owners = safeList(activity.getOrganisations());
         if (owners.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "An activity without an owning organisation cannot be managed");
         }
-        owners.forEach(org -> organisationAdminService.requireAdminOf(userId, org.getId()));
+
+        boolean administersLinkedOrganisation = owners.stream()
+                .filter(Objects::nonNull)
+                .anyMatch(org -> organisationAdminService.isAdminOf(userId, org.getId()));
+        if (!administersLinkedOrganisation) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Only the activity creator or an administrator of a linked organisation may manage this activity");
+        }
     }
 
     public Activity getActivityByProjectId(int projectId) {
@@ -239,7 +308,7 @@ public class ActivityService {
         }
 
         if (activity.getTags() == null) {
-            activity.setTags(List.of());
+            activity.setTags(new ArrayList<>());
         } else {
             activity.setTags(cleanTags(activity.getTags()));
         }

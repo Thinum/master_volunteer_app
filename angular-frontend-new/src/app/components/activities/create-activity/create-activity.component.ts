@@ -236,6 +236,14 @@ export class CreateActivityComponent implements OnInit {
     return this.hasFormArrayValue(this.tags, tag);
   }
 
+  tagHue(tag: string): string {
+    let hash = 0;
+    for (const character of this.normalizeChip(tag)) {
+      hash = ((hash << 5) - hash + character.charCodeAt(0)) | 0;
+    }
+    return String(Math.abs(hash) % 360);
+  }
+
   toggleCategory(category: InterestCategory, event: MatChipSelectionChange): void {
     if (event.selected) {
       this.selectedCategoryCodes.add(category.code);
@@ -336,13 +344,21 @@ export class CreateActivityComponent implements OnInit {
       error: err => {
         console.error(err);
         this.isSubmitting = false;
-        this.snackBar.open('Could not create activity', 'Close', { duration: 3500 });
+        this.snackBar.open(
+          this.activityId ? 'Could not save the activity changes.' : 'Could not create the activity.',
+          'Close',
+          { duration: 3500, panelClass: ['error-snackbar'] }
+        );
       }
     });
   }
 
   get isEditing(): boolean {
     return !!this.activityId;
+  }
+
+  cancel(): void {
+    this.router.navigate(this.activityId ? ['/activities', this.activityId] : ['/activities']);
   }
 
   private loadActivity(id: number): void {

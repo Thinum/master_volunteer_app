@@ -108,12 +108,16 @@ public class OrganisationAdminService {
 
 
     public void requireAdminOf(int userId, int organisationId) {
-        if (!organisationRepository.existsByIdAndOrgAdmins_Id(organisationId, userId)) {
+        if (!isAdminOf(userId, organisationId)) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     "Only an administrator assigned to this organisation may perform this operation"
             );
         }
+    }
+
+    public boolean isAdminOf(int userId, int organisationId) {
+        return organisationRepository.existsByIdAndOrgAdmins_Id(organisationId, userId);
     }
 
     private void requirePlatformAdmin(int userId) {

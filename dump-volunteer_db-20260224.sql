@@ -208,10 +208,10 @@ INSERT INTO `user_relationship` (from_user_id, to_user_id, type) VALUES
 
 -- Organisations
 INSERT INTO `organisation` (id, org_name, lat, lon, profilepicture, created_at, body, deactivated, category) VALUES
-(1, 'Tech Aid Association', 48.2082, 16.3738, 'https://logotypes.dev/Protopie?variant=glyph&version=color', '2023-06-15 00:00:00', 'Helping underprivileged communities learn coding skills.', 0, 'Technology'),
-(2, 'Green Future Org', 48.3069, 14.2858, 'https://logotypes.dev/Clearscope?variant=glyph&version=color', '2023-09-20 00:00:00', 'Dedicated to sustainability and green innovation.', 0, 'Environment'),
-(3, 'Community Connect', 47.0707, 15.4395, 'https://logotypes.dev/Contentful?variant=glyph&version=color', '2023-10-01 00:00:00', 'Connecting volunteers with local social projects.', 0, 'Community'),
-(4, 'Education for All', 47.8095, 13.055, 'https://logotypes.dev/Feedly?variant=glyph&version=color', '2024-02-10 00:00:00', 'Providing access to quality education worldwide.', 0, 'Education');
+(1, 'Tech Aid Association', 48.2082, 16.3738, 'https://api.dicebear.com/10.x/shapes/svg?seed=Tech%20Aid%20Association', '2023-06-15 00:00:00', 'Helping underprivileged communities learn coding skills.', 0, 'Technology'),
+(2, 'Green Future Org', 48.3069, 14.2858, 'https://api.dicebear.com/10.x/shapes/svg?seed=Green%20Future%20Org', '2023-09-20 00:00:00', 'Dedicated to sustainability and green innovation.', 0, 'Environment'),
+(3, 'Community Connect', 47.0707, 15.4395, 'https://api.dicebear.com/10.x/shapes/svg?seed=Community%20Connect', '2023-10-01 00:00:00', 'Connecting volunteers with local social projects.', 0, 'Community'),
+(4, 'Education for All', 47.8095, 13.055, 'https://api.dicebear.com/10.x/shapes/svg?seed=Education%20for%20All', '2024-02-10 00:00:00', 'Providing access to quality education worldwide.', 0, 'Education');
 
 -- Organisation Tags
 INSERT INTO `organisation_tags` (organisation_id, tags) VALUES
