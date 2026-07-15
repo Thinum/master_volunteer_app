@@ -76,7 +76,7 @@
       </mat-form-field>
 
       <!-- BUTTON -->
-      <button mat-raised-button class="submit-btn" type="submit">
+      <button mat-raised-button class="submit-btn" type="submit" [disabled]="!canManageGoals">
         {{ isEditMode ? 'Save Goal' : 'Create Goal' }}
       </button>
 
@@ -98,6 +98,7 @@
           mat-icon-button
           class="goals-add-btn"
           (click)="goToCreateGoal()"
+          [disabled]="!canManageGoals"
           aria-label="Add goal">
           <mat-icon>add</mat-icon>
         </button>
@@ -120,7 +121,12 @@
               </div>
             </div>
             <div class="goal-actions">
-              <button mat-icon-button type="button" aria-label="Edit goal" (click)="goToEditGoal(goal)">
+              <button
+                mat-icon-button
+                type="button"
+                aria-label="Edit goal"
+                [disabled]="!canManageGoals"
+                (click)="goToEditGoal(goal)">
                 <mat-icon>edit</mat-icon>
               </button>
               <span class="goal-amount">{{ goal.currentValue || 0 }} / {{ goal.targetValue }}</span>
