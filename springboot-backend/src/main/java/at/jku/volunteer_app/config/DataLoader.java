@@ -44,6 +44,7 @@ public class DataLoader {
                                    PasswordEncoder passwordEncoder) {
         return args -> {
             ensureNotificationAutoIncrement(jdbcTemplate);
+            updateLegacyOrganisationProfilePictures(organisationRepository);
 
             if (userRepository.count() > 0) {
                 organisationAdminService.ensureDefaultAssignments();
@@ -438,7 +439,7 @@ public class DataLoader {
             Organisation techAid = createOrganisation(
                     "Tech Aid Association",
                     new Location(48.2082, 16.3738),
-                    "https://logotypes.dev/Protopie?variant=glyph&version=color",
+                    "https://api.dicebear.com/10.x/shapes/svg?seed=Tech%20Aid%20Association",
                     "Helping underprivileged communities learn coding skills.",
                     OrganisationCategory.Technology,
                     Set.of("coding", "programming", "mentorship"),
@@ -448,7 +449,7 @@ public class DataLoader {
             Organisation greenFuture = createOrganisation(
                     "Green Future Org",
                     new Location(48.3069, 14.2858),
-                    "https://logotypes.dev/Clearscope?variant=glyph&version=color",
+                    "https://api.dicebear.com/10.x/shapes/svg?seed=Green%20Future%20Org",
                     "Dedicated to sustainability and green innovation.",
                     OrganisationCategory.Environment,
                     Set.of("sustainability", "climate", "eco projects"),
@@ -458,7 +459,7 @@ public class DataLoader {
             Organisation communityConnect = createOrganisation(
                     "Community Connect",
                     new Location(47.0707, 15.4395),
-                    "https://logotypes.dev/Contentful?variant=glyph&version=color",
+                    "https://api.dicebear.com/10.x/shapes/svg?seed=Community%20Connect",
                     "Connecting volunteers with local social projects.",
                     OrganisationCategory.Community,
                     Set.of("volunteering", "local projects", "social impact"),
@@ -468,7 +469,7 @@ public class DataLoader {
             Organisation eduForAll = createOrganisation(
                     "Education for All",
                     new Location(47.8095, 13.055),
-                    "https://logotypes.dev/Feedly?variant=glyph&version=color",
+                    "https://api.dicebear.com/10.x/shapes/svg?seed=Education%20for%20All",
                     "Providing access to quality education worldwide.",
                     OrganisationCategory.Education,
                     Set.of("schools", "learning", "children"),
@@ -478,7 +479,7 @@ public class DataLoader {
             Organisation herzFuerMenschen = createOrganisation(
                     "Herz für Menschen",
                     new Location(48.2100, 16.3700),
-                    "https://logotypes.dev/Notion?variant=glyph&version=color",
+                    "https://api.dicebear.com/10.x/shapes/svg?seed=Herz%20f%C3%BCr%20Menschen",
                     "Supporting vulnerable people through community initiatives.",
                     OrganisationCategory.Community,
                     Set.of("charity", "community", "social support"),
@@ -488,7 +489,7 @@ public class DataLoader {
             Organisation localLearningSupport = createOrganisation(
                     "Local Learning Support",
                     new Location(48.3000, 14.2900),
-                    "https://logotypes.dev/Linear?variant=glyph&version=color",
+                    "https://api.dicebear.com/10.x/shapes/svg?seed=Local%20Learning%20Support",
                     "Tutoring and mentoring for students.",
                     OrganisationCategory.Education,
                     Set.of("education", "tutoring", "mentoring"),
@@ -498,7 +499,7 @@ public class DataLoader {
             Organisation pawsAndHearts = createOrganisation(
                     "Paws & Hearts",
                     new Location(48.3200, 14.3000),
-                    "https://logotypes.dev/Figma?variant=glyph&version=color",
+                    "https://api.dicebear.com/10.x/shapes/svg?seed=Paws%20%26%20Hearts",
                     "Helping animals find safe homes.",
                     OrganisationCategory.Community,
                     Set.of("animals", "rescue", "shelter"),
@@ -508,7 +509,7 @@ public class DataLoader {
             Organisation volunteerFire = createOrganisation(
                     "Volunteer Fire Service Linz",
                     new Location(48.3050, 14.2860),
-                    "https://logotypes.dev/Firefox?variant=glyph&version=color",
+                    "https://api.dicebear.com/10.x/shapes/svg?seed=Volunteer%20Fire%20Service%20Linz",
                     "Volunteer fire and emergency support.",
                     OrganisationCategory.Community,
                     Set.of("fire service", "emergency", "rescue"),
@@ -968,6 +969,36 @@ public class DataLoader {
         }
         organisation.setOrgMembers(organisationMembers);
         return organisation;
+    }
+
+    private void updateLegacyOrganisationProfilePictures(OrganisationRepository organisationRepository) {
+        Map<String, String> replacements = Map.of(
+                "https://logotypes.dev/Protopie?variant=glyph&version=color",
+                "https://api.dicebear.com/10.x/shapes/svg?seed=Tech%20Aid%20Association",
+                "https://logotypes.dev/Clearscope?variant=glyph&version=color",
+                "https://api.dicebear.com/10.x/shapes/svg?seed=Green%20Future%20Org",
+                "https://logotypes.dev/Contentful?variant=glyph&version=color",
+                "https://api.dicebear.com/10.x/shapes/svg?seed=Community%20Connect",
+                "https://logotypes.dev/Feedly?variant=glyph&version=color",
+                "https://api.dicebear.com/10.x/shapes/svg?seed=Education%20for%20All",
+                "https://logotypes.dev/Notion?variant=glyph&version=color",
+                "https://api.dicebear.com/10.x/shapes/svg?seed=Herz%20f%C3%BCr%20Menschen",
+                "https://logotypes.dev/Linear?variant=glyph&version=color",
+                "https://api.dicebear.com/10.x/shapes/svg?seed=Local%20Learning%20Support",
+                "https://logotypes.dev/Figma?variant=glyph&version=color",
+                "https://api.dicebear.com/10.x/shapes/svg?seed=Paws%20%26%20Hearts",
+                "https://logotypes.dev/Firefox?variant=glyph&version=color",
+                "https://api.dicebear.com/10.x/shapes/svg?seed=Volunteer%20Fire%20Service%20Linz"
+        );
+
+        List<Organisation> updatedOrganisations = organisationRepository.findAll().stream()
+                .filter(organisation -> replacements.containsKey(organisation.getProfilePicture()))
+                .peek(organisation -> organisation.setProfilePicture(replacements.get(organisation.getProfilePicture())))
+                .toList();
+
+        if (!updatedOrganisations.isEmpty()) {
+            organisationRepository.saveAll(updatedOrganisations);
+        }
     }
 
     private void seedGoalDemoData(UserRepository userRepository,
