@@ -215,7 +215,7 @@ export class CreateOrganisationComponent implements OnInit {
     this.organisationService.addOrganisation(payload).subscribe({
       next: organisation => {
         this.snackBar.open('Organization created successfully.', 'Close', { duration: 3000 });
-        this.router.navigate(['/organisations', organisation.id]);
+        this.router.navigate(['/organisations', organisation.id, 'engagement-levels']);
       },
       error: () => {
         this.isSubmitting = false;

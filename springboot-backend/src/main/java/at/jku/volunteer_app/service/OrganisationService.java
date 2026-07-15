@@ -21,14 +21,17 @@ public class OrganisationService {
     private final UserRepository userRepository;
     private final ActivityRepository activityRepository;
     private final OrganisationAdminService organisationAdminService;
+    private final EngagementLevelService engagementLevelService;
 
     public OrganisationService(OrganisationRepository organisationRepository, UserRepository userRepository,
                                ActivityRepository activityRepository,
-                               OrganisationAdminService organisationAdminService) {
+                               OrganisationAdminService organisationAdminService,
+                               EngagementLevelService engagementLevelService) {
         this.organisationRepository = organisationRepository;
         this.userRepository = userRepository;
         this.activityRepository = activityRepository;
         this.organisationAdminService = organisationAdminService;
+        this.engagementLevelService = engagementLevelService;
     }
 
     public List<Organisation> getAllOrganisations(){
@@ -36,17 +39,41 @@ public class OrganisationService {
     }
 
     public Organisation getOrganisationById(int id) {
-        return organisationRepository.findById(id).get();
+        Organisation organisation = organisationRepository.findById(id)
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "Organisation not found"));
+        engagementLevelService.refreshMemberLevels(organisation);
+        return organisation;
     }
 
     public List<Organisation> getOrganisationsForUser(at.jku.volunteer_app.model.User user) {
         return organisationRepository.findAllByOrgMembers_User(user);
     }
 
-    public Organisation addOrganisation(Organisation organisation) {
+    public Organisation addOrganisation(Organisation organisation, int creatorId) {
         normalizeOrganisationProfile(organisation);
+        organisation.setOrgMembers(organisation.getOrgMembers() == null
+                ? new LinkedHashSet<>() : new LinkedHashSet<>(organisation.getOrgMembers()));
+        organisation.setOrgAdmins(organisation.getOrgAdmins() == null
+                ? new LinkedHashSet<>() : new LinkedHashSet<>(organisation.getOrgAdmins()));
         Organisation saved = organisationRepository.save(organisation);
         organisationAdminService.assignPlatformAdminsTo(saved);
+        engagementLevelService.ensureDefaults(saved);
+
+        userRepository.findById(creatorId).ifPresent(creator -> {
+            saved.getOrgAdmins().add(creator);
+            boolean alreadyMember = saved.getOrgMembers().stream()
+                    .anyMatch(member -> member.getUser().getId() == creatorId);
+            if (!alreadyMember) {
+                OrganisationMember member = new OrganisationMember();
+                member.setOrganisation(saved);
+                member.setUser(creator);
+                member.setEngagementLevel(EngagementLevelService.DEDICATED_LEVEL);
+                member.setJoinedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+                saved.getOrgMembers().add(member);
+            }
+            organisationRepository.save(saved);
+        });
         return organisationRepository.findById(saved.getId()).orElse(saved);
     }
 
@@ -68,6 +95,9 @@ public class OrganisationService {
         }
         Organisation organisation = optionalOrganisation.get();
         User user = optionalUser.get();
+        if (organisation.getOrgMembers() == null) {
+            organisation.setOrgMembers(new LinkedHashSet<>());
+        }
         boolean alreadyMember = organisation.getOrgMembers().stream()
                 .anyMatch(member -> member.getUser().getId() == userId);
 

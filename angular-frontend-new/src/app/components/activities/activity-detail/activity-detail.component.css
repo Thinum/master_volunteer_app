@@ -609,3 +609,34 @@
     white-space: normal;
   }
 }
+
+.join-button-wrap {
+  display: block;
+  width: 100%;
+}
+.join-button-wrap .join-button {
+  width: 100%;
+}
+.registration-limitation {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 9px 10px;
+  border-radius: 9px;
+  color: #6f5919;
+  background: #fff8dc;
+  font-size: .82rem;
+  line-height: 1.35;
+}
+.registration-limitation mat-icon {
+  flex: 0 0 auto;
+  width: 17px;
+  height: 17px;
+  font-size: 17px;
+}
+.registration-usage {
+  display: block;
+  margin-top: 8px;
+  color: #667b80;
+}

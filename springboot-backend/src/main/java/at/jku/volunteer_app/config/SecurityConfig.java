@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -43,6 +44,16 @@ public class SecurityConfig {
                         .requestMatchers("/notifications/**").permitAll()
                         .requestMatchers("/demande/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/organisations/recommendations",
+                                "/organisations/administered",
+                                "/organisations/manageable",
+                                "/organisations/*/engagement-levels").authenticated()
+                        .requestMatchers(HttpMethod.POST,
+                                "/organisations", "/organisations/join/*").authenticated()
+                        .requestMatchers(HttpMethod.PUT,
+                                "/organisations/*/engagement-levels").authenticated()
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers("/organisations/**").permitAll()
                         .requestMatchers("/organisation-admin-assignments/**").authenticated()
                         .requestMatchers("/activities/**").permitAll()
@@ -61,6 +72,9 @@ public class SecurityConfig {
                         .requestMatchers("/formateur/**").permitAll() // .authenticated()
                         .requestMatchers("/individu/**").authenticated() // Done
                 ).csrf(AbstractHttpConfigurer::disable)
+                .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(
+                        (request, response, exception) -> response.sendError(401, "Authentication required")
+                ))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
@@ -81,7 +95,8 @@ public class SecurityConfig {
 
     public CorsConfiguration corsConfiguration() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.addAllowedOrigin("http://localhost:4200");
+        corsConfig.addAllowedOriginPattern("http://localhost:*");
+        corsConfig.addAllowedOriginPattern("http://127.0.0.1:*");
         corsConfig.addAllowedMethod("*");
         corsConfig.addAllowedHeader("*");
         corsConfig.setAllowCredentials(true);

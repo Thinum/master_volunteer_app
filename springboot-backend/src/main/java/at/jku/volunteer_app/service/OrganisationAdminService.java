@@ -2,6 +2,7 @@ package at.jku.volunteer_app.service;
 
 import at.jku.volunteer_app.model.Org_Admin;
 import at.jku.volunteer_app.model.Organisation;
+import at.jku.volunteer_app.model.OrganisationMember;
 import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.repository.Org_AdminRepository;
 import at.jku.volunteer_app.repository.OrganisationRepository;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -74,6 +77,7 @@ public class OrganisationAdminService {
         }
 
         organisation.setOrgAdmins(new HashSet<>(selectedUsers));
+        ensureHighestEngagementLevel(organisation, selectedUsers);
         return organisationRepository.save(organisation);
     }
 
@@ -81,6 +85,7 @@ public class OrganisationAdminService {
     public void assignPlatformAdminsTo(Organisation organisation) {
         List<Org_Admin> platformAdmins = adminRepository.findAllByPlatformAdminTrue();
         organisation.getOrgAdmins().addAll(platformAdmins);
+        ensureHighestEngagementLevel(organisation, platformAdmins);
         organisationRepository.save(organisation);
     }
 
@@ -103,9 +108,33 @@ public class OrganisationAdminService {
         if (alice != null && techAid != null) {
             techAid.getOrgAdmins().add(alice);
         }
+        organisations.forEach(organisation ->
+                ensureHighestEngagementLevel(organisation, organisation.getOrgAdmins()));
         organisationRepository.saveAll(organisations);
     }
 
+
+    private void ensureHighestEngagementLevel(Organisation organisation,
+                                              Collection<? extends User> admins) {
+        if (organisation.getOrgMembers() == null) {
+            organisation.setOrgMembers(new HashSet<>());
+        }
+
+        for (User admin : admins) {
+            OrganisationMember membership = organisation.getOrgMembers().stream()
+                    .filter(member -> member.getUser() != null && member.getUser().getId() == admin.getId())
+                    .findFirst()
+                    .orElseGet(() -> {
+                        OrganisationMember created = new OrganisationMember();
+                        created.setOrganisation(organisation);
+                        created.setUser(admin);
+                        created.setJoinedAt(new Timestamp(System.currentTimeMillis()));
+                        organisation.getOrgMembers().add(created);
+                        return created;
+                    });
+            membership.setEngagementLevel(EngagementLevelService.DEDICATED_LEVEL);
+        }
+    }
 
     public void requireAdminOf(int userId, int organisationId) {
         if (!isAdminOf(userId, organisationId)) {

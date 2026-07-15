@@ -12,6 +12,7 @@ import {VolunteerService} from '../../../services/api/volunteer.service';
 import {ActivityService} from '../../../services/api/activity.service';
 import {OrganisationService} from '../../../services/api/organisation.service';
 import {ShareButtonComponent} from '../../../shared/components/share-button/share-button.component';
+import { ActivityEngagementAccess } from '../../../models/engagement-level.model';
 
 @Component({
   selector: 'app-activity-detail',
@@ -37,6 +38,7 @@ export class ActivityDetailComponent implements OnInit {
   hasJoined: boolean = false;
   currentUser: User | null = null;
   canManage = false;
+  engagementAccess?: ActivityEngagementAccess;
   private friendIds = new Set<number>();
   private administeredOrganisationIds = new Set<number>();
 
@@ -53,7 +55,8 @@ export class ActivityDetailComponent implements OnInit {
         this.activity = activity;
         this.updateJoinState();
         this.updateManageState();
-        this.organisationService.getAdministeredOrganisations().subscribe({
+        this.loadEngagementAccess();
+        this.organisationService.getManageableOrganisations().subscribe({
           next: organisations => {
             this.administeredOrganisationIds = new Set((organisations || []).map(org => org.id));
             this.updateManageState();
@@ -124,6 +127,25 @@ export class ActivityDetailComponent implements OnInit {
     return this.uniqueLabels(this.activity?.skills || []);
   }
 
+  get registrationDisabled(): boolean {
+    return !this.hasJoined && (this.isFull || !this.engagementAccess?.canRegister);
+  }
+
+  get registrationButtonLabel(): string {
+    if (this.hasJoined) {
+      return 'Deregister';
+    }
+    return this.isFull ? 'No spots left' : 'Join activity';
+  }
+
+  get registrationLimitation(): string | null {
+    if (this.hasJoined) {
+      return 'You can deregister at any time to free this registration slot.';
+    }
+    return this.isFull ? 'This activity has reached its participant capacity.'
+      : this.engagementAccess?.limitationMessage ?? null;
+  }
+
   tagHue(tag: string): string {
     let hash = 0;
     for (const character of this.normalizeLabel(tag)) {
@@ -171,30 +193,71 @@ export class ActivityDetailComponent implements OnInit {
     });
   }
 
-  joinActivity(){
-    if (this.hasJoined || this.isFull) {
+  registrationAction(): void {
+    if (this.hasJoined) {
+      this.leaveActivity();
+      return;
+    }
+    this.joinActivity();
+  }
+
+  joinActivity(): void {
+    if (this.registrationDisabled) {
+      if (this.registrationLimitation) {
+        this.snackBar.open(this.registrationLimitation, 'Close', { duration: 5000 });
+      }
       return;
     }
     this.activityService.joinActivity(this.activityId).subscribe({
       next: result => {
-        if (result) {
-          console.log('Joined activity:', result);
-          this.hasJoined = true;
-          if (this.activity) {
-            if (this.currentUser && !this.activity.participants?.some(user => user.id === this.currentUser?.id)) {
-              this.activity.participants = [...(this.activity.participants ?? []), this.currentUser];
-            }
-            this.activity.spotsTaken = this.activity.participants?.length ?? this.spotsTaken + 1;
-          }
-        } else {
-          console.error('Could not join activity')
+        if (!result) {
+          return;
         }
+        this.hasJoined = true;
+        if (this.activity && this.currentUser
+            && !this.activity.participants?.some(user => user.id === this.currentUser?.id)) {
+          this.activity.participants = [...(this.activity.participants ?? []), this.currentUser];
+          this.activity.spotsTaken = this.activity.participants.length;
+        }
+        this.loadEngagementAccess();
+        this.snackBar.open('Activity added to your schedule.', 'Close', { duration: 3000 });
       },
-      error: err =>
-        // TODO: Maybe move to message bar
-        console.error('Could not join activity', err)
+      error: error => this.snackBar.open(this.errorText(error, 'Could not join this activity.'), 'Close', { duration: 5000 })
+    });
+  }
+
+  private leaveActivity(): void {
+    this.activityService.leaveActivity(this.activityId).subscribe({
+      next: removed => {
+        if (!removed) {
+          return;
+        }
+        this.hasJoined = false;
+        if (this.activity && this.currentUser) {
+          this.activity.participants = (this.activity.participants ?? [])
+            .filter(user => user.id !== this.currentUser?.id);
+          this.activity.spotsTaken = this.activity.participants.length;
+        }
+        this.loadEngagementAccess();
+        this.snackBar.open('Activity registration removed.', 'Close', { duration: 3000 });
       },
-    );
+      error: error => this.snackBar.open(this.errorText(error, 'Could not deregister.'), 'Close', { duration: 5000 })
+    });
+  }
+
+  private loadEngagementAccess(): void {
+    this.activityService.getEngagementAccess(this.activityId).subscribe({
+      next: access => this.engagementAccess = access,
+      error: error => this.engagementAccess = {
+        member: false, organisationId: 0, currentLevel: -1, currentLevelName: 'New Member',
+        activeRegistrations: 0, registrationLimit: null, canRegister: false, canDeregister: false,
+        limitationMessage: this.errorText(error, 'Registration access could not be checked.')
+      }
+    });
+  }
+
+  private errorText(error: any, fallback: string): string {
+    return error?.error?.detail || error?.error?.message || fallback;
   }
 
   private uniqueUsers(users: User[]): User[] {

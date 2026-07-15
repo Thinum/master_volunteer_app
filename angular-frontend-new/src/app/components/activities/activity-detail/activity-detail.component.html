@@ -49,11 +49,21 @@
              [attr.aria-valuenow]="spotsTaken" aria-valuemin="0" [attr.aria-valuemax]="capacity">
           <span [style.width.%]="slotProgress"></span>
         </div>
-        <button mat-flat-button color="primary" class="join-button" [disabled]="hasJoined || isFull" (click)="joinActivity()">
-          <mat-icon>{{ hasJoined ? 'check_circle' : 'person_add' }}</mat-icon>
-          {{ hasJoined ? 'You’re joining' : (isFull ? 'No spots left' : 'Join activity') }}
-        </button>
-        <span class="joined-note" *ngIf="hasJoined">This activity is now in your schedule.</span>
+        <span class="join-button-wrap" [matTooltip]="registrationDisabled ? (registrationLimitation || '') : ''">
+          <button mat-flat-button color="primary" class="join-button" [disabled]="registrationDisabled"
+                  (click)="registrationAction()">
+            <mat-icon>{{ hasJoined ? 'event_busy' : 'person_add' }}</mat-icon>
+            {{ registrationButtonLabel }}
+          </button>
+        </span>
+        <span class="joined-note" *ngIf="hasJoined">This activity is in your schedule.</span>
+        <p class="registration-limitation" *ngIf="registrationLimitation">
+          <mat-icon>{{ registrationDisabled ? 'lock_outline' : 'info_outline' }}</mat-icon>
+          {{ registrationLimitation }}
+        </p>
+        <small class="registration-usage" *ngIf="engagementAccess?.member && engagementAccess?.registrationLimit !== null">
+          {{ engagementAccess?.activeRegistrations }} / {{ engagementAccess?.registrationLimit }} active registrations at {{ engagementAccess?.currentLevelName }}
+        </small>
       </aside>
     </div>
   </section>

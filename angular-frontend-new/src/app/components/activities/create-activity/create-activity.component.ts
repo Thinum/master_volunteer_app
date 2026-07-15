@@ -138,11 +138,11 @@ export class CreateActivityComponent implements OnInit {
     const requestedOrganisationId = Number(this.route.snapshot.queryParamMap.get('organisationId'));
     this.requestedProjectId = Number(this.route.snapshot.queryParamMap.get('projectId'));
 
-    this.organisationService.getAdministeredOrganisations().subscribe({
+    this.organisationService.getManageableOrganisations().subscribe({
       next: organisations => {
         this.administeredOrganisations = organisations ?? [];
         if (!this.administeredOrganisations.length) {
-          this.snackBar.open('Only organization admins can manage activities.', 'Close', { duration: 3500 });
+          this.snackBar.open('Reach Level 3 in an organization to manage its activities.', 'Close', { duration: 4500 });
           this.router.navigate(['/activities']);
           return;
         }

@@ -709,3 +709,35 @@ mat-list-item .mat-list-text {
   color: #5c5f68;
   white-space: nowrap;
 }
+
+.organization-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.member-level {
+  margin-left: auto;
+  padding: 6px 11px;
+  border-radius: 999px;
+  color: #075f69;
+  background: #dff4f4;
+  font-size: .82rem;
+  font-weight: 700;
+}
+.engagement-limitation {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 16px 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: #715a18;
+  background: #fff8dc;
+  font-size: .9rem;
+}
+.engagement-limitation mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}

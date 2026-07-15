@@ -23,7 +23,7 @@ class ActivityTaxonomyServiceTest {
                     throw new UnsupportedOperationException(method.getName());
                 }
         );
-        ActivityService service = new ActivityService(repository, null, null, null, null);
+        ActivityService service = new ActivityService(repository, null, null, null, null, null);
 
         TagConceptDTO environment = service.getActivityTagConceptCatalog().stream()
                 .filter(tag -> "environment".equals(tag.preferredLabel()))

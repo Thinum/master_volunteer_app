@@ -25,9 +25,26 @@
       <span class="location-attribution">Address data &copy; OpenStreetMap contributors</span>
     </div>
 
-    <mat-card-actions>
-      <button matButton="filled" [disabled]="hasJoined" (click)="joinOrganisation()">{{hasJoined ? "Joined" : "Join"}}</button>
+    <mat-card-actions class="organization-actions">
+      <button matButton="filled" [disabled]="isAuthenticated && hasJoined" (click)="joinOrganisation()">
+        {{ !isAuthenticated ? 'Log in to join' : (hasJoined ? 'Joined' : 'Join') }}
+      </button>
+      <button mat-stroked-button type="button" (click)="inviteOthers()"
+              [disabled]="!engagementOverview?.canInvite"
+              [matTooltip]="engagementOverview?.inviteLimitation || 'Invite others to this organization'">
+        <mat-icon>person_add</mat-icon> Invite others
+      </button>
+      <a *ngIf="canManage" mat-stroked-button [routerLink]="['/organisations', id, 'engagement-levels']">
+        <mat-icon>workspace_premium</mat-icon> Engagement levels
+      </a>
+      <span class="member-level" *ngIf="engagementOverview">
+        {{ engagementOverview.currentLevel < 0 ? 'Initial level' : 'Level ' + engagementOverview.currentLevel }} ·
+        {{ engagementOverview.currentLevelName }}
+      </span>
     </mat-card-actions>
+    <p class="engagement-limitation" *ngIf="engagementOverview && !engagementOverview.canManageActivitiesAndGoals">
+      <mat-icon>lock_outline</mat-icon> {{ engagementLimitation }}
+    </p>
   </mat-card>
 
   <mat-card class="goals-card">
@@ -36,6 +53,8 @@
 
       <button
         mat-icon-button
+        [disabled]="!canManageContent"
+        [matTooltip]="engagementLimitation"
         class="goals-add-btn"
         (click)="goToCreateGoal()"
         aria-label="Add goal">
@@ -64,7 +83,8 @@
               </div>
             </div>
             <div class="goal-actions">
-              <button mat-icon-button type="button" aria-label="Edit goal" (click)="goToEditGoal(goal)">
+              <button mat-icon-button type="button" aria-label="Edit goal" (click)="goToEditGoal(goal)"
+                      [disabled]="!canManageContent" [matTooltip]="engagementLimitation">
                 <mat-icon>edit</mat-icon>
               </button>
               <span class="goal-amount">{{ goal.currentValue || 0 }} / {{ goal.targetValue }}</span>
@@ -140,7 +160,8 @@
       <mat-card-header>
         <mat-card-title>Activities</mat-card-title>
         <button
-          *ngIf="canManage"
+          [disabled]="!canManageContent"
+          [matTooltip]="engagementLimitation"
           mat-icon-button
           class="goals-add-btn"
           type="button"

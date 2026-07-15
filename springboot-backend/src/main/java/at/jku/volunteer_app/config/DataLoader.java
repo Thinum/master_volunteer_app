@@ -2,6 +2,7 @@ package at.jku.volunteer_app.config;
 
 import at.jku.volunteer_app.model.*;
 import at.jku.volunteer_app.repository.*;
+import at.jku.volunteer_app.service.EngagementLevelService;
 import at.jku.volunteer_app.service.OrganisationAdminService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,7 @@ public class DataLoader {
     CommandLineRunner initDatabase(UserRepository userRepository,
                                    OrganisationRepository organisationRepository,
                                    OrganisationAdminService organisationAdminService,
+                                   EngagementLevelService engagementLevelService,
                                    ActivityRepository activityRepository,
                                    CommunityGoalRepository communityGoalRepository,
                                    InterestRepository interestRepository,
@@ -54,6 +56,8 @@ public class DataLoader {
                 enrichDemoActivityRecommendationProfiles(activityRepository);
                 seedInterestCatalog(userRepository, organisationRepository, activityRepository, communityGoalRepository, interestRepository);
                 seedCalendarSampleData(userRepository, organisationRepository, activityRepository, appointmentRepository, communityGoalRepository, interestRepository);
+                seedMockEngagementLevels(organisationRepository, activityRepository,
+                        engagementLevelService);
                 return; // Data already loaded
             }
 
@@ -934,6 +938,8 @@ public class DataLoader {
             seedGoalDemoData(userRepository, organisationRepository, activityRepository, communityGoalRepository, interestRepository);
             seedInterestCatalog(userRepository, organisationRepository, activityRepository, communityGoalRepository, interestRepository);
             seedCalendarSampleData(userRepository, organisationRepository, activityRepository, appointmentRepository, communityGoalRepository, interestRepository);
+            seedMockEngagementLevels(organisationRepository, activityRepository,
+                    engagementLevelService);
 
             System.out.println("Database seeded successfully!");
         };
@@ -969,6 +975,114 @@ public class DataLoader {
         }
         organisation.setOrgMembers(organisationMembers);
         return organisation;
+    }
+
+    private void seedMockEngagementLevels(OrganisationRepository organisationRepository,
+                                          ActivityRepository activityRepository,
+                                          EngagementLevelService engagementLevelService) {
+        List<Organisation> organisations = organisationRepository.findAll().stream()
+                .map(item -> organisationRepository.findById(item.getId()).orElse(item))
+                .toList();
+        organisations.forEach(engagementLevelService::ensureDefaults);
+
+        Map<String, Activity> historyByTitle = new HashMap<>();
+        activityRepository.findAll().stream()
+                .filter(activity -> activity.getTitle() != null
+                        && activity.getTitle().startsWith("Mock engagement history - "))
+                .forEach(activity -> historyByTitle.put(activity.getTitle(), activity));
+
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        for (Organisation organisation : organisations) {
+            Set<Integer> adminIds = organisation.getOrgAdmins() == null
+                    ? Set.of()
+                    : organisation.getOrgAdmins().stream().map(User::getId).collect(java.util.stream.Collectors.toSet());
+
+            if (organisation.getOrgMembers() == null) {
+                continue;
+            }
+            for (OrganisationMember membership : organisation.getOrgMembers()) {
+                User user = membership.getUser();
+                if (user == null) {
+                    continue;
+                }
+
+                int targetLevel = adminIds.contains(user.getId())
+                        ? EngagementLevelService.DEDICATED_LEVEL
+                        : mockEngagementLevel(user.getUsername());
+                if (targetLevel == EngagementLevelService.DEDICATED_LEVEL) {
+                    membership.setEngagementLevel(EngagementLevelService.DEDICATED_LEVEL);
+                    continue;
+                }
+
+                membership.setEngagementLevel(0);
+                int historyCount = targetLevel == 2 ? 4 : targetLevel == 1 ? 1 : 0;
+                for (int sequence = 0; sequence < historyCount; sequence++) {
+                    String title = "Mock engagement history - " + organisation.getId()
+                            + " - " + user.getUsername() + " - " + (sequence + 1);
+                    Activity activity = historyByTitle.getOrDefault(title, new Activity());
+                    configureMockEngagementActivity(activity, title, organisation, user, sequence, now);
+                    Activity saved = activityRepository.save(activity);
+                    historyByTitle.put(title, saved);
+                }
+            }
+            organisationRepository.save(organisation);
+        }
+
+        organisations.forEach(organisation -> {
+            if (organisation.getOrgMembers() != null) {
+                organisation.getOrgMembers().stream()
+                        .filter(member -> member.getUser() != null)
+                        .forEach(member -> engagementLevelService.getCurrentLevel(
+                                organisation.getId(), member.getUser().getId()));
+            }
+        });
+    }
+
+    private int mockEngagementLevel(String username) {
+        return switch (username == null ? "" : username.toLowerCase(Locale.ROOT)) {
+            case "charlie", "fiona", "sandra", "sophia", "emma" -> 1;
+            case "diana", "george", "mia", "lukas" -> 2;
+            default -> 0;
+        };
+    }
+
+    private void configureMockEngagementActivity(Activity activity,
+                                                 String title,
+                                                 Organisation organisation,
+                                                 User user,
+                                                 int sequence,
+                                                 Timestamp now) {
+        Timestamp completedAt = new Timestamp(now.getTime() - Duration.ofDays(sequence + 1L).toMillis());
+        activity.setTitle(title);
+        activity.setBody("Demo activity used to establish a predictable engagement level.");
+        activity.setDescription("Completed mock engagement activity for " + user.getName() + ".");
+        activity.setProjectId(0);
+        activity.setOrganisations(List.of(organisation));
+        activity.setDate(completedAt);
+        activity.setStartTime("10:00");
+        activity.setEndTime("12:00");
+        activity.setDuration("2 hours");
+        activity.setExpiresAt(completedAt);
+        activity.setLocation("Demo location");
+        activity.setCoordinates(new Coordinates(48.3069, 14.2858));
+        activity.setParticipants(List.of(user));
+        activity.setCreatedBy(user);
+        setActivityProfile(activity,
+                List.of(InterestCategory.COMMUNITY_AND_SOCIAL_EVENTS),
+                List.of(requiredSkill("Teamwork", SkillProficiency.BEGINNER)),
+                List.of("mock-data", "engagement-history"));
+        activity.setQualifications(List.of());
+        activity.setPrerequisites(List.of());
+        activity.setCapacity(1);
+        activity.setSpotsTaken(1);
+        activity.setEquipmentProvided(List.of());
+        activity.setDifficulty("easy");
+        activity.setPublic(false);
+        activity.setStatus(ActivityStatus.finished);
+        if (activity.getCreatedAt() == null) {
+            activity.setCreatedAt(completedAt);
+        }
+        activity.setUpdatedAt(now);
     }
 
     private void updateLegacyOrganisationProfilePictures(OrganisationRepository organisationRepository) {

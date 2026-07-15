@@ -22,6 +22,9 @@ import { Project } from '../../../models/project.model';
 import { ProjectService } from '../../../services/api/project.service';
 import { Activity } from '../../../models/activity.model';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { EngagementLevelOverview } from '../../../models/engagement-level.model';
+import { AuthService } from '../../../services/authservice/auth.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 const FALLBACK_LOCATION_LABEL = 'Location unavailable';
 const NOMINATIM_REVERSE_URL = 'https://nominatim.openstreetmap.org/reverse';
@@ -73,9 +76,12 @@ export class OrganisationDetailComponent implements OnInit {
   goals: CommunityGoal[] = [];
   projects: Project[] = [];
   canManage = false;
+  canManageContent = false;
+  engagementOverview?: EngagementLevelOverview;
   activities: Activity[] = [];
   visibleActivities: Activity[] = [];
   hasJoined = false;
+  isAuthenticated = false;
   locationLabel = FALLBACK_LOCATION_LABEL;
   mapCenter: google.maps.LatLngLiteral = { lat: 48.3069, lng: 14.2858 };
   mapMarker?: google.maps.LatLngLiteral;
@@ -98,26 +104,34 @@ constructor(
     private router: Router,
     private communityGoalService: CommunityGoalService,
     private projectService: ProjectService,
-    private http: HttpClient
+    private http: HttpClient,
+    private authService: AuthService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
     this.id = parseInt(this.route.snapshot.paramMap.get('id') ?? '-1');
+    this.isAuthenticated = this.authService.isAuthenticated();
 
     if (this.id) {
+      if (this.isAuthenticated) {
+        this.loadEngagementOverview();
+      }
       this.organisationService.getOrganisationById(this.id)
         .subscribe(org => {
           this.detailedOrganisation = org;
           this.updateMapLocation(org);
           this.updateLocationLabel(org);
-          this.volunteerService.getCurrentUser().subscribe(user => {
-            this.hasJoined = this.detailedOrganisation?.orgMembers?.
-              some((orgMember) => orgMember.user.id === user.id) ?? false;
-            this.volunteerService.getFriends(user.id).subscribe({
-              next: friends => this.friendIds = new Set((friends ?? []).map(friend => friend.id)),
-              error: err => console.error('Could not load friends', err)
+          if (this.isAuthenticated) {
+            this.volunteerService.getCurrentUser().subscribe(user => {
+              this.hasJoined = this.detailedOrganisation?.orgMembers?.
+                some((orgMember) => orgMember.user.id === user.id) ?? false;
+              this.volunteerService.getFriends(user.id).subscribe({
+                next: friends => this.friendIds = new Set((friends ?? []).map(friend => friend.id)),
+                error: err => console.error('Could not load friends', err)
+              });
             });
-          });
+          }
         });
 
       this.communityGoalService.getGoalsForOrganisation(this.id)
@@ -135,11 +149,54 @@ constructor(
     this.projectService.getAllProjects(this.id ?? undefined)
       .subscribe(projects => this.projects = projects ?? []);
 
-    this.organisationService.getAdministeredOrganisations().subscribe({
-      next: organisations => this.canManage = organisations.some(org => org.id === this.id),
-      error: () => this.canManage = false
-    });
+    if (this.isAuthenticated) {
+      this.organisationService.getAdministeredOrganisations().subscribe({
+        next: organisations => this.canManage = organisations.some(org => org.id === this.id),
+        error: () => this.canManage = false
+      });
+    }
 
+  }
+
+  get engagementLimitation(): string {
+    return this.engagementOverview?.managementLimitation
+      || 'Reach Level 3 to create, update or delete activities and manage organization goals.';
+  }
+
+  inviteOthers(): void {
+    if (!this.engagementOverview?.canInvite || !this.detailedOrganisation) {
+      return;
+    }
+    const inviteUrl = `${window.location.origin}/organisations/${this.id}`;
+    if (navigator.share) {
+      void navigator.share({
+        title: `Join ${this.detailedOrganisation.orgName}`,
+        text: `Join me at ${this.detailedOrganisation.orgName} on iVolunteer.`,
+        url: inviteUrl
+      });
+      return;
+    }
+    if (navigator.clipboard) {
+      void navigator.clipboard.writeText(inviteUrl);
+    } else {
+      window.prompt('Copy this organization invitation link:', inviteUrl);
+    }
+  }
+
+  private loadEngagementOverview(): void {
+    if (!this.id) {
+      return;
+    }
+    this.organisationService.getEngagementLevels(this.id).subscribe({
+      next: overview => {
+        this.engagementOverview = overview;
+        this.canManageContent = overview.canManageActivitiesAndGoals;
+      },
+      error: () => {
+        this.engagementOverview = undefined;
+        this.canManageContent = false;
+      }
+    });
   }
 
   goToCommunityGoals(): void {
@@ -160,13 +217,13 @@ constructor(
   }
 
   createActivity(): void {
-    if (this.id) {
+    if (this.id && this.canManageContent) {
       this.router.navigate(['/createActivity'], { queryParams: { organisationId: this.id } });
     }
   }
 
   goToCreateGoal(): void {
-    if (!this.id) {
+    if (!this.id || !this.canManageContent) {
       return;
     }
 
@@ -176,7 +233,7 @@ constructor(
   }
 
   goToEditGoal(goal: CommunityGoal): void {
-    if (!this.id || !goal.id) {
+    if (!this.id || !goal.id || !this.canManageContent) {
       return;
     }
 
@@ -261,19 +318,27 @@ constructor(
 
 
   joinOrganisation(){
+    if (!this.isAuthenticated) {
+      this.snackBar.open('Log in to join this organization.', 'Close', { duration: 4000 });
+      void this.router.navigate(['/']);
+      return;
+    }
     if (this.id === null || this.id === undefined) return;
     this.organisationService.joinOrganisation(this.id).subscribe({
         next: result => {
           if (result) {
-            console.log('Joined activity:', result);
             this.hasJoined = true;
+            this.loadEngagementOverview();
           } else {
-            console.error('Could not join activity')
+            this.snackBar.open('You are already a member of this organization.', 'Close', { duration: 4000 });
           }
         },
-        error: err =>
-          // TODO: Maybe move to message bar
-          console.error('Could not join activity', err)
+        error: err => {
+          const message = err?.status === 401 || err?.status === 403
+            ? 'Your session is no longer valid. Please log in again.'
+            : err?.error?.message || 'Could not join this organization.';
+          this.snackBar.open(message, 'Close', { duration: 5000 });
+        }
       },
     );
   }

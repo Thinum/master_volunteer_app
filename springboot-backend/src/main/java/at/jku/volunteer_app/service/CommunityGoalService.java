@@ -13,6 +13,8 @@ import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.repository.ActivityRepository;
 import at.jku.volunteer_app.repository.CommunityGoalRepository;
 import at.jku.volunteer_app.repository.InterestRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,18 +36,22 @@ public class CommunityGoalService {
     private final OrganisationService organisationService;
     private final ActivityRepository activityRepository;
     private final InterestRepository interestRepository;
+    private final EngagementLevelService engagementLevelService;
 
     public CommunityGoalService(CommunityGoalRepository communityGoalRepository,
                                 OrganisationService organisationService,
                                 ActivityRepository activityRepository,
-                                InterestRepository interestRepository) {
+                                InterestRepository interestRepository,
+                                EngagementLevelService engagementLevelService) {
         this.communityGoalRepository = communityGoalRepository;
         this.organisationService = organisationService;
         this.activityRepository = activityRepository;
         this.interestRepository = interestRepository;
+        this.engagementLevelService = engagementLevelService;
     }
 
-    public CommunityGoal createGoal(CommunityGoal goal, int organisationId) {
+    public CommunityGoal createGoal(CommunityGoal goal, int organisationId, int userId) {
+        engagementLevelService.requireCanManageActivitiesAndGoals(userId, organisationId);
         goal.setOrganisation(organisationService.getOrganisationById(organisationId));
         goal.setActivityInterests(resolveInterests(goal.getActivityTags()));
         goal.setCreatedAt(new Timestamp(System.currentTimeMillis()));
@@ -65,22 +71,26 @@ public class CommunityGoalService {
         return communityGoalRepository.findById(id).orElse(null);
     }
 
-    public CommunityGoal updateGoal(CommunityGoal goal) {
+    public CommunityGoal updateGoal(CommunityGoal goal, int userId) {
         CommunityGoal existingGoal = getGoalById(goal.getId());
-        if (existingGoal != null) {
-            goal.setCreatedAt(existingGoal.getCreatedAt());
-            goal.setOrganisation(existingGoal.getOrganisation());
+        if (existingGoal == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Community goal not found");
         }
+        engagementLevelService.requireCanManageActivitiesAndGoals(userId, existingGoal.getOrganisation().getId());
+        goal.setCreatedAt(existingGoal.getCreatedAt());
+        goal.setOrganisation(existingGoal.getOrganisation());
         goal.setActivityInterests(resolveInterests(goal.getActivityTags()));
         goal.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
         goal.setCurrentValue(calculateCurrentValue(goal));
         return communityGoalRepository.save(goal);
     }
 
-    public boolean deleteGoal(int id) {
-        if (!communityGoalRepository.existsById(id)) {
+    public boolean deleteGoal(int id, int userId) {
+        CommunityGoal goal = getGoalById(id);
+        if (goal == null) {
             return false;
         }
+        engagementLevelService.requireCanManageActivitiesAndGoals(userId, goal.getOrganisation().getId());
         communityGoalRepository.deleteById(id);
         return true;
     }

@@ -26,6 +26,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { CommunityGoalService } from '../../../services/api/community-goal.service';
 import { CommunityGoal } from '../../../models/community-goal.model';
 import { InterestService } from '../../../services/api/interest.service';
+import { OrganisationService } from '../../../services/api/organisation.service';
 import { MOCK_SKILLS } from '../../../mock/mock-skills';
 
 /* ---------------- Validators ---------------- */
@@ -91,12 +92,14 @@ export class CommunityGoalsComponent {
   errorMessage = '';
   goals: CommunityGoal[] = [];
   activityTagOptions: string[] = [];
+  canManageGoals = false;
 
   constructor(
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private communityGoalService: CommunityGoalService,
     private interestService: InterestService,
+    private organisationService: OrganisationService,
     private router: Router,
     private snackBar: MatSnackBar
   ) {}
@@ -107,8 +110,10 @@ export class CommunityGoalsComponent {
       this.isCreateMode = params.get('mode') === 'create';
       this.isEditMode = params.get('mode') === 'edit';
       this.goalId = Number(params.get('goalId')) || null;
+      this.canManageGoals = false;
 
       if (this.organisationId) {
+        this.loadGoalManagementAccess(this.organisationId);
         this.loadActivityTags();
         if (this.isEditMode && this.goalId) {
           this.loadGoalForEdit(this.goalId);
@@ -139,6 +144,13 @@ export class CommunityGoalsComponent {
   }
 
   onCreateGoal() {
+    if (!this.canManageGoals) {
+      this.snackBar.open('You do not have permission to manage goals for this organization.', 'Close', {
+        duration: 4000
+      });
+      return;
+    }
+
     this.formSubmitted = true;
 
     this.goalForm.markAllAsTouched();
@@ -243,6 +255,21 @@ export class CommunityGoalsComponent {
     });
   }
 
+  private loadGoalManagementAccess(organisationId: number): void {
+    this.organisationService.getEngagementLevels(organisationId).subscribe({
+      next: overview => {
+        if (this.organisationId === organisationId) {
+          this.canManageGoals = overview.canManageActivitiesAndGoals;
+        }
+      },
+      error: () => {
+        if (this.organisationId === organisationId) {
+          this.canManageGoals = false;
+        }
+      }
+    });
+  }
+
   requiresActivityTags(): boolean {
     return false;
   }
@@ -299,13 +326,17 @@ export class CommunityGoalsComponent {
   }
 
   goToCreateGoal(): void {
+    if (!this.organisationId || !this.canManageGoals) {
+      return;
+    }
+
     this.router.navigate(['/community-goals'], {
       queryParams: { organisationId: this.organisationId, mode: 'create' }
     });
   }
 
   goToEditGoal(goal: CommunityGoal): void {
-    if (!this.organisationId || !goal.id) {
+    if (!this.organisationId || !goal.id || !this.canManageGoals) {
       return;
     }
 

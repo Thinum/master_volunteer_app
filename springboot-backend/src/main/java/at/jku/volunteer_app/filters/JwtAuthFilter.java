@@ -31,8 +31,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return "/auth/login".equals(path) || "/auth/register".equals(path);
+    }
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+		String requestAuthHeader = request.getHeader("Authorization");
 		try {
 			String authHeader = request.getHeader("Authorization"); 
 			String token = null; 
@@ -50,8 +57,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 				} 
 			}
 		} catch (Exception e) {
-			// Ignore token validation errors. If authentication is required, 
-			// Spring Security will reject the request later in the filter chain.
+			SecurityContextHolder.clearContext();
+			if (requestAuthHeader != null && requestAuthHeader.startsWith("Bearer ")) {
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired authentication token");
+				return;
+			}
 		}
 
 		filterChain.doFilter(request, response);

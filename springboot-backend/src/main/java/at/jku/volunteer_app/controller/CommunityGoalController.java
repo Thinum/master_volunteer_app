@@ -3,6 +3,10 @@ package at.jku.volunteer_app.controller;
 import at.jku.volunteer_app.contract.CommunityGoalDTO;
 import at.jku.volunteer_app.contract.ContractMapper;
 import at.jku.volunteer_app.service.CommunityGoalService;
+import at.jku.volunteer_app.model.UserModelDetails;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,15 +45,17 @@ public class CommunityGoalController {
 
     @PostMapping
     public CommunityGoalDTO createGoal(@RequestParam("organisationId") int organisationId,
-                                       @RequestBody CommunityGoalDTO goal) {
+                                       @RequestBody CommunityGoalDTO goal,
+                                       @AuthenticationPrincipal UserModelDetails userDetails) {
         return ContractMapper.toCommunityGoalDTO(
-                communityGoalService.createGoal(ContractMapper.toCommunityGoalEntity(goal), organisationId)
+                communityGoalService.createGoal(ContractMapper.toCommunityGoalEntity(goal), organisationId, requireUser(userDetails))
         );
     }
 
     @PutMapping("/{id}")
     public CommunityGoalDTO updateGoal(@PathVariable int id,
-                                       @RequestBody CommunityGoalDTO goal) {
+                                       @RequestBody CommunityGoalDTO goal,
+                                       @AuthenticationPrincipal UserModelDetails userDetails) {
         CommunityGoalDTO goalToUpdate = new CommunityGoalDTO(
                 id,
                 goal.title(),
@@ -66,12 +72,19 @@ public class CommunityGoalController {
                 null
         );
         return communityGoalService.toGoalDTOWithProgress(
-                communityGoalService.updateGoal(ContractMapper.toCommunityGoalEntity(goalToUpdate))
+                communityGoalService.updateGoal(ContractMapper.toCommunityGoalEntity(goalToUpdate), requireUser(userDetails))
         );
     }
 
     @DeleteMapping("/{id}")
-    public boolean deleteGoal(@PathVariable int id) {
-        return communityGoalService.deleteGoal(id);
+    public boolean deleteGoal(@PathVariable int id, @AuthenticationPrincipal UserModelDetails userDetails) {
+        return communityGoalService.deleteGoal(id, requireUser(userDetails));
+    }
+
+    private int requireUser(UserModelDetails userDetails) {
+        if (userDetails == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
+        }
+        return userDetails.getUserId();
     }
 }

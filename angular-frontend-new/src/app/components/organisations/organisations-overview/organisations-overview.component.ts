@@ -54,6 +54,7 @@ export class OrganisationsOverviewComponent implements OnInit {
   userSkillMatchLabels: string[] = [];
 
   joinedOrganisations: Organisation[] = [];
+  administeredOrganisations: Organisation[] = [];
   recommendedOrganisations: Organisation[] = [];
   featuredOrganisations = MOCK_FEATURED_ORGANISATIONS;
 
@@ -68,6 +69,16 @@ export class OrganisationsOverviewComponent implements OnInit {
     this.loadOrganisations();
     this.loadJoinedOrganisations();
     this.loadRecommendedOrganisations();
+    this.loadAdministeredOrganisations();
+  }
+
+  private loadAdministeredOrganisations(): void {
+    this.organisationService.getAdministeredOrganisations()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: organisations => this.administeredOrganisations = organisations ?? [],
+        error: () => this.administeredOrganisations = []
+      });
   }
 
   private loadRecommendedOrganisations(): void {

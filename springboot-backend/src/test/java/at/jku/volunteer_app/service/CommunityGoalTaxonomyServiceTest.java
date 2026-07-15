@@ -28,7 +28,7 @@ class CommunityGoalTaxonomyServiceTest {
                     throw new UnsupportedOperationException(method.getName());
                 }
         );
-        CommunityGoalService service = new CommunityGoalService(null, null, repository, null);
+        CommunityGoalService service = new CommunityGoalService(null, null, repository, null, null);
 
         assertThat(service.getActivityInterestsForOrganisation(7))
                 .containsExactly("Environment and Nature", "Technology");

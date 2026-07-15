@@ -1,6 +1,7 @@
 package at.jku.volunteer_app.service;
 
 import at.jku.volunteer_app.contract.TagConceptDTO;
+import at.jku.volunteer_app.contract.ActivityEngagementAccessDTO;
 import at.jku.volunteer_app.model.User;
 import at.jku.volunteer_app.repository.OrganisationRepository;
 import at.jku.volunteer_app.repository.ProjectRepository;
@@ -32,20 +33,25 @@ public class ActivityService {
     private final OrganisationRepository organisationRepository;
     private final OrganisationAdminService organisationAdminService;
     private final ProjectRepository projectRepository;
+    private final EngagementLevelService engagementLevelService;
 
     public ActivityService(ActivityRepository activityRepository, UserRepository userRepository,
                            OrganisationRepository organisationRepository,
                            OrganisationAdminService organisationAdminService,
-                           ProjectRepository projectRepository) {
+                           ProjectRepository projectRepository,
+                           EngagementLevelService engagementLevelService) {
         this.activityRepository = activityRepository;
         this.userRepository = userRepository;
         this.organisationRepository = organisationRepository;
         this.organisationAdminService = organisationAdminService;
         this.projectRepository = projectRepository;
+        this.engagementLevelService = engagementLevelService;
     }
 
     public List<Activity> getAllActivities(){
-        return activityRepository.findAll();
+        return activityRepository.findAll().stream()
+                .filter(activity -> !isInternalEngagementHistory(activity))
+                .toList();
     }
 
     public List<String> getActivityTagCatalog() {
@@ -75,8 +81,9 @@ public class ActivityService {
                 "care"
         ));
 
-        activityRepository.findAll().forEach(activity ->
-                safeList(activity.getTags()).stream()
+        activityRepository.findAll().stream()
+                .filter(activity -> !isInternalEngagementHistory(activity))
+                .forEach(activity -> safeList(activity.getTags()).stream()
                         .map(this::cleanTag)
                         .filter(tag -> tag != null && !tag.isBlank())
                         .forEach(tags::add)
@@ -139,7 +146,7 @@ public class ActivityService {
 
     @Transactional
     public Activity createActivity(Activity activity, int userId) {
-        List<Organisation> organisations = resolveAdministeredOrganisations(activity, userId);
+        List<Organisation> organisations = resolveManageableOrganisations(activity, userId);
         User creator = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
         Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -184,14 +191,14 @@ public class ActivityService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Activity not found"));
     }
 
-    private List<Organisation> resolveAdministeredOrganisations(Activity activity, int userId) {
+    private List<Organisation> resolveManageableOrganisations(Activity activity, int userId) {
         List<Integer> ids = activity == null || activity.getOrganisations() == null
                 ? List.of()
                 : activity.getOrganisations().stream().map(Organisation::getId).distinct().toList();
         if (ids.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one organisation is required");
         }
-        ids.forEach(id -> organisationAdminService.requireAdminOf(userId, id));
+        ids.forEach(id -> engagementLevelService.requireCanManageActivitiesAndGoals(userId, id));
         Map<Integer, Organisation> organisationsById = organisationRepository.findAllById(ids).stream()
                 .collect(Collectors.toMap(Organisation::getId, organisation -> organisation));
         return ids.stream()
@@ -209,7 +216,7 @@ public class ActivityService {
         Set<Integer> existingIds = new LinkedHashSet<>(organisationIds(existing.getOrganisations()));
         Set<Integer> updatedIds = new LinkedHashSet<>(requestedIds);
         if (!existingIds.equals(updatedIds)) {
-            return resolveAdministeredOrganisations(changes, userId);
+            return resolveManageableOrganisations(changes, userId);
         }
 
         return safeList(existing.getOrganisations());
@@ -252,22 +259,18 @@ public class ActivityService {
     }
 
     private void requireCanManage(Activity activity, int userId) {
-        if (activity.getCreatedBy() != null && activity.getCreatedBy().getId() == userId) {
-            return;
-        }
-
         List<Organisation> owners = safeList(activity.getOrganisations());
         if (owners.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "An activity without an owning organisation cannot be managed");
         }
 
-        boolean administersLinkedOrganisation = owners.stream()
+        boolean canManageLinkedOrganisation = owners.stream()
                 .filter(Objects::nonNull)
-                .anyMatch(org -> organisationAdminService.isAdminOf(userId, org.getId()));
-        if (!administersLinkedOrganisation) {
+                .anyMatch(org -> engagementLevelService.canManageActivitiesAndGoals(userId, org.getId()));
+        if (!canManageLinkedOrganisation) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Only the activity creator or an administrator of a linked organisation may manage this activity");
+                    "Reach Level 3 in a linked organization to manage this activity");
         }
     }
 
@@ -304,24 +307,39 @@ public class ActivityService {
         return activityRepository.findAllByParticipantsContains(user);
     }
 
+    @Transactional
     public boolean joinActivity(int activityId, int userId) {
-        Optional<Activity> optionalActivity = activityRepository.findById(activityId);
-        Optional<User> optionalUser = userRepository.findById(userId);
-        if (optionalActivity.isEmpty() || optionalUser.isEmpty()) {
-            return false;
-        }
-        Activity activity = optionalActivity.get();
-        User user = optionalUser.get();
+        Activity activity = getActivityOrThrow(activityId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
         if (activity.getParticipants() == null) {
             activity.setParticipants(new ArrayList<>());
         }
-        if (activity.getParticipants().stream().anyMatch(user1 -> user1.getId() == userId)) {
+        if (activity.getParticipants().stream().anyMatch(participant -> participant.getId() == userId)) {
             return false;
         }
+        engagementLevelService.requireCanRegister(activity, userId);
         if (activity.getCapacity() > 0 && activity.getParticipants().size() >= activity.getCapacity()) {
-            return false;
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "This activity is already full");
         }
         activity.getParticipants().add(user);
+        activity.setSpotsTaken(activity.getParticipants().size());
+        activityRepository.save(activity);
+        return true;
+    }
+
+    public ActivityEngagementAccessDTO getEngagementAccess(int activityId, int userId) {
+        return engagementLevelService.getActivityAccess(getActivityOrThrow(activityId), userId);
+    }
+
+    @Transactional
+    public boolean leaveActivity(int activityId, int userId) {
+        Activity activity = getActivityOrThrow(activityId);
+        boolean removed = activity.getParticipants() != null
+                && activity.getParticipants().removeIf(participant -> participant.getId() == userId);
+        if (!removed) {
+            return false;
+        }
         activity.setSpotsTaken(activity.getParticipants().size());
         activityRepository.save(activity);
         return true;
@@ -378,6 +396,11 @@ public class ActivityService {
 
     private <T> Set<T> safeSet(Set<T> values) {
         return values == null ? Set.of() : values;
+    }
+
+    private boolean isInternalEngagementHistory(Activity activity) {
+        return activity != null && safeList(activity.getTags()).stream()
+                .anyMatch(tag -> "engagement-history".equalsIgnoreCase(tag));
     }
 
     private String cleanTag(String value) {

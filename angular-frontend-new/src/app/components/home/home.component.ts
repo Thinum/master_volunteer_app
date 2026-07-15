@@ -4,6 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CardComponent } from '../../shared/components/card/card.component';
 import { User } from '../../models/user.model';
 import { Activity, RecommendationReason } from '../../models/activity.model';
@@ -31,6 +32,7 @@ interface VerificationRequest {
     CommonModule,
     MatCardModule,
     MatIconModule,
+    MatSnackBarModule,
     MatButtonModule,
     RouterLink,
     CardComponent,
@@ -57,6 +59,7 @@ export class HomeComponent implements OnInit {
   private readonly notificationService = inject(NotificationService);
   private readonly activityService = inject(ActivityService);
   private readonly calendarDataService = inject(CalendarDataService);
+  private readonly snackBar = inject(MatSnackBar);
 
   ngOnInit(): void {
     this.loadUserData();
@@ -215,7 +218,9 @@ export class HomeComponent implements OnInit {
           this.loadCalendar();
         }
       },
-      error: (err) => console.error('Error joining activity:', err)
+      error: (error) => this.snackBar.open(
+        error?.error?.detail || error?.error?.message || 'Could not join this activity.', 'Close', { duration: 5000 }
+      )
     });
   }
 

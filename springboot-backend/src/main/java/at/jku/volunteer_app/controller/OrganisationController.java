@@ -1,11 +1,9 @@
 package at.jku.volunteer_app.controller;
 
-import at.jku.volunteer_app.contract.ActivityDTO;
-import at.jku.volunteer_app.contract.ContractMapper;
-import at.jku.volunteer_app.contract.OrganisationDTO;
-import at.jku.volunteer_app.contract.OrganisationRecommendationDTO;
+import at.jku.volunteer_app.contract.*;
 import at.jku.volunteer_app.model.UserModelDetails;
 import at.jku.volunteer_app.service.OrganisationAdminService;
+import at.jku.volunteer_app.service.EngagementLevelService;
 import at.jku.volunteer_app.service.OrganisationRecommendationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,12 +20,15 @@ public class OrganisationController {
     private final OrganisationAdminService organisationAdminService;
     private final OrganisationRecommendationService organisationRecommendationService;
 
+    private final EngagementLevelService engagementLevelService;
     public OrganisationController(OrganisationService organisationService,
                                   OrganisationAdminService organisationAdminService,
-                                  OrganisationRecommendationService organisationRecommendationService) {
+                                  OrganisationRecommendationService organisationRecommendationService,
+                                  EngagementLevelService engagementLevelService) {
         this.organisationService = organisationService;
         this.organisationAdminService = organisationAdminService;
         this.organisationRecommendationService = organisationRecommendationService;
+        this.engagementLevelService = engagementLevelService;
     }
 
     @GetMapping
@@ -55,14 +56,39 @@ public class OrganisationController {
                 organisationAdminService.getAdministeredOrganisations(userDetails.getUserId()));
     }
 
+    @GetMapping("/manageable")
+    public List<OrganisationDTO> getManageableOrganisations(
+            @AuthenticationPrincipal UserModelDetails userDetails) {
+        return ContractMapper.toOrganisationDTOList(
+                engagementLevelService.getManageableOrganisations(requireUser(userDetails)));
+    }
+
+    @GetMapping("/{id}/engagement-levels")
+    public EngagementLevelOverviewDTO getEngagementLevels(
+            @PathVariable int id,
+            @AuthenticationPrincipal UserModelDetails userDetails) {
+        return engagementLevelService.getOverview(id, requireUser(userDetails));
+    }
+
+    @PutMapping("/{id}/engagement-levels")
+    public EngagementLevelOverviewDTO updateEngagementLevels(
+            @PathVariable int id,
+            @RequestBody List<EngagementLevelRequirementDTO> requirements,
+            @AuthenticationPrincipal UserModelDetails userDetails) {
+        return engagementLevelService.updateRequirements(id, requireUser(userDetails), requirements);
+    }
+
     @GetMapping("/{id}")
     public OrganisationDTO getOrganisationById(@PathVariable int id) {
         return ContractMapper.toOrganisationDTO(organisationService.getOrganisationById(id));
     }
 
     @PostMapping
-    public OrganisationDTO createOrganisation(@RequestBody OrganisationDTO organisation) {
-        return ContractMapper.toOrganisationDTO(organisationService.addOrganisation(ContractMapper.toOrganisationEntity(organisation)));
+    @ResponseStatus(HttpStatus.CREATED)
+    public OrganisationDTO createOrganisation(@RequestBody OrganisationDTO organisation,
+                                              @AuthenticationPrincipal UserModelDetails userDetails) {
+        return ContractMapper.toOrganisationDTO(organisationService.addOrganisation(
+                ContractMapper.toOrganisationEntity(organisation), requireUser(userDetails)));
     }
 
     @PutMapping("/{id}")
@@ -92,11 +118,18 @@ public class OrganisationController {
 
     @PostMapping( "/join/{id}")
     public boolean joinOrganisation(@AuthenticationPrincipal UserModelDetails userDetails, @PathVariable int id) {
-        return organisationService.joinOrganisation(id, userDetails.getUserId());
+        return organisationService.joinOrganisation(id, requireUser(userDetails));
     }
 
     @GetMapping("/{id}/exampleActivities")
     public List<ActivityDTO> getExampleActivities(@PathVariable int id){
         return ContractMapper.toActivityDTOList(this.organisationService.getExampleActivities(id));
+    }
+
+    private int requireUser(UserModelDetails userDetails) {
+        if (userDetails == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
+        }
+        return userDetails.getUserId();
     }
 }

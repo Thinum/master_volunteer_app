@@ -22,6 +22,21 @@
     </div>
   </section>
 
+  <section class="engagement-admin-panel" *ngIf="administeredOrganisations.length">
+    <div class="engagement-admin-copy">
+      <mat-icon>workspace_premium</mat-icon>
+      <div>
+        <strong>Manage engagement levels</strong>
+        <span>Adjust registration limits and activity requirements for your organizations.</span>
+      </div>
+    </div>
+    <div class="engagement-admin-links">
+      <a mat-stroked-button *ngFor="let org of administeredOrganisations" [routerLink]="['/organisations', org.id, 'engagement-levels']">
+        {{ org.orgName }} <mat-icon>arrow_forward</mat-icon>
+      </a>
+    </div>
+  </section>
+
   <section class="search-panel">
     <mat-form-field appearance="outline" class="search-bar" subscriptSizing="dynamic">
       <mat-label>Search</mat-label>

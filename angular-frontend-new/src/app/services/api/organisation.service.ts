@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Organisation, OrganisationRecommendation } from '../../models/organisation.model';
 import { environment } from '../../../environments/environment';
 import {Activity} from '../../models/activity.model';
+import { EngagementLevelOverview, EngagementLevelRequirement } from '../../models/engagement-level.model';
 
 @Injectable({
   providedIn: 'root',
@@ -34,6 +35,10 @@ export class OrganisationService {
   getAdministeredOrganisations(): Observable<Organisation[]> {
     return this.http.get<Organisation[]>(`${this.apiUrl}/administered`);
   }
+  getManageableOrganisations(): Observable<Organisation[]> {
+    return this.http.get<Organisation[]>(`${this.apiUrl}/manageable`);
+  }
+
 
   /**
    * Adds a new organisation.
@@ -48,5 +53,15 @@ export class OrganisationService {
 
   getExampleActivitiesForOrganisation(orgId: number): Observable<Activity[]> {
     return this.http.get<Activity[]>(`${this.apiUrl}/${orgId}/exampleActivities`);
+  }
+
+  getEngagementLevels(orgId: number): Observable<EngagementLevelOverview> {
+    return this.http.get<EngagementLevelOverview>(`${this.apiUrl}/${orgId}/engagement-levels`);
+  }
+
+  updateEngagementLevels(orgId: number, levels: EngagementLevelRequirement[]): Observable<EngagementLevelOverview> {
+    return this.http.put<EngagementLevelOverview>(
+      `${this.apiUrl}/${orgId}/engagement-levels`, levels
+    );
   }
 }

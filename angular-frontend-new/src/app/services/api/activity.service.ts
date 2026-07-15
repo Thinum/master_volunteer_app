@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Activity, ActivityRecommendation, TagConcept } from '../../models/activity.model';
 import { environment } from '../../../environments/environment';
+import { ActivityEngagementAccess } from '../../models/engagement-level.model';
 
 @Injectable({
   providedIn: 'root',
@@ -58,5 +59,13 @@ export class ActivityService {
 
   joinActivity(activityId: number) {
     return this.http.post<boolean>(`${this.apiUrl}/join/${activityId}`, {});
+  }
+
+  getEngagementAccess(activityId: number) {
+    return this.http.get<ActivityEngagementAccess>(`${this.apiUrl}/${activityId}/engagement-access`);
+  }
+
+  leaveActivity(activityId: number) {
+    return this.http.delete<boolean>(`${this.apiUrl}/join/${activityId}`);
   }
 }

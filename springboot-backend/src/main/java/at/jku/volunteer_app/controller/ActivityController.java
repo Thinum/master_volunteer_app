@@ -1,6 +1,7 @@
 package at.jku.volunteer_app.controller;
 
 import at.jku.volunteer_app.contract.ActivityDTO;
+import at.jku.volunteer_app.contract.ActivityEngagementAccessDTO;
 import at.jku.volunteer_app.contract.ActivityRecommendationDTO;
 import at.jku.volunteer_app.contract.ContractMapper;
 import at.jku.volunteer_app.contract.TagConceptDTO;
@@ -43,6 +44,12 @@ public class ActivityController {
     @GetMapping("/{id}")
     public ActivityDTO getActivityById(@PathVariable int id) {
         return ContractMapper.toActivityDTO(activityService.getActivityById(id));
+    }
+
+    @GetMapping("/{id}/engagement-access")
+    public ActivityEngagementAccessDTO getEngagementAccess(
+            @PathVariable int id, @AuthenticationPrincipal UserModelDetails userDetails) {
+        return activityService.getEngagementAccess(id, requireUser(userDetails));
     }
 
     @GetMapping("/recommendations")
@@ -90,9 +97,14 @@ public class ActivityController {
 
     @PostMapping( "/join/{id}")
     public boolean joinActivity(@AuthenticationPrincipal UserModelDetails userDetails, @PathVariable int id) {
-        return activityService.joinActivity(id, userDetails.getUserId());
+        return activityService.joinActivity(id, requireUser(userDetails));
     }
 
+
+    @DeleteMapping("/join/{id}")
+    public boolean leaveActivity(@AuthenticationPrincipal UserModelDetails userDetails, @PathVariable int id) {
+        return activityService.leaveActivity(id, requireUser(userDetails));
+    }
     private int requireUser(UserModelDetails userDetails) {
         if (userDetails == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
