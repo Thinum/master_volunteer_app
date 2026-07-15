@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Organisation } from '../../models/organisation.model';
+import { Organisation, OrganisationRecommendation } from '../../models/organisation.model';
 import { environment } from '../../../environments/environment';
 import {Activity} from '../../models/activity.model';
 
@@ -18,6 +18,10 @@ export class OrganisationService {
    */
   getAllOrganisations(): Observable<Organisation[]> {
     return this.http.get<Organisation[]>(this.apiUrl);
+  }
+
+  getRecommendedOrganisations(): Observable<OrganisationRecommendation[]> {
+    return this.http.get<OrganisationRecommendation[]>(`${this.apiUrl}/recommendations`);
   }
 
   /**

@@ -10,6 +10,7 @@ export interface InterestCategory {
   code: string;
   label: string;
   escoConceptUri?: string;
+  aliases?: string[];
 }
 
 export type RecommendationReasonType = 'INTEREST' | 'REQUIRED_SKILL' | 'PREFERRED_SKILL' | 'TAG' | 'CATEGORY';

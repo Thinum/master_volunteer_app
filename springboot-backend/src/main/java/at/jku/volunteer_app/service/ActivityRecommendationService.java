@@ -54,6 +54,7 @@ public class ActivityRecommendationService {
         return activityRepository.findAll().stream()
                 .filter(activity -> isRecommendableActivity(activity, userId))
                 .map(activity -> scoreActivity(user, activity))
+                .filter(scored -> scored.score() > 0.0)
                 .sorted(Comparator.comparingDouble(ScoredActivity::score).reversed()
                         .thenComparing(scored -> scored.activity().getDate(), Comparator.nullsLast(Timestamp::compareTo))
                         .thenComparing(scored -> safeText(scored.activity().getTitle()), String.CASE_INSENSITIVE_ORDER))

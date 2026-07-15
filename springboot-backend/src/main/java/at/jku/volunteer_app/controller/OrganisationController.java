@@ -3,8 +3,10 @@ package at.jku.volunteer_app.controller;
 import at.jku.volunteer_app.contract.ActivityDTO;
 import at.jku.volunteer_app.contract.ContractMapper;
 import at.jku.volunteer_app.contract.OrganisationDTO;
+import at.jku.volunteer_app.contract.OrganisationRecommendationDTO;
 import at.jku.volunteer_app.model.UserModelDetails;
 import at.jku.volunteer_app.service.OrganisationAdminService;
+import at.jku.volunteer_app.service.OrganisationRecommendationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -18,16 +20,29 @@ import java.util.List;
 public class OrganisationController {
     private final OrganisationService organisationService;
     private final OrganisationAdminService organisationAdminService;
+    private final OrganisationRecommendationService organisationRecommendationService;
 
     public OrganisationController(OrganisationService organisationService,
-                                  OrganisationAdminService organisationAdminService) {
+                                  OrganisationAdminService organisationAdminService,
+                                  OrganisationRecommendationService organisationRecommendationService) {
         this.organisationService = organisationService;
         this.organisationAdminService = organisationAdminService;
+        this.organisationRecommendationService = organisationRecommendationService;
     }
 
     @GetMapping
     public List<OrganisationDTO> getAllOrganisations() {
         return ContractMapper.toOrganisationDTOList(organisationService.getAllOrganisations());
+    }
+
+    @GetMapping("/recommendations")
+    public List<OrganisationRecommendationDTO> getRecommendedOrganisations(
+            @AuthenticationPrincipal UserModelDetails userDetails
+    ) {
+        if (userDetails == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
+        }
+        return organisationRecommendationService.getRecommendationsForUser(userDetails.getUserId());
     }
 
     @GetMapping("/administered")

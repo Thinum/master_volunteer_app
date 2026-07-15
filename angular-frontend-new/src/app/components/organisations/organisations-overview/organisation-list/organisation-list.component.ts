@@ -19,6 +19,8 @@ import {Organisation} from '../../../../models/organisation.model';
 export class OrganisationListComponent {
     @Input() organisationsList?: Organisation[];
     @Input() sectionTitle?: string;
+    @Input() userInterestMatchLabels: string[] = [];
+    @Input() userSkillMatchLabels: string[] = [];
 
     getMemberCount(org: Organisation): number {
       return org.orgMembers?.length ?? 0;
@@ -37,6 +39,29 @@ export class OrganisationListComponent {
           }
         });
 
-      return Array.from(labels.values()).slice(0, 3);
+      return Array.from(labels.values())
+        .sort((first, second) => Number(this.isUserMatchedTag(second)) - Number(this.isUserMatchedTag(first)))
+        .slice(0, 3);
+    }
+
+    isUserMatchedTag(tag: string): boolean {
+      const normalizedTag = this.normalizeTag(tag);
+      const matchesInterest = this.userInterestMatchLabels.some(label => {
+        const normalizedLabel = this.normalizeTag(label);
+        return normalizedLabel && normalizedTag.includes(normalizedLabel);
+      });
+      const matchesSkill = this.userSkillMatchLabels.some(label => this.normalizeTag(label) === normalizedTag);
+
+      return matchesInterest || matchesSkill;
+    }
+
+    private normalizeTag(value: string): string {
+      return value
+        .trim()
+        .replace(/[&_-]+/g, ' ')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim()
+        .replace(/\s+/g, ' ');
     }
 }

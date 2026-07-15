@@ -87,16 +87,22 @@
 
   <app-organisation-list
     [organisationsList]="joinedOrganisations"
+    [userInterestMatchLabels]="userInterestMatchLabels"
+    [userSkillMatchLabels]="userSkillMatchLabels"
     [sectionTitle]="'Joined'">
   </app-organisation-list>
 
   <app-organisation-list
     [organisationsList]="recommendedOrganisations"
+    [userInterestMatchLabels]="userInterestMatchLabels"
+    [userSkillMatchLabels]="userSkillMatchLabels"
     [sectionTitle]="'Recommended'">
   </app-organisation-list>
 
   <app-organisation-list
     [organisationsList]="organisationsFiltered"
+    [userInterestMatchLabels]="userInterestMatchLabels"
+    [userSkillMatchLabels]="userSkillMatchLabels"
     [sectionTitle]="'All organizations'">
   </app-organisation-list>
 </div>

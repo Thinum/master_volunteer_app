@@ -26,6 +26,7 @@ export class ActivityOverviewComponent implements OnInit {
   activities: Activity[] = [];
   filteredActivities: Activity[] = [];
   private backendRecommendedActivities: Activity[] = [];
+  private recommendationsLoaded = false;
   searchTerm = '';
   selectedStatus: Activity['status'] | null = null;
   selectedTags: string[] = [];
@@ -80,6 +81,7 @@ export class ActivityOverviewComponent implements OnInit {
             reasons: recommendation.reasons || []
           }
         }));
+        this.recommendationsLoaded = true;
         this.applyFilters();
       },
       error: err => console.error('Could not load activities', err)
@@ -164,9 +166,9 @@ export class ActivityOverviewComponent implements OnInit {
   }
 
   get recommendedActivities(): Activity[] {
-    const source = this.backendRecommendedActivities.length
+    const source = this.recommendationsLoaded
       ? this.backendRecommendedActivities.filter(activity => this.matchesFilters(activity, this.searchTerm.trim().toLowerCase()))
-      : this.filteredActivities;
+      : [];
 
     return source
       .filter(activity => !this.joinedActivityIds.has(activity.id) && activity.status !== 'finished' && activity.status !== 'canceled')

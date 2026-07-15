@@ -680,7 +680,8 @@ public final class ContractMapper {
                 .map(category -> new InterestCategoryDTO(
                         category.getCode(),
                         category.getLabel(),
-                        category.getEscoConceptUri()
+                        category.getEscoConceptUri(),
+                        category.getAliases()
                 ))
                 .toList();
     }

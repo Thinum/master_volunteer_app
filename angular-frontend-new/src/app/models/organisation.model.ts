@@ -56,3 +56,9 @@ export interface Organisation {
   /** Interests that can be matched with the user interests etc. Kept as tags for API compatibility. */
   tags: string[];
 }
+
+export interface OrganisationRecommendation {
+  organisation: Organisation;
+  score: number;
+  reasons: import('./activity.model').RecommendationReason[];
+}

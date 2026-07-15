@@ -137,20 +137,8 @@ export class HomeComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error fetching recommended activities:', err);
-        this.loadFallbackRecommendedActivities(joinedActivities);
+        this.recommendedActivities = [];
       }
-    });
-  }
-
-  private loadFallbackRecommendedActivities(joinedActivities: Activity[]): void {
-    this.activityService.getAllActivities().subscribe({
-      next: (allActivities) => {
-        const joinedIds = new Set(joinedActivities.map(a => a.id));
-        this.recommendedActivities = (allActivities || [])
-          .filter(a => !joinedIds.has(a.id))
-          .slice(0, 3);
-      },
-      error: (err) => console.error('Error fetching fallback recommendations:', err)
     });
   }
 

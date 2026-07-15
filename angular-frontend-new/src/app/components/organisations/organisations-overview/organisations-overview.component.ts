@@ -12,10 +12,10 @@ import { MatChipsModule } from '@angular/material/chips';
 import { OrganisationService } from '../../../services/api/organisation.service';
 import { VolunteerService } from '../../../services/api/volunteer.service';
 import { Organisation, OrganisationCategory } from '../../../models/organisation.model';
+import { User } from '../../../models/user.model';
 import { OrganisationListComponent } from './organisation-list/organisation-list.component';
 
 import {
-  MOCK_RECOMMENDED_ORGANISATIONS,
   MOCK_FEATURED_ORGANISATIONS
 } from '../../../mock/mock-organisations';
 
@@ -50,9 +50,11 @@ export class OrganisationsOverviewComponent implements OnInit {
 
   categories: OrganisationCategory[] = [];
   tags: string[] = [];
+  userInterestMatchLabels: string[] = [];
+  userSkillMatchLabels: string[] = [];
 
   joinedOrganisations: Organisation[] = [];
-  recommendedOrganisations = MOCK_RECOMMENDED_ORGANISATIONS;
+  recommendedOrganisations: Organisation[] = [];
   featuredOrganisations = MOCK_FEATURED_ORGANISATIONS;
 
   private readonly destroyRef = inject(DestroyRef);
@@ -65,12 +67,32 @@ export class OrganisationsOverviewComponent implements OnInit {
   ngOnInit(): void {
     this.loadOrganisations();
     this.loadJoinedOrganisations();
+    this.loadRecommendedOrganisations();
+  }
+
+  private loadRecommendedOrganisations(): void {
+    this.organisationService.getRecommendedOrganisations()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: recommendations => {
+          this.recommendedOrganisations = (recommendations ?? [])
+            .slice(0, 3)
+            .map(recommendation => this.withCleanTags(recommendation.organisation));
+        },
+        error: error => {
+          console.error('Could not load organisation recommendations', error);
+          this.recommendedOrganisations = [];
+        }
+      });
   }
 
   private loadJoinedOrganisations(): void {
     this.volunteerService.getCurrentUser()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(user => {
+        this.userInterestMatchLabels = this.getUserInterestMatchLabels(user);
+        this.userSkillMatchLabels = this.getUserSkillMatchLabels(user);
+
         if (!user?.id) {
           this.joinedOrganisations = [];
           return;
@@ -200,5 +222,32 @@ export class OrganisationsOverviewComponent implements OnInit {
 
   private normalizeTag(value: string): string {
     return value.trim().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').toLowerCase();
+  }
+
+  private getUserInterestMatchLabels(user: User | null | undefined): string[] {
+    if (!user) {
+      return [];
+    }
+
+    return this.uniqueLabels([
+      ...(user.interests ?? []),
+      ...(user.interestCategories ?? []).map(interest => interest.label),
+      ...(user.interestCategories ?? []).map(interest => interest.code),
+      ...(user.interestCategories ?? []).reduce<string[]>(
+        (aliases, interest) => [...aliases, ...(interest.aliases ?? [])],
+        []
+      )
+    ]);
+  }
+
+  private getUserSkillMatchLabels(user: User | null | undefined): string[] {
+    if (!user) {
+      return [];
+    }
+
+    return this.uniqueLabels([
+      ...(user.skills ?? []),
+      ...(user.skillProfiles ?? []).map(skill => skill.name)
+    ]);
   }
 }

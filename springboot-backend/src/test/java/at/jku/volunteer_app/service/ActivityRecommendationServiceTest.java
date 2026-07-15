@@ -12,27 +12,17 @@ import at.jku.volunteer_app.model.UserSkill;
 import at.jku.volunteer_app.repository.ActivityRepository;
 import at.jku.volunteer_app.repository.UserRepository;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class ActivityRecommendationServiceTest {
 
-    @Mock
-    private ActivityRepository activityRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
     @Test
-    void ranksActivitiesWithMatchingInterestsSkillsAndTagsHigher() {
+    void returnsOnlyActivitiesWithMatchingInterestsSkillsOrTags() {
         User user = new User();
         user.setId(1);
         user.setInterestCategories(List.of(InterestCategory.ANIMALS, InterestCategory.OUTDOOR_ACTIVITIES));
@@ -62,15 +52,19 @@ class ActivityRecommendationServiceTest {
         communityEvent.setTags(List.of("Social"));
         communityEvent.setSkillRequirements(List.of(ActivitySkillRequirement.required("Teamwork")));
 
-        when(userRepository.findById(1)).thenReturn(Optional.of(user));
-        when(activityRepository.findAll()).thenReturn(List.of(communityEvent, animalShelterWalk));
+        UserRepository userRepository = repository(UserRepository.class, "findById", Optional.of(user));
+        ActivityRepository activityRepository = repository(
+                ActivityRepository.class,
+                "findAll",
+                List.of(communityEvent, animalShelterWalk)
+        );
 
         ActivityRecommendationService service = new ActivityRecommendationService(activityRepository, userRepository);
         List<ActivityRecommendationDTO> recommendations = service.getRecommendationsForUser(1);
 
-        assertThat(recommendations).hasSize(2);
+        assertThat(recommendations).hasSize(1);
         assertThat(recommendations.get(0).activity().id()).isEqualTo(10);
-        assertThat(recommendations.get(0).score()).isGreaterThan(recommendations.get(1).score());
+        assertThat(recommendations.get(0).score()).isPositive();
         assertThat(recommendations.get(0).reasons())
                 .extracting(reason -> reason.type() + ":" + reason.label())
                 .contains(
@@ -78,5 +72,19 @@ class ActivityRecommendationServiceTest {
                         RecommendationReasonType.REQUIRED_SKILL + ":Animal Care",
                         RecommendationReasonType.TAG + ":Outdoor"
                 );
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T repository(Class<T> type, String supportedMethod, Object result) {
+        return (T) Proxy.newProxyInstance(
+                type.getClassLoader(),
+                new Class<?>[]{type},
+                (proxy, method, arguments) -> {
+                    if (supportedMethod.equals(method.getName())) {
+                        return result;
+                    }
+                    throw new UnsupportedOperationException(method.getName());
+                }
+        );
     }
 }
