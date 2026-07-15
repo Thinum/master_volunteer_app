@@ -1,46 +1,99 @@
 <section class="assignment-page">
-  <header>
-    <div>
+  <header class="page-header">
+    <div class="header-copy">
+      <span class="eyebrow">Platform administration</span>
       <h1>Organization admin assignments</h1>
-      <p>Choose organization members to manage each organization.</p>
+      <p>Choose trusted members to manage their organization, projects and volunteer activities.</p>
     </div>
-    <mat-icon>admin_panel_settings</mat-icon>
+
+    <div class="header-summary" aria-label="Assignment summary">
+      <div class="summary-icon" aria-hidden="true">
+        <mat-icon>admin_panel_settings</mat-icon>
+      </div>
+      <div>
+        <strong>{{ assignments.length }}</strong>
+        <span>{{ assignments.length === 1 ? 'organization' : 'organizations' }}</span>
+      </div>
+    </div>
   </header>
 
-  <p class="notice">
-    Platform administrators are automatically retained for every organization.
-  </p>
+  <div class="notice" role="note">
+    <span class="notice-icon" aria-hidden="true"><mat-icon>info</mat-icon></span>
+    <div>
+      <strong>Platform access is protected</strong>
+      <p>Platform administrators are automatically retained for every organization.</p>
+    </div>
+  </div>
 
-  <p *ngIf="loading">Loading assignments…</p>
+  <div class="loading-state" *ngIf="loading" role="status" aria-live="polite">
+    <span class="loading-spinner" aria-hidden="true"></span>
+    <div>
+      <strong>Loading assignments</strong>
+      <p>Gathering organizations and eligible members…</p>
+    </div>
+  </div>
 
   <div class="assignment-grid" *ngIf="!loading">
-    <mat-card *ngFor="let assignment of assignments">
-      <mat-card-header>
-        <mat-card-title>{{ assignment.organisationName }}</mat-card-title>
-      </mat-card-header>
+    <div class="empty-state" *ngIf="assignments.length === 0">
+      <span class="empty-icon" aria-hidden="true"><mat-icon>domain_disabled</mat-icon></span>
+      <h2>No organizations to manage</h2>
+      <p>Organizations will appear here when they are available.</p>
+    </div>
+
+    <mat-card class="assignment-card" *ngFor="let assignment of assignments">
+      <div class="card-heading">
+        <div class="organisation-mark" aria-hidden="true">
+          {{ organisationInitial(assignment.organisationName) }}
+        </div>
+        <div class="organisation-copy">
+          <span class="card-eyebrow">Organization</span>
+          <h2>{{ assignment.organisationName }}</h2>
+          <p>Select the members who should have administrative access.</p>
+        </div>
+        <div class="selection-count">
+          <strong>{{ selectedCount(assignment.organisationId) }}</strong>
+          <span>selected</span>
+        </div>
+      </div>
 
       <mat-card-content>
-        <div class="admin-list">
-          <p *ngIf="assignment.availableAdmins.length === 0">
-            This organization has no members available for assignment.
-          </p>
+        <div class="no-members" *ngIf="assignment.availableAdmins.length === 0">
+          <mat-icon aria-hidden="true">person_off</mat-icon>
+          <div>
+            <strong>No eligible members</strong>
+            <p>This organization has no members available for assignment.</p>
+          </div>
+        </div>
+
+        <div class="admin-list" *ngIf="assignment.availableAdmins.length > 0">
           <mat-checkbox
+            class="admin-option"
             *ngFor="let admin of assignment.availableAdmins"
             [checked]="isSelected(assignment.organisationId, admin.id)"
             (change)="toggleAdmin(assignment.organisationId, admin.id, $event)">
-            <span>{{ adminLabel(admin) }}</span>
-            <small>{{ admin.email }}</small>
+            <span class="member-row">
+              <span class="member-avatar" aria-hidden="true">{{ adminInitials(admin) }}</span>
+              <span class="member-details">
+                <strong>{{ adminLabel(admin) }}</strong>
+                <small>{{ admin.email }}</small>
+              </span>
+            </span>
           </mat-checkbox>
         </div>
       </mat-card-content>
 
-      <mat-card-actions align="end">
+      <mat-card-actions class="card-actions">
+        <span class="selection-hint">
+          {{ selectedCount(assignment.organisationId) }} of {{ assignment.availableAdmins.length }} members selected
+        </span>
         <button
           mat-raised-button
           color="primary"
+          class="save-button"
           [disabled]="savingOrganisationId === assignment.organisationId"
           (click)="save(assignment)">
-          Save assignments
+          <mat-icon>{{ savingOrganisationId === assignment.organisationId ? 'sync' : 'save' }}</mat-icon>
+          {{ savingOrganisationId === assignment.organisationId ? 'Saving…' : 'Save assignments' }}
         </button>
       </mat-card-actions>
     </mat-card>

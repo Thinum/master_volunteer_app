@@ -85,6 +85,25 @@ export class OrganisationAdminAssignmentsComponent implements OnInit {
     return admin.name || admin.username || admin.email;
   }
 
+  selectedCount(organisationId: number): number {
+    return this.selectedAdminIds.get(organisationId)?.size ?? 0;
+  }
+
+  organisationInitial(name: string): string {
+    return name.trim().charAt(0).toUpperCase() || 'O';
+  }
+
+  adminInitials(admin: User): string {
+    const label = this.adminLabel(admin).trim();
+    const words = label.split(/\s+/).filter(Boolean);
+
+    if (words.length > 1) {
+      return `${words[0][0]}${words[words.length - 1][0]}`.toUpperCase();
+    }
+
+    return label.slice(0, 2).toUpperCase();
+  }
+
   private setSelection(assignment: OrganisationAdminAssignment): void {
     const availableAdminIds = new Set(assignment.availableAdmins.map(admin => admin.id));
     this.selectedAdminIds.set(
