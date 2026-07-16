@@ -1,36 +1,48 @@
 <main class="levels-page">
   <a mat-button class="back-link" [routerLink]="['/organisations', organisationId]">
-    <mat-icon>arrow_back</mat-icon> Back to organization
+    <mat-icon>arrow_back</mat-icon>
+    Back to organization
   </a>
 
   <section class="levels-hero" *ngIf="overview as currentOverview">
-    <div>
+    <div class="hero-copy">
       <span class="eyebrow">Volunteer progression</span>
       <h1>Engagement levels</h1>
       <p>
-        {{ currentOverview.organisationName }} defines the numeric limits. Level functionality and the type of
-        unlock condition are fixed for every organization.
+        Review how members progress at {{ currentOverview.organisationName }} and configure the numeric
+        requirements for each level.
       </p>
     </div>
-    <div class="current-level">
-      <span>Your current level</span>
-      <strong>{{ currentOverview.currentLevel < 0 ? 'Initial' : 'Level ' + currentOverview.currentLevel }}</strong>
-      <small>{{ currentOverview.currentLevelName }}</small>
+    <div class="current-level" aria-label="Your current engagement level">
+      <span class="current-level-icon" aria-hidden="true">
+        <mat-icon>workspace_premium</mat-icon>
+      </span>
+      <div>
+        <span>Your current level</span>
+        <strong>{{ currentOverview.currentLevel < 0 ? 'Initial' : 'Level ' + currentOverview.currentLevel }}</strong>
+        <small>{{ currentOverview.currentLevelName }}</small>
+      </div>
     </div>
   </section>
 
-  <div class="state-card" *ngIf="loading">
-    <mat-icon>hourglass_top</mat-icon>
-    <p>Loading engagement levels…</p>
+  <div class="state-card" *ngIf="loading" role="status" aria-live="polite">
+    <span class="state-icon" aria-hidden="true"><mat-icon>hourglass_top</mat-icon></span>
+    <div>
+      <strong>Loading engagement levels</strong>
+      <p>Gathering this organization’s progression settings…</p>
+    </div>
   </div>
 
-  <div class="state-card state-card--error" *ngIf="errorMessage">
-    <mat-icon>error_outline</mat-icon>
-    <p>{{ errorMessage }}</p>
+  <div class="state-card state-card--error" *ngIf="errorMessage" role="alert">
+    <span class="state-icon" aria-hidden="true"><mat-icon>error_outline</mat-icon></span>
+    <div>
+      <strong>Engagement levels could not be loaded</strong>
+      <p>{{ errorMessage }}</p>
+    </div>
   </div>
 
-  <section class="read-only-note" *ngIf="overview && !overview.canManage">
-    <mat-icon>lock</mat-icon>
+  <section class="read-only-note" *ngIf="overview && !overview.canManage" role="note">
+    <span class="note-icon" aria-hidden="true"><mat-icon>lock</mat-icon></span>
     <div>
       <strong>Organization-admin access required</strong>
       <span>You can review these levels, but only an assigned organization admin can change their limits.</span>
@@ -38,8 +50,11 @@
   </section>
 
   <section class="level-grid" *ngIf="overview">
-    <mat-card class="level-card initial-level-card">
-      <div class="level-heading"><span class="level-number">Initial level</span></div>
+    <mat-card class="level-card initial-level-card" [class.level-card--current]="overview.currentLevel < 0">
+      <div class="level-heading">
+        <span class="level-number">Initial level</span>
+        <span class="current-badge" *ngIf="overview.currentLevel < 0">Current</span>
+      </div>
       <h2>New Member</h2>
       <p class="engagement-label">Upon registration</p>
       <div class="fixed-block">
@@ -54,11 +69,20 @@
         <strong>Register an iVolunteer account</strong>
       </div>
       <div class="settings-block">
-        <h3>Organization limits</h3>
-        <span>None — this system-wide level is not organization-specific.</span>
+        <div class="settings-heading">
+          <span class="settings-icon" aria-hidden="true"><mat-icon>tune</mat-icon></span>
+          <div>
+            <h3>Organization limits</h3>
+            <p>Configured by the organization</p>
+          </div>
+        </div>
+        <span class="settings-empty">None — this system-wide level is not organization-specific.</span>
       </div>
     </mat-card>
-    <mat-card class="level-card" *ngFor="let level of levels; trackBy: trackLevel" [class.level-card--current]="overview.currentLevel === level.level">
+    <mat-card
+      class="level-card"
+      *ngFor="let level of levels; trackBy: trackLevel"
+      [class.level-card--current]="overview.currentLevel === level.level">
       <div class="level-heading">
         <span class="level-number">Level {{ level.level }}</span>
         <span class="current-badge" *ngIf="overview.currentLevel === level.level">Current</span>
@@ -81,7 +105,13 @@
       </div>
 
       <div class="settings-block">
-        <h3>Organization limits</h3>
+        <div class="settings-heading">
+          <span class="settings-icon" aria-hidden="true"><mat-icon>tune</mat-icon></span>
+          <div>
+            <h3>Organization limits</h3>
+            <p>{{ overview.canManage ? 'Adjust numeric requirements' : 'Configured by the organization' }}</p>
+          </div>
+        </div>
         <mat-checkbox
           [checked]="isUnlimited(level)"
           [disabled]="!overview.canManage"
@@ -125,7 +155,7 @@
       <strong>Only numeric limits are editable</strong>
       <span>Capabilities and unlock-condition types remain the same.</span>
     </div>
-    <button mat-flat-button color="primary" type="button" [disabled]="!canSave" (click)="save()">
+    <button mat-raised-button color="primary" type="button" [disabled]="!canSave" (click)="save()">
       <mat-icon>save</mat-icon> {{ saving ? 'Saving…' : 'Save limits' }}
     </button>
   </div>
