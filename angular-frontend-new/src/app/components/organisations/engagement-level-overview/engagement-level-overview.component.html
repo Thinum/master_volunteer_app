@@ -1,0 +1,132 @@
+<main class="levels-page">
+  <a mat-button class="back-link" [routerLink]="['/organisations', organisationId]">
+    <mat-icon>arrow_back</mat-icon> Back to organization
+  </a>
+
+  <section class="levels-hero" *ngIf="overview as currentOverview">
+    <div>
+      <span class="eyebrow">Volunteer progression</span>
+      <h1>Engagement levels</h1>
+      <p>
+        {{ currentOverview.organisationName }} defines the numeric limits. Level functionality and the type of
+        unlock condition are fixed for every organization.
+      </p>
+    </div>
+    <div class="current-level">
+      <span>Your current level</span>
+      <strong>{{ currentOverview.currentLevel < 0 ? 'Initial' : 'Level ' + currentOverview.currentLevel }}</strong>
+      <small>{{ currentOverview.currentLevelName }}</small>
+    </div>
+  </section>
+
+  <div class="state-card" *ngIf="loading">
+    <mat-icon>hourglass_top</mat-icon>
+    <p>Loading engagement levels…</p>
+  </div>
+
+  <div class="state-card state-card--error" *ngIf="errorMessage">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <section class="read-only-note" *ngIf="overview && !overview.canManage">
+    <mat-icon>lock</mat-icon>
+    <div>
+      <strong>Organization-admin access required</strong>
+      <span>You can review these levels, but only an assigned organization admin can change their limits.</span>
+    </div>
+  </section>
+
+  <section class="level-grid" *ngIf="overview">
+    <mat-card class="level-card initial-level-card">
+      <div class="level-heading"><span class="level-number">Initial level</span></div>
+      <h2>New Member</h2>
+      <p class="engagement-label">Upon registration</p>
+      <div class="fixed-block">
+        <span class="block-label"><mat-icon>verified</mat-icon> Fixed functionality</span>
+        <ul>
+          <li>Basic profile management</li>
+          <li>View organizations, projects and activities</li>
+        </ul>
+      </div>
+      <div class="fixed-block unlock-block">
+        <span class="block-label"><mat-icon>lock_open</mat-icon> Fixed unlock condition</span>
+        <strong>Register an iVolunteer account</strong>
+      </div>
+      <div class="settings-block">
+        <h3>Organization limits</h3>
+        <span>None — this system-wide level is not organization-specific.</span>
+      </div>
+    </mat-card>
+    <mat-card class="level-card" *ngFor="let level of levels; trackBy: trackLevel" [class.level-card--current]="overview.currentLevel === level.level">
+      <div class="level-heading">
+        <span class="level-number">Level {{ level.level }}</span>
+        <span class="current-badge" *ngIf="overview.currentLevel === level.level">Current</span>
+      </div>
+      <h2>{{ level.name }}</h2>
+      <p class="engagement-label">{{ level.engagementLabel }}</p>
+
+      <div class="fixed-block">
+        <span class="block-label"><mat-icon>verified</mat-icon> Fixed functionality</span>
+        <ul>
+          <li *ngFor="let capability of level.functionality">{{ capability }}</li>
+          <li>{{ registrationSummary(level) }}</li>
+          <li *ngIf="level.permanentOnceReached">The system can never move a member down from this level</li>
+        </ul>
+      </div>
+
+      <div class="fixed-block unlock-block">
+        <span class="block-label"><mat-icon>lock_open</mat-icon> Fixed unlock condition</span>
+        <strong>{{ unlockSummary(level) }}</strong>
+      </div>
+
+      <div class="settings-block">
+        <h3>Organization limits</h3>
+        <mat-checkbox
+          [checked]="isUnlimited(level)"
+          [disabled]="!overview.canManage"
+          (change)="setUnlimited(level, $event.checked)">
+          Unlimited registrations
+        </mat-checkbox>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" *ngIf="!isUnlimited(level)">
+          <mat-label>Registration limit</mat-label>
+          <input matInput type="number" min="0" [(ngModel)]="level.registrationLimit"
+                 [name]="'registrationLimit' + level.level" [disabled]="!overview.canManage">
+        </mat-form-field>
+
+        <div class="requirement-fields" *ngIf="level.level > 0">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Completed activities</mat-label>
+            <input matInput type="number" min="1" [(ngModel)]="level.requiredActivities"
+                   [name]="'requiredActivities' + level.level" [disabled]="!overview.canManage">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Timespan</mat-label>
+            <input matInput type="number" min="1" [(ngModel)]="level.timespanValue"
+                   [name]="'timespanValue' + level.level" [disabled]="!overview.canManage">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Unit</mat-label>
+            <mat-select [(ngModel)]="level.timespanUnit" [name]="'timespanUnit' + level.level"
+                        [disabled]="!overview.canManage">
+              <mat-option *ngFor="let unit of timespanUnits" [value]="unit">{{ unit | titlecase }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-card>
+  </section>
+
+  <div class="save-bar" *ngIf="overview?.canManage">
+    <div>
+      <strong>Only numeric limits are editable</strong>
+      <span>Capabilities and unlock-condition types remain the same.</span>
+    </div>
+    <button mat-flat-button color="primary" type="button" [disabled]="!canSave" (click)="save()">
+      <mat-icon>save</mat-icon> {{ saving ? 'Saving…' : 'Save limits' }}
+    </button>
+  </div>
+</main>
