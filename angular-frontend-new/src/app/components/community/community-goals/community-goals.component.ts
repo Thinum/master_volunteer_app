@@ -87,6 +87,7 @@ export class CommunityGoalsComponent {
 
   goalForm!: FormGroup;
   formSubmitted = false;
+  isSubmitting = false;
 
   loading = false;
   errorMessage = '';
@@ -131,7 +132,7 @@ export class CommunityGoalsComponent {
       {
         title: ['', Validators.required],
         description: [''],
-        targetValue: [null, Validators.required],
+        targetValue: [null, [Validators.required, Validators.min(1)]],
         currentValue: [0],
         activityTags: [[]],
         startDate: [today, [Validators.required]],
@@ -144,6 +145,10 @@ export class CommunityGoalsComponent {
   }
 
   onCreateGoal() {
+    if (this.isSubmitting) {
+      return;
+    }
+
     if (!this.canManageGoals) {
       this.snackBar.open('You do not have permission to manage goals for this organization.', 'Close', {
         duration: 4000
@@ -163,6 +168,7 @@ export class CommunityGoalsComponent {
     }
 
     const payload = this.goalForm.value;
+    this.isSubmitting = true;
 
     if (this.isEditMode && this.goalId) {
       this.communityGoalService.updateGoal(this.goalId, payload).subscribe({
@@ -176,6 +182,7 @@ export class CommunityGoalsComponent {
           });
         },
         error: () => {
+          this.isSubmitting = false;
           this.snackBar.open('Failed to update goal.', 'Close', {
             duration: 4000
           });
@@ -193,6 +200,7 @@ export class CommunityGoalsComponent {
         this.router.navigate(['/organisations', this.organisationId]);
       },
       error: () => {
+        this.isSubmitting = false;
         this.snackBar.open('Failed to create goal.', 'Close', {
           duration: 4000
         });
@@ -332,6 +340,12 @@ export class CommunityGoalsComponent {
 
     this.router.navigate(['/community-goals'], {
       queryParams: { organisationId: this.organisationId, mode: 'create' }
+    });
+  }
+
+  cancel(): void {
+    this.router.navigate(['/community-goals'], {
+      queryParams: { organisationId: this.organisationId }
     });
   }
 
