@@ -155,8 +155,20 @@ mat-card-content {
   }
 
   .edit-profile-button {
+    flex: 0 0 2.75rem;
     width: 2.75rem;
+    height: 2.75rem;
     min-width: 2.75rem;
-    overflow: hidden;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+  }
+
+  .edit-profile-button mat-icon {
+    margin: 0;
+  }
+
+  .edit-profile-label {
+    display: none;
   }
 }

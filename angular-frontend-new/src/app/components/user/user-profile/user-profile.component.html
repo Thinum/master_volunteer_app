@@ -10,9 +10,14 @@
     <mat-card-subtitle>{{ user?.email }}</mat-card-subtitle>
 
     @if (isOwnProfile) {
-    <a mat-raised-button color="primary" class="edit-profile-button" routerLink="/profile/edit">
+    <a
+      mat-raised-button
+      color="primary"
+      class="edit-profile-button"
+      routerLink="/profile/edit"
+      aria-label="Edit profile">
       <mat-icon>edit</mat-icon>
-      Edit profile
+      <span class="edit-profile-label">Edit profile</span>
     </a>
     } @else {
     <div class="icon-wrapper">

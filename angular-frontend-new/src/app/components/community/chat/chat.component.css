@@ -42,7 +42,9 @@
 
 .chat-list {
   flex: 1;
+  min-width: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 1rem;
   background-color: #ffffff;
 }
@@ -90,15 +92,26 @@
 
 /* Conversation cards */
 .conversation-card {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
   border-radius: 0.75rem;
   padding: 1rem;
   margin-bottom: 0.5rem;
   cursor: pointer;
 }
 
-.conversation-card .card-body {
+:host ::ng-deep .conversation-card .app-card {
+  min-width: 0;
+  max-width: 100%;
+}
+
+:host ::ng-deep .conversation-card .card-body {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
   overflow: hidden;
-  max-width: calc(100% - 120px);
+  max-width: none;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -163,6 +176,8 @@
 
 .convo-content {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   overflow: hidden;
 }
 
@@ -177,13 +192,50 @@
 }
 
 .last-message-preview {
-  white-space: nowrap;
+  display: -webkit-box;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
   overflow: hidden;
-  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   max-width: 100%;
   margin: 0;
   color: #5c5f68;
   font-size: 0.875rem;
+  line-height: 1.35;
+}
+
+@media (max-width: 640px) {
+  .conversation-card {
+    padding: 0;
+  }
+
+  :host ::ng-deep .conversation-card .card-left {
+    flex: 0 0 6rem;
+    width: 6rem;
+    min-width: 6rem;
+  }
+
+  :host ::ng-deep .conversation-card .card-body {
+    padding: 0.75rem;
+  }
+
+  :host ::ng-deep .conversation-card .card-right {
+    flex: 0 0 2rem;
+    width: 2rem;
+    min-width: 2rem;
+  }
+
+  .contact-info {
+    gap: 0.4rem;
+  }
+
+  .avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
 }
 
 /* Status dots */

@@ -1,4 +1,4 @@
-<mat-toolbar class="toolbarNav">
+<mat-toolbar class="toolbarNav desktopNavigation" aria-label="Primary navigation">
   <div class="navGroup">
     <a routerLink="/profile" routerLinkActive="active" ariaCurrentWhenActive="page" aria-label="Profile"><mat-icon class="material-icons">person</mat-icon></a>
     <a routerLink="/community" routerLinkActive="active" ariaCurrentWhenActive="page" aria-label="Community"><mat-icon class="material-icons">group</mat-icon></a>
@@ -20,3 +20,79 @@
     </a>
   </div>
 </mat-toolbar>
+
+<mat-toolbar class="mobileNavigation" aria-label="Primary navigation">
+  <a routerLink="/home" routerLinkActive="active" ariaCurrentWhenActive="page" aria-label="Home">
+    <mat-icon class="material-icons">home</mat-icon>
+    <span>Home</span>
+  </a>
+  <a routerLink="/activities" routerLinkActive="active" ariaCurrentWhenActive="page" aria-label="Activities">
+    <mat-icon class="material-icons">checklist</mat-icon>
+    <span>Activities</span>
+  </a>
+  <a routerLink="/organisations" routerLinkActive="active" ariaCurrentWhenActive="page" aria-label="Organisations">
+    <mat-icon class="material-icons">diversity_1</mat-icon>
+    <span>Organisations</span>
+  </a>
+  <a routerLink="/community" routerLinkActive="active" ariaCurrentWhenActive="page" aria-label="Community">
+    <mat-icon class="material-icons">group</mat-icon>
+    <span>Community</span>
+  </a>
+  <button
+    type="button"
+    class="menuButton"
+    [class.active]="isMobileMenuOpen"
+    [attr.aria-expanded]="isMobileMenuOpen"
+    aria-controls="mobile-more-navigation"
+    aria-haspopup="true"
+    aria-label="More navigation options"
+    (click)="toggleMobileMenu()">
+    <mat-icon class="material-icons">{{ isMobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+    <span>More</span>
+  </button>
+</mat-toolbar>
+
+<button
+  *ngIf="isMobileMenuOpen"
+  type="button"
+  class="menuBackdrop"
+  aria-label="Close navigation menu"
+  (click)="closeMobileMenu()">
+</button>
+
+<nav
+  *ngIf="isMobileMenuOpen"
+  id="mobile-more-navigation"
+  class="mobileMenu"
+  aria-label="More navigation options">
+  <div class="menuHeading">
+    <span>More</span>
+    <button type="button" aria-label="Close navigation menu" (click)="closeMobileMenu()">
+      <mat-icon class="material-icons">close</mat-icon>
+    </button>
+  </div>
+
+  <div class="menuLinks">
+    <a routerLink="/profile" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeMobileMenu()">
+      <mat-icon class="material-icons">person</mat-icon>
+      <span>Profile</span>
+    </a>
+    <a routerLink="/calendar" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeMobileMenu()">
+      <mat-icon class="material-icons">calendar_month</mat-icon>
+      <span>Calendar</span>
+    </a>
+    <a routerLink="/reports" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeMobileMenu()">
+      <mat-icon class="material-icons">bar_chart</mat-icon>
+      <span>Reports</span>
+    </a>
+    <a
+      *ngIf="hasPlatformAdminAccess"
+      routerLink="/admin/organisation-assignments"
+      routerLinkActive="active"
+      ariaCurrentWhenActive="page"
+      (click)="closeMobileMenu()">
+      <mat-icon class="material-icons">admin_panel_settings</mat-icon>
+      <span>Admin</span>
+    </a>
+  </div>
+</nav>

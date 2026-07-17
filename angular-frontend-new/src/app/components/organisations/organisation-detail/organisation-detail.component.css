@@ -445,8 +445,61 @@ mat-list-item .mat-list-text {
 /* Mobile adjustments */
 @media (max-width: 599px) {
   .organisation-container {
-    padding: 1rem;
+    padding: 0;
     gap: 1.5rem;
+  }
+  .header-card {
+    padding: 1rem;
+  }
+  .header-card mat-card-header {
+    padding: 0;
+  }
+  .header-card mat-card-title,
+  .header-card mat-card-subtitle {
+    overflow-wrap: anywhere;
+    word-break: normal;
+    white-space: normal;
+  }
+  .header-card mat-card-title {
+    margin-bottom: 0.25rem;
+    font-size: 1.3rem;
+    line-height: 1.2;
+  }
+  .header-card mat-card-subtitle:not(.additional-info) {
+    margin-bottom: 0.75rem;
+    color: #5c5f68;
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+  .header-card .avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-right: 0.75rem;
+  }
+  .header-card .avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  :host ::ng-deep .header-card .mat-mdc-card-header-text {
+    min-width: 0;
+    margin: 0;
+  }
+  .organization-actions {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem 0 0;
+  }
+  .organization-actions > button,
+  .organization-actions > a {
+    width: 100%;
+  }
+  .member-level {
+    padding-top: 0.25rem;
+    font-size: 0.78rem;
+    line-height: 1.4;
   }
   .middle-row {
     flex-direction: column;
