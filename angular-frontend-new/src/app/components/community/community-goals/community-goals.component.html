@@ -1,92 +1,156 @@
-<div class="container" *ngIf="isCreateMode || isEditMode; else goalsList">
-  <mat-card class="card">
-    <h2 class="title">{{ isEditMode ? 'Edit Goal' : 'Create Goal' }}</h2>
+<main class="form-page" *ngIf="isCreateMode || isEditMode; else goalsList">
+  <header class="page-header">
+    <div class="header-icon">
+      <mat-icon>{{ isEditMode ? 'edit' : 'outlined_flag' }}</mat-icon>
+    </div>
+    <div>
+      <span class="eyebrow">Community goal</span>
+      <h1>{{ isEditMode ? 'Edit goal' : 'Create a goal' }}</h1>
+      <p>Define a clear target and timeframe so every completed activity moves the organization forward.</p>
+    </div>
+  </header>
 
-    <form [formGroup]="goalForm" (ngSubmit)="onCreateGoal()">
+  <div class="loading-state" *ngIf="loading" role="status" aria-live="polite">
+    <mat-icon>sync</mat-icon>
+    <span>Loading goal details…</span>
+  </div>
 
-      <!-- TITLE -->
-      <mat-form-field appearance="fill">
-        <mat-label>Goal Title</mat-label>
-        <input matInput formControlName="title" />
+  <form
+    *ngIf="!loading"
+    [formGroup]="goalForm"
+    (ngSubmit)="onCreateGoal()"
+    class="goal-form">
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-number">1</span>
+        <div>
+          <h2>Goal details</h2>
+          <p>Give volunteers a concise outcome they can understand at a glance.</p>
+        </div>
+      </div>
 
-        <mat-error *ngIf="goalForm.get('title')?.touched || formSubmitted">
-          Title is required
+      <mat-form-field appearance="outline">
+        <mat-label>Goal title</mat-label>
+        <input matInput formControlName="title" required placeholder="e.g. Complete 50 neighborhood cleanups" />
+        <mat-icon matSuffix>flag</mat-icon>
+        <mat-error *ngIf="goalForm.get('title')?.hasError('required')">
+          Please enter a goal title.
         </mat-error>
       </mat-form-field>
 
-      <!-- DESCRIPTION -->
-      <mat-form-field appearance="fill">
+      <mat-form-field appearance="outline">
         <mat-label>Description</mat-label>
-        <textarea matInput rows="3" formControlName="description"></textarea>
+        <textarea
+          matInput
+          rows="5"
+          formControlName="description"
+          placeholder="Explain the impact this goal should create and what success looks like."></textarea>
+        <mat-hint>Keep it specific, encouraging, and easy to scan.</mat-hint>
       </mat-form-field>
+    </section>
 
-      <!-- TARGET -->
-      <mat-form-field appearance="fill">
-        <mat-label>Target Value</mat-label>
-        <input matInput type="number" formControlName="targetValue" />
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-number">2</span>
+        <div>
+          <h2>Progress rules</h2>
+          <p>Set the target and decide which completed activities count toward it.</p>
+        </div>
+      </div>
 
-        <mat-error *ngIf="goalForm.get('targetValue')?.touched || formSubmitted">
-          Target value is required
-        </mat-error>
-      </mat-form-field>
+      <div class="progress-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Target value</mat-label>
+          <input matInput type="number" min="1" formControlName="targetValue" required />
+          <mat-icon matSuffix>track_changes</mat-icon>
+          <mat-hint>Number of completed activities needed.</mat-hint>
+          <mat-error *ngIf="goalForm.get('targetValue')?.hasError('required')">
+            Please enter a target value.
+          </mat-error>
+          <mat-error *ngIf="goalForm.get('targetValue')?.hasError('min')">
+            The target must be at least 1.
+          </mat-error>
+        </mat-form-field>
 
-      <!-- ACTIVITY INTERESTS -->
-      <mat-form-field appearance="fill">
-        <mat-label>Activity Interests</mat-label>
-        <mat-select formControlName="activityTags" multiple>
-          <mat-option *ngFor="let tag of activityTagOptions" [value]="tag">
-            {{ tag }}
-          </mat-option>
-        </mat-select>
+        <mat-form-field appearance="outline">
+          <mat-label>Activity interests</mat-label>
+          <mat-select formControlName="activityTags" multiple>
+            <mat-option *ngFor="let tag of activityTagOptions" [value]="tag">
+              {{ tag }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>interests</mat-icon>
+          <mat-hint *ngIf="activityTagOptions.length === 0">
+            No activity interests are available yet.
+          </mat-hint>
+          <mat-hint *ngIf="activityTagOptions.length > 0">
+            Leave empty to count all completed activities.
+          </mat-hint>
+        </mat-form-field>
+      </div>
 
-        <mat-hint *ngIf="activityTagOptions.length === 0">
-          No activity interests available yet.
-        </mat-hint>
-        <mat-hint *ngIf="activityTagOptions.length > 0">
-          Leave empty to count all finished activities in the goal timeframe.
-        </mat-hint>
-      </mat-form-field>
+      <div class="progress-note" *ngIf="isEditMode">
+        <span class="progress-note__icon"><mat-icon>trending_up</mat-icon></span>
+        <div>
+          <strong>{{ goalForm.get('currentValue')?.value || 0 }} activities currently count toward this goal</strong>
+          <span>Progress updates automatically when matching activities are completed.</span>
+        </div>
+      </div>
+    </section>
 
-      <!-- START -->
-      <mat-form-field appearance="fill">
-        <mat-label>Start Date</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="startDate" />
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-number">3</span>
+        <div>
+          <h2>Timeframe</h2>
+          <p>Only completed activities within these dates contribute to the goal.</p>
+        </div>
+      </div>
 
-        <mat-error *ngIf="goalForm.get('startDate')?.touched || formSubmitted">
-          Start date is required
-        </mat-error>
+      <div class="field-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Start date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="startDate" required />
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="goalForm.get('startDate')?.hasError('required')">
+            Please choose a start date.
+          </mat-error>
+        </mat-form-field>
 
-        <mat-error *ngIf="goalForm.get('startDate')?.hasError('pastDate')">
-          Start date cannot be in the past
-        </mat-error>
-      </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>End date</mat-label>
+          <input matInput [matDatepicker]="picker1" formControlName="endDate" required />
+          <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+          <mat-datepicker #picker1></mat-datepicker>
+          <mat-error *ngIf="goalForm.get('endDate')?.hasError('required')">
+            Please choose an end date.
+          </mat-error>
+        </mat-form-field>
+      </div>
 
-      <!-- END -->
-      <mat-form-field appearance="fill">
-        <mat-label>End Date</mat-label>
-        <input matInput [matDatepicker]="picker1" formControlName="endDate" />
-        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-        <mat-datepicker #picker1></mat-datepicker>
+      <div class="range-error" *ngIf="goalForm.hasError('endBeforeStart') && (goalForm.touched || formSubmitted)">
+        <mat-icon>error_outline</mat-icon>
+        The end date must be after the start date.
+      </div>
+    </section>
 
-        <mat-error *ngIf="goalForm.get('endDate')?.touched || formSubmitted">
-          End date is required
-        </mat-error>
-      </mat-form-field>
-
-      <!-- BUTTON -->
-      <button mat-raised-button class="submit-btn" type="submit" [disabled]="!canManageGoals">
-        {{ isEditMode ? 'Save Goal' : 'Create Goal' }}
-      </button>
-
-      <mat-error *ngIf="goalForm.hasError('endBeforeStart')">
-        End date must be after start date
-      </mat-error>
-
-    </form>
-  </mat-card>
-</div>
+    <div class="submit-container">
+      <span><mat-icon>info</mat-icon> Progress is calculated from completed activities</span>
+      <div class="form-actions">
+        <button mat-button type="button" (click)="cancel()">Cancel</button>
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          [disabled]="goalForm.invalid || isSubmitting || !canManageGoals">
+          <mat-icon>{{ isSubmitting ? 'hourglass_top' : (isEditMode ? 'save' : 'add_circle') }}</mat-icon>
+          {{ isSubmitting ? 'Saving…' : (isEditMode ? 'Save changes' : 'Create goal') }}
+        </button>
+      </div>
+    </div>
+  </form>
+</main>
 
 <!-- LIST -->
 <ng-template #goalsList>

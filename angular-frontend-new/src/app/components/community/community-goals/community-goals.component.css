@@ -1,70 +1,228 @@
-.container {
-  padding: 1.5rem;
+:host {
+  display: block;
+  min-height: 100%;
+  background: radial-gradient(circle at 88% 0, rgba(179, 205, 254, 0.3), transparent 28rem);
+}
+
+.form-page {
+  width: min(100% - 2rem, 900px);
+  margin: 0 auto;
+  padding: 2.5rem 0 4rem;
+}
+
+.page-header {
   display: flex;
-  justify-content: center;
-  background-color: #f9f9fe;
-  min-height: 100vh;
-}
-
-.card {
-  width: 100%;
-  max-width: 600px;
-  padding: 2rem;
-  background-color: #ffffff;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
-}
-
-mat-form-field {
-  width: 100%;
+  align-items: flex-start;
+  gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
-h3 {
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
-  font-weight: 700;
-  color: #2f323a;
+.header-icon {
+  display: grid;
+  width: 3.25rem;
+  height: 3.25rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dim));
+  color: var(--on-primary);
+  box-shadow: 0 10px 24px rgba(57, 84, 125, 0.22);
+}
+
+.eyebrow {
+  color: var(--primary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 0.875rem;
 }
 
-.coords {
-  margin: 0.5rem 0 1rem;
-  font-size: 0.875rem;
-  color: #5c5f68;
+.page-header h1 {
+  margin: 0.2rem 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  line-height: 1.1;
 }
 
-.submit-btn {
-  width: 100%;
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background: linear-gradient(to bottom right, #46608a, #39547d);
-  color: #ffffff !important;
-  border: none;
-  border-radius: 0.75rem;
-  font-size: 0.875rem;
+.page-header p,
+.section-heading p {
+  margin: 0;
+  color: var(--on-surface-variant);
+  line-height: 1.5;
+}
+
+.goal-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-section {
+  padding: clamp(1.1rem, 3vw, 1.75rem);
+  border: 1px solid rgba(175, 178, 187, 0.22);
+  border-radius: var(--radius-xl);
+  background: var(--surface-container-lowest);
+  box-shadow: var(--shadow-ambient);
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-heading h2 {
+  margin: 0 0 0.2rem;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.section-heading p {
+  font-size: 0.84rem;
+}
+
+.section-number {
+  display: grid;
+  width: 1.8rem;
+  height: 1.8rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--primary-container);
+  color: var(--primary-dim);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.form-section > mat-form-field + mat-form-field {
+  margin-top: 0.35rem;
+}
+
+.field-grid,
+.progress-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.25rem 1rem;
+}
+
+.progress-note {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.35rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(70, 96, 138, 0.14);
+  border-radius: var(--radius-md);
+  background: var(--surface-container-low);
+}
+
+.progress-note__icon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--primary-container);
+  color: var(--primary-dim);
+}
+
+.progress-note strong,
+.progress-note span {
+  display: block;
+}
+
+.progress-note strong {
+  color: var(--on-surface);
+  font-size: 0.88rem;
+}
+
+.progress-note div > span {
+  margin-top: 0.15rem;
+  color: var(--on-surface-variant);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.range-error {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: -0.25rem;
+  color: var(--error);
+  font-size: 0.8rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(70, 96, 138, 0.2);
 }
 
-.submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(70, 96, 138, 0.3);
+.range-error mat-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  font-size: 1.1rem;
 }
 
-form {
-  max-width: 700px;
-  margin: 0 auto;
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 12rem;
+  padding: 2rem;
+  border: 1px solid rgba(175, 178, 187, 0.22);
+  border-radius: var(--radius-xl);
+  background: var(--surface-container-lowest);
+  color: var(--on-surface-variant);
+  box-shadow: var(--shadow-ambient);
+  font-weight: 700;
 }
 
-mat-chip {
-  margin: 0.25rem;
+.loading-state mat-icon {
+  color: var(--primary);
+  animation: spin 1.2s linear infinite;
+}
+
+.submit-container {
+  position: sticky;
+  bottom: calc(var(--bottom-nav-height) + 0.5rem);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem;
+  border: 1px solid rgba(175, 178, 187, 0.2);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 12px 30px rgba(47, 50, 58, 0.12);
+  backdrop-filter: blur(12px);
+}
+
+.submit-container > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--on-surface-variant);
+  font-size: 0.76rem;
+}
+
+.submit-container > span mat-icon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.form-actions button {
+  min-height: 2.8rem;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .overview-container {
@@ -284,6 +442,37 @@ mat-chip {
 }
 
 @media (max-width: 599px) {
+  .form-page {
+    width: min(100% - 1rem, 900px);
+    padding-top: 1.25rem;
+  }
+
+  .header-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .field-grid,
+  .progress-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .submit-container {
+    bottom: calc(var(--bottom-nav-height) + 0.25rem);
+  }
+
+  .submit-container > span {
+    display: none;
+  }
+
+  .form-actions {
+    width: 100%;
+  }
+
+  .form-actions button {
+    flex: 1 1 0;
+  }
+
   .overview-container {
     padding: 1rem;
   }

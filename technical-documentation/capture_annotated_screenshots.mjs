@@ -3,6 +3,7 @@ import { chromium } from '/tmp/codex-playwright/node_modules/playwright/index.mj
 
 const baseUrl = 'http://localhost:4200';
 const outputDirectory = new URL('./screenshots-annotated-current/', import.meta.url);
+const defaultViewport = { width: 1440, height: 1000 };
 
 const screens = [
   {
@@ -77,6 +78,23 @@ const screens = [
       { title: 'Alice’s latest member highlights', targets: ['.home-grid'] },
       { title: 'Recommendations based on Alice’s interests and skills', targets: ['.recommended-section'] },
       { title: 'Standard member navigation without platform administration', targets: ['app-nav-bar .toolbarNav'] },
+    ],
+  },
+  {
+    file: '02c-home-mobile-menu.png',
+    route: '/home',
+    waitFor: '.home-container',
+    authenticated: true,
+    viewport: { width: 390, height: 844 },
+    fullPage: false,
+    action: async (page) => {
+      await page.locator('app-nav-bar .menuButton').click();
+      await page.waitForSelector('#mobile-more-navigation', { state: 'visible' });
+    },
+    callouts: [
+      { title: 'Home dashboard behind the mobile navigation overlay', targets: ['.home-container > .header'] },
+      { title: 'Expanded burger menu with secondary destinations', targets: ['#mobile-more-navigation'] },
+      { title: 'Mobile primary navigation and active More control', targets: ['app-nav-bar .mobileNavigation'] },
     ],
   },
   {
@@ -307,9 +325,28 @@ const screens = [
     authenticated: true,
     callouts: [
       { title: 'Calendar introduction and appointment creation', targets: ['.calendar-page > .page-header'] },
-      { title: 'Monthly calendar and event markers', targets: ['app-calendar-month'] },
+      { title: 'Monthly calendar, view switch, and event markers', targets: ['app-calendar-month'] },
       { title: 'Entry type and timeframe filters', targets: ['.filter-groups'] },
       { title: 'Detailed schedule entries and actions', targets: ['.appointment-items'] },
+    ],
+  },
+  {
+    file: '11b-calendar-map.png',
+    route: '/calendar',
+    waitFor: '.calendar-page',
+    authenticated: true,
+    fullPage: false,
+    action: async (page) => {
+      await page.waitForSelector('app-calendar-month .days-grid');
+      await page.getByRole('button', { name: 'Map', exact: true }).click();
+      await page.waitForSelector('app-calendar-month .map-view google-map');
+      await page.waitForTimeout(1200);
+    },
+    callouts: [
+      { title: 'Calendar introduction and appointment creation', targets: ['.calendar-page > .page-header'] },
+      { title: 'Map selected in the Calendar/Map view switch', targets: ['app-calendar-month .calendar-toolbar'] },
+      { title: 'Location count, activity focus control, and marker legend', targets: ['app-calendar-month .map-summary'] },
+      { title: 'Interactive map of activities and joined organisations', targets: ['app-calendar-month .map-view google-map'] },
     ],
   },
   {
@@ -384,9 +421,14 @@ async function waitForImages(page) {
   });
 }
 
-async function addAnnotations(page, callouts) {
-  return page.evaluate((definitions) => {
+async function addAnnotations(page, callouts, viewportOnly = false) {
+  return page.evaluate(({ definitions, viewportOnly: constrainToViewport }) => {
     document.getElementById('documentation-annotations')?.remove();
+
+    const documentWidth = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
+    const documentHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+    const annotationWidth = constrainToViewport ? window.innerWidth : documentWidth;
+    const annotationHeight = constrainToViewport ? window.innerHeight : documentHeight;
 
     const root = document.createElement('div');
     root.id = 'documentation-annotations';
@@ -394,8 +436,8 @@ async function addAnnotations(page, callouts) {
     Object.assign(root.style, {
       position: 'absolute',
       inset: '0',
-      width: `${Math.max(document.documentElement.scrollWidth, document.body.scrollWidth)}px`,
-      height: `${Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)}px`,
+      width: `${annotationWidth}px`,
+      height: `${annotationHeight}px`,
       pointerEvents: 'none',
       zIndex: '2147483647',
     });
@@ -432,8 +474,8 @@ async function addAnnotations(page, callouts) {
       const padding = 8;
       const left = Math.max(4, Math.min(...rectangles.map((rect) => rect.left)) - padding);
       const top = Math.max(4, Math.min(...rectangles.map((rect) => rect.top)) - padding);
-      const right = Math.max(...rectangles.map((rect) => rect.right)) + padding;
-      const bottom = Math.max(...rectangles.map((rect) => rect.bottom)) + padding;
+      const right = Math.min(annotationWidth - 4, Math.max(...rectangles.map((rect) => rect.right)) + padding);
+      const bottom = Math.min(annotationHeight - 4, Math.max(...rectangles.map((rect) => rect.bottom)) + padding);
 
       const box = document.createElement('div');
       Object.assign(box.style, {
@@ -453,7 +495,7 @@ async function addAnnotations(page, callouts) {
       badge.textContent = String(calloutIndex + 1);
       Object.assign(badge.style, {
         position: 'absolute',
-        left: '-18px',
+        left: left < 28 ? '6px' : '-18px',
         top: top < 28 ? '6px' : '-18px',
         width: '38px',
         height: '38px',
@@ -474,12 +516,15 @@ async function addAnnotations(page, callouts) {
 
     document.body.appendChild(root);
     return results;
-  }, callouts.map((callout) => ({
-    ...callout,
-    targets: callout.targets.map((target) => (
-      typeof target === 'string' ? { selector: target, index: null } : target
-    )),
-  })));
+  }, {
+    viewportOnly,
+    definitions: callouts.map((callout) => ({
+      ...callout,
+      targets: callout.targets.map((target) => (
+        typeof target === 'string' ? { selector: target, index: null } : target
+      )),
+    })),
+  });
 }
 
 async function preparePage(page) {
@@ -558,6 +603,7 @@ async function preparePage(page) {
 }
 
 async function capture(page, screen) {
+  await page.setViewportSize(screen.viewport ?? defaultViewport);
   await page.goto(`${baseUrl}${screen.route}`, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector(screen.waitFor, { state: 'visible' });
   if (screen.action) {
@@ -565,7 +611,7 @@ async function capture(page, screen) {
   }
   await preparePage(page);
 
-  const results = await addAnnotations(page, screen.callouts);
+  const results = await addAnnotations(page, screen.callouts, screen.fullPage === false);
   const missing = results.filter((result) => !result.found);
   if (missing.length) {
     console.warn(`${screen.file}: missing callouts: ${missing.map((entry) => entry.title).join(', ')}`);
@@ -616,11 +662,16 @@ function buildLegend() {
   return `${lines.join('\n')}\n`;
 }
 
+const requestedFiles = new Set(process.argv.slice(2));
+const captureScreens = requestedFiles.size
+  ? screens.filter((screen) => requestedFiles.has(screen.file))
+  : screens;
+
 await mkdir(outputDirectory, { recursive: true });
 
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({
-  viewport: { width: 1440, height: 1000 },
+  viewport: defaultViewport,
   deviceScaleFactor: 1,
   colorScheme: 'light',
   reducedMotion: 'reduce',
@@ -629,17 +680,17 @@ const page = await context.newPage();
 page.setDefaultTimeout(20_000);
 
 try {
-  for (const screen of screens.filter((entry) => !entry.authenticated)) {
+  for (const screen of captureScreens.filter((entry) => !entry.authenticated)) {
     await capture(page, screen);
   }
 
   await login(page, 'admin', 'admin123');
 
-  for (const screen of screens.filter((entry) => entry.authenticated && entry.session !== 'alice')) {
+  for (const screen of captureScreens.filter((entry) => entry.authenticated && entry.session !== 'alice')) {
     await capture(page, screen);
   }
 
-  const aliceScreens = screens.filter((entry) => entry.session === 'alice');
+  const aliceScreens = captureScreens.filter((entry) => entry.session === 'alice');
   if (aliceScreens.length) {
     await resetSession(page);
     await login(page, 'alice', 'password');

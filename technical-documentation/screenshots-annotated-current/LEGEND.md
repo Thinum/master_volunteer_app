@@ -37,6 +37,12 @@ Red numbered boxes identify the main UI regions referenced by the technical docu
 4. Recommendations based on Alice’s interests and skills
 5. Standard member navigation without platform administration
 
+## 02c-home-mobile-menu.png
+
+1. Home dashboard behind the mobile navigation overlay
+2. Expanded burger menu with secondary destinations
+3. Mobile primary navigation and active More control
+
 ## 03-organisations.png
 
 1. Organization overview and totals
@@ -135,9 +141,16 @@ Red numbered boxes identify the main UI regions referenced by the technical docu
 ## 11-calendar.png
 
 1. Calendar introduction and appointment creation
-2. Monthly calendar and event markers
+2. Monthly calendar, view switch, and event markers
 3. Entry type and timeframe filters
 4. Detailed schedule entries and actions
+
+## 11b-calendar-map.png
+
+1. Calendar introduction and appointment creation
+2. Map selected in the Calendar/Map view switch
+3. Location count, activity focus control, and marker legend
+4. Interactive map of activities and joined organisations
 
 ## 12-reports.png
 
