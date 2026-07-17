@@ -272,6 +272,10 @@ form {
   --event-color: #a46618;
 }
 
+.appointment-item.type-organisation {
+  --event-color: #438963;
+}
+
 .appointment-item.type-reactivation {
   --event-color: #80558c;
 }

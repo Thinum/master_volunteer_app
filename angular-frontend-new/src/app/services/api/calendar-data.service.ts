@@ -20,6 +20,7 @@ export class CalendarDataService {
   loadEvents(): Observable<CalendarEvent[]> {
     return this.volunteerService.getCurrentUser().pipe(
       switchMap(user => forkJoin({
+        userId: of(user.id),
         activities: this.activityService.getActivitiesByUserParticipation(user.id)
           .pipe(catchError(() => of([] as Activity[]))),
         personalAppointments: this.appointmentService.getPersonalAppointments()
@@ -32,7 +33,8 @@ export class CalendarDataService {
           base.activities,
           base.personalAppointments,
           base.organisations,
-          goals
+          goals,
+          base.userId
         ))
       ))
     );
@@ -49,13 +51,20 @@ export class CalendarDataService {
     activities: Activity[],
     personalAppointments: Appointment[],
     organisations: Organisation[],
-    goals: CommunityGoal[]
+    goals: CommunityGoal[],
+    userId: number
   ): CalendarEvent[] {
     const events: CalendarEvent[] = [];
 
     activities.forEach(activity => {
       if (!activity.date) return;
       const start = this.combineDateAndTime(activity.date, activity.startTime);
+      const organisation = activity.organisations?.find(org => this.hasCoordinates(org.location));
+      const coordinates = this.hasCoordinates(activity.coordinates)
+        ? activity.coordinates
+        : organisation
+          ? { lat: organisation.location.lat, lng: organisation.location.lon }
+          : undefined;
       events.push({
         id: `activity-${activity.id}`,
         title: activity.title,
@@ -63,7 +72,8 @@ export class CalendarDataService {
         start,
         end: this.activityEnd(start, activity.endTime, activity.duration),
         allDay: !activity.startTime && this.asDate(activity.date).getHours() === 0,
-        location: activity.location,
+        location: activity.location || (organisation ? `${organisation.orgName} home base` : undefined),
+        coordinates,
         description: activity.description || activity.body,
         route: `/activities/${activity.id}`
       });
@@ -92,6 +102,25 @@ export class CalendarDataService {
         allDay: true,
         description: goal.description,
         route: organisationId ? `/community-goals?organisationId=${organisationId}` : undefined
+      });
+    });
+
+    organisations.forEach(org => {
+      if (!this.hasCoordinates(org.location)) return;
+      const membership = org.orgMembers?.find(member => member.user?.id === userId);
+      const joinedAt = membership?.joinedAt ?? org.createdAt;
+      if (!joinedAt) return;
+      events.push({
+        id: `organisation-${org.id}`,
+        title: `Joined ${org.orgName}`,
+        type: 'organisation',
+        start: this.asDate(joinedAt),
+        allDay: false,
+        location: `${org.orgName} home base`,
+        coordinates: { lat: org.location.lat, lng: org.location.lon },
+        markerImageUrl: org.profilePicture,
+        description: org.body,
+        route: `/organisations/${org.id}`
       });
     });
 
@@ -130,6 +159,11 @@ export class CalendarDataService {
     }
     const hours = Number.parseFloat(duration ?? '');
     return Number.isFinite(hours) ? new Date(start.getTime() + hours * 60 * 60 * 1000) : undefined;
+  }
+
+  private hasCoordinates(value?: { lat: number; lng?: number; lon?: number }): boolean {
+    const longitude = value?.lng ?? value?.lon;
+    return Number.isFinite(value?.lat) && Number.isFinite(longitude);
   }
 
 }

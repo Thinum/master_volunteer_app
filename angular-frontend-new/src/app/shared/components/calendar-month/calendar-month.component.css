@@ -51,6 +51,53 @@ h2 {
   background: white;
 }
 
+.view-switch {
+  display: inline-flex;
+  margin-inline: .2rem;
+  padding: .2rem;
+  border: 1px solid rgba(70, 96, 138, .16);
+  border-radius: var(--radius-full);
+  background: var(--surface-container-low);
+}
+
+.view-switch button {
+  display: inline-flex;
+  min-height: 2.1rem;
+  padding: .35rem .65rem;
+  align-items: center;
+  gap: .3rem;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--on-surface-variant);
+  font: inherit;
+  font-size: .75rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition: background-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
+}
+
+.view-switch button:hover {
+  color: var(--primary);
+}
+
+.view-switch button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.view-switch button.active {
+  background: white;
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(47, 50, 58, .1);
+}
+
+.view-switch mat-icon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+}
+
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -247,10 +294,230 @@ h2 {
   color: #27606a;
 }
 
+.type-organisation {
+  background: #dff2e8;
+  color: #286044;
+}
+
 .legend-dot.type-activity { background: #5f86bb; }
 .legend-dot.type-personal { background: #c7586a; }
 .legend-dot.type-goal { background: #8a64a8; }
+.legend-dot.type-organisation { background: #438963; }
 .legend-dot.type-reactivation { background: #4b8791; }
+
+.map-view {
+  border-top: 1px solid rgba(70, 96, 138, .1);
+  background: var(--surface-container-low);
+}
+
+.map-summary {
+  display: flex;
+  min-height: 4rem;
+  padding: .75rem 1.4rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.map-summary > div:first-child {
+  display: flex;
+  min-width: 9rem;
+  flex-direction: column;
+  gap: .12rem;
+}
+
+.map-summary strong {
+  color: var(--on-surface);
+  font-size: .82rem;
+}
+
+.map-summary span {
+  color: var(--on-surface-variant);
+  font-size: .7rem;
+}
+
+.map-legend {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+}
+
+.activity-map-controls {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 27rem;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+}
+
+.activity-map-controls label {
+  flex: 0 0 auto;
+  color: var(--on-surface-variant);
+  font-size: .65rem;
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.activity-map-controls select {
+  width: min(100%, 22rem);
+  min-width: 0;
+  min-height: 2.25rem;
+  padding: .35rem 2rem .35rem .7rem;
+  border: 1px solid rgba(70, 96, 138, .18);
+  border-radius: var(--radius-full);
+  background: white;
+  color: var(--on-surface);
+  font: inherit;
+  font-size: .72rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.activity-map-controls select:focus-visible,
+.activity-map-controls button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.activity-map-controls button {
+  display: inline-flex;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+}
+
+.activity-map-controls button:hover {
+  filter: brightness(.94);
+}
+
+.activity-map-controls mat-icon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+}
+
+.map-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: .32rem;
+  font-weight: 700;
+}
+
+.pin-key {
+  display: inline-flex;
+  width: 1.35rem;
+  height: 1.35rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: .58rem;
+  font-style: normal;
+}
+
+.pin-key.organisation {
+  background: #438963;
+}
+
+.pin-key mat-icon {
+  width: .85rem;
+  height: .85rem;
+  color: white;
+  font-size: .85rem;
+}
+
+.map-view google-map {
+  display: block;
+}
+
+.map-info {
+  display: flex;
+  min-width: 13rem;
+  max-width: 18rem;
+  padding: .2rem;
+  flex-direction: column;
+  gap: .45rem;
+  color: #2f323a;
+}
+
+.map-info > strong {
+  font-family: var(--font-display);
+  font-size: .95rem;
+}
+
+.map-info-type {
+  color: #46608a;
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.map-info > span:not(.map-info-type) {
+  display: flex;
+  align-items: flex-start;
+  gap: .3rem;
+  color: #656b78;
+  font-size: .72rem;
+}
+
+.map-info mat-icon {
+  width: .9rem;
+  height: .9rem;
+  flex: 0 0 .9rem;
+  font-size: .9rem;
+}
+
+.map-info button {
+  display: inline-flex;
+  width: max-content;
+  margin-top: .15rem;
+  padding: .4rem .65rem;
+  align-items: center;
+  gap: .25rem;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: #46608a;
+  color: white;
+  font: inherit;
+  font-size: .7rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.map-empty {
+  display: flex;
+  min-height: 24rem;
+  padding: 2rem;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: .45rem;
+  color: var(--on-surface-variant);
+  text-align: center;
+}
+
+.map-empty mat-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--primary);
+  font-size: 2.5rem;
+}
+
+.map-empty strong {
+  color: var(--on-surface);
+  font-family: var(--font-display);
+}
 
 .compact .calendar-toolbar {
   min-height: 0;
@@ -312,6 +579,22 @@ h2 {
   .weekday-row div {
     font-size: .56rem;
   }
+
+  .view-switch button span {
+    display: none;
+  }
+
+  .map-summary {
+    padding-inline: 1rem;
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .activity-map-controls {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 430px) {
@@ -322,6 +605,38 @@ h2 {
   .calendar-actions > button:first-child {
     min-width: auto;
     padding-inline: .6rem;
+  }
+
+  .calendar-actions {
+    gap: 0;
+  }
+
+  .view-switch {
+    margin-inline: .1rem;
+  }
+
+  .view-switch button {
+    min-width: 2rem;
+    padding-inline: .5rem;
+  }
+
+  .map-summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .activity-map-controls {
+    width: 100%;
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .activity-map-controls label {
+    width: 100%;
+  }
+
+  .activity-map-controls select {
+    flex: 1;
   }
 
   .legend {

@@ -210,6 +210,7 @@ export class CalendarComponent implements OnInit {
       personal: 'My appointment',
       activity: 'Organisation activity',
       goal: 'Community goal',
+      organisation: 'Organisation joined',
       reactivation: 'Organisation update'
     };
     return labels[type];
@@ -220,6 +221,7 @@ export class CalendarComponent implements OnInit {
       personal: 'person',
       activity: 'volunteer_activism',
       goal: 'flag',
+      organisation: 'domain',
       reactivation: 'domain'
     };
     return icons[type];

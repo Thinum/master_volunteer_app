@@ -1,4 +1,9 @@
-export type CalendarEventType = 'activity' | 'personal' | 'goal' | 'reactivation';
+export type CalendarEventType = 'activity' | 'personal' | 'goal' | 'organisation' | 'reactivation';
+
+export interface CalendarEventCoordinates {
+  lat: number;
+  lng: number;
+}
 
 export interface CalendarEvent {
   id: string;
@@ -8,6 +13,8 @@ export interface CalendarEvent {
   end?: Date;
   allDay: boolean;
   location?: string;
+  coordinates?: CalendarEventCoordinates;
+  markerImageUrl?: string;
   description?: string;
   route?: string;
   personalAppointmentId?: number;

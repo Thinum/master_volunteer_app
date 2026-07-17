@@ -2,51 +2,126 @@
   <header class="calendar-toolbar">
     <div>
       <p class="eyebrow">Calendar</p>
-      <h2>{{ monthLabel }}</h2>
+      <h2>{{ viewMode === 'calendar' ? monthLabel : 'All locations' }}</h2>
     </div>
     <div class="calendar-actions" *ngIf="allowNavigation">
-      <button mat-button type="button" (click)="goToToday()">Today</button>
-      <button mat-icon-button type="button" aria-label="Previous month" (click)="previousMonth()"><mat-icon>chevron_left</mat-icon></button>
-      <button mat-icon-button type="button" aria-label="Next month" (click)="nextMonth()"><mat-icon>chevron_right</mat-icon></button>
+      <button *ngIf="viewMode === 'calendar'" mat-button type="button" (click)="goToToday()">Today</button>
+      <div class="view-switch" aria-label="Calendar view">
+        <button type="button" [class.active]="viewMode === 'calendar'" [attr.aria-pressed]="viewMode === 'calendar'" (click)="setViewMode('calendar')">
+          <mat-icon>calendar_month</mat-icon><span>Calendar</span>
+        </button>
+        <button type="button" [class.active]="viewMode === 'map'" [attr.aria-pressed]="viewMode === 'map'" (click)="setViewMode('map')">
+          <mat-icon>map</mat-icon><span>Map</span>
+        </button>
+      </div>
+      <ng-container *ngIf="viewMode === 'calendar'">
+        <button mat-icon-button type="button" aria-label="Previous month" (click)="previousMonth()"><mat-icon>chevron_left</mat-icon></button>
+        <button mat-icon-button type="button" aria-label="Next month" (click)="nextMonth()"><mat-icon>chevron_right</mat-icon></button>
+      </ng-container>
     </div>
   </header>
 
-  <div class="legend" *ngIf="!compact">
+  <div class="legend" *ngIf="!compact && viewMode === 'calendar'">
     <span *ngFor="let item of eventTypes"><i [class]="'legend-dot type-' + item.type"></i>{{ item.label }}</span>
   </div>
 
-  <div class="calendar-grid weekday-row">
-    <div *ngFor="let weekday of weekdays">{{ weekday }}</div>
-  </div>
-  <div class="calendar-grid days-grid">
-    <button
-      *ngFor="let day of days"
-      class="calendar-day"
-      type="button"
-      [class.outside]="!day.inCurrentMonth"
-      [class.today]="day.isToday"
-      [attr.aria-label]="dayAriaLabel(day)"
-      (click)="selectDay(day)">
-      <span class="day-number">{{ day.dayNumber }}</span>
-      <span class="day-events">
-        <span
-          *ngFor="let event of visibleEvents(day)"
-          class="calendar-event"
-          [class]="'calendar-event type-' + event.type"
-          [class.has-route]="!!event.route"
-          [class.past-event]="isPastEvent(event)"
-          [attr.role]="event.route ? 'link' : null"
-          [attr.tabindex]="event.route ? 0 : null"
-          [title]="event.route ? event.title + ' — open details' : event.title"
-          (click)="openEvent(event, $event)"
-          (keydown.enter)="openEvent(event, $event)"
-          (keydown.space)="openEvent(event, $event)">
-          <strong>{{ formatTime(event) }}</strong><span class="event-title">{{ event.title }}</span><mat-icon *ngIf="event.route">arrow_outward</mat-icon>
+  <ng-container *ngIf="viewMode === 'calendar'">
+    <div class="calendar-grid weekday-row">
+      <div *ngFor="let weekday of weekdays">{{ weekday }}</div>
+    </div>
+    <div class="calendar-grid days-grid">
+      <button
+        *ngFor="let day of days"
+        class="calendar-day"
+        type="button"
+        [class.outside]="!day.inCurrentMonth"
+        [class.today]="day.isToday"
+        [attr.aria-label]="dayAriaLabel(day)"
+        (click)="selectDay(day)">
+        <span class="day-number">{{ day.dayNumber }}</span>
+        <span class="day-events">
+          <span
+            *ngFor="let event of visibleEvents(day)"
+            class="calendar-event"
+            [class]="'calendar-event type-' + event.type"
+            [class.has-route]="!!event.route"
+            [class.past-event]="isPastEvent(event)"
+            [attr.role]="event.route ? 'link' : null"
+            [attr.tabindex]="event.route ? 0 : null"
+            [title]="event.route ? event.title + ' — open details' : event.title"
+            (click)="openEvent(event, $event)"
+            (keydown.enter)="openEvent(event, $event)"
+            (keydown.space)="openEvent(event, $event)">
+            <strong>{{ formatTime(event) }}</strong><span class="event-title">{{ event.title }}</span><mat-icon *ngIf="event.route">arrow_outward</mat-icon>
+          </span>
+          <span class="more-events" *ngIf="day.events.length > visibleEvents(day).length">
+            +{{ day.events.length - visibleEvents(day).length }} more
+          </span>
         </span>
-        <span class="more-events" *ngIf="day.events.length > visibleEvents(day).length">
-          +{{ day.events.length - visibleEvents(day).length }} more
-        </span>
-      </span>
-    </button>
-  </div>
+      </button>
+    </div>
+  </ng-container>
+
+  <section class="map-view" *ngIf="viewMode === 'map'">
+    <div class="map-summary">
+      <div>
+        <strong>{{ mappedEvents.length }} {{ mappedEvents.length === 1 ? 'place' : 'places' }}</strong>
+        <span>Activities and organisations you joined</span>
+      </div>
+      <div class="activity-map-controls" *ngIf="activityMapEvents.length">
+        <label for="map-activity-select">Focus activity</label>
+        <select
+          id="map-activity-select"
+          [value]="selectedMapEvent?.type === 'activity' ? selectedMapEvent?.id : ''"
+          (change)="selectActivity($any($event.target).value)">
+          <option value="">All locations</option>
+          <option *ngFor="let event of activityMapEvents" [value]="event.id">
+            {{ event === nextUpcomingActivity ? 'Next · ' : '' }}{{ event.title }} · {{ event.start | date:'d MMM, HH:mm' }}
+          </option>
+        </select>
+        <button type="button" title="Focus next activity" aria-label="Focus next activity" (click)="focusNextActivity()">
+          <mat-icon>skip_next</mat-icon>
+        </button>
+      </div>
+      <div class="map-legend" aria-label="Map pin types">
+        <span><i class="pin-key activity">A</i>Activities</span>
+        <span><i class="pin-key organisation"><mat-icon>domain</mat-icon></i>Organisations</span>
+      </div>
+    </div>
+
+    <google-map
+      *ngIf="mappedEvents.length; else noMapLocations"
+      height="500px"
+      width="100%"
+      [center]="{ lat: 48.3069, lng: 14.2858 }"
+      [zoom]="7"
+      [options]="{ mapTypeControl: false, streetViewControl: false, fullscreenControl: true }"
+      (mapInitialized)="onMapReady($event)">
+      <map-marker
+        #marker="mapMarker"
+        *ngFor="let event of mappedEvents"
+        [position]="mapPosition(event)"
+        [icon]="markerIcon(event)"
+        [title]="event.title"
+        (mapClick)="openMapEvent(marker, event)">
+      </map-marker>
+      <map-info-window>
+        <div class="map-info" *ngIf="selectedMapEvent as event">
+          <span class="map-info-type">{{ mapEventTypeLabel(event) }}</span>
+          <strong>{{ event.title }}</strong>
+          <span><mat-icon>schedule</mat-icon>{{ mapEventDate(event) }}</span>
+          <span *ngIf="event.location"><mat-icon>location_on</mat-icon>{{ event.location }}</span>
+          <button *ngIf="event.route" type="button" (click)="openSelectedMapEvent()">Open details <mat-icon>arrow_forward</mat-icon></button>
+        </div>
+      </map-info-window>
+    </google-map>
+
+    <ng-template #noMapLocations>
+      <div class="map-empty">
+        <mat-icon>location_off</mat-icon>
+        <strong>No mapped entries yet</strong>
+        <span>Activities and joined organisations with a saved position will appear here.</span>
+      </div>
+    </ng-template>
+  </section>
 </section>
