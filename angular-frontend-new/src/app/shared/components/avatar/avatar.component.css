@@ -1,0 +1,43 @@
+:host {
+  --app-avatar-size: 40px;
+  --app-avatar-border-color: #fff;
+
+  display: inline-flex;
+  width: var(--app-avatar-size);
+  height: var(--app-avatar-size);
+  flex: 0 0 var(--app-avatar-size);
+  border-radius: var(--radius-full, 9999px);
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.avatar {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  place-items: center;
+  border-radius: inherit;
+  background: var(--avatar-bg, linear-gradient(135deg, #46608a, #39547d));
+  color: var(--on-primary, #fff);
+}
+
+.avatar--bordered {
+  border: 2px solid var(--app-avatar-border-color);
+}
+
+img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar__initials {
+  font-family: var(--font-body, 'Inter'), sans-serif;
+  font-size: clamp(0.625rem, calc(var(--app-avatar-size) * 0.36), 2rem);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  text-transform: uppercase;
+}

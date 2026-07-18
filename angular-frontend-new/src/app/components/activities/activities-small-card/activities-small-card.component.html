@@ -5,11 +5,12 @@
   </div>
 
   <div *ngIf="friends" class="friends">
-    <span *ngFor="let friend of friends" class="friend-avatar">
-      <img *ngIf="friend.profilePicture" [src]="friend.profilePicture" [alt]="friend.name">
-      <span *ngIf="!friend.profilePicture" class="initials">
-        {{ friend.name.charAt(0) }}
-      </span>
-    </span>
+    <app-avatar
+      *ngFor="let friend of friends"
+      class="friend-avatar"
+      [src]="friend.profilePicture"
+      [name]="friend.name"
+      size="sm"
+    />
   </div>
 </div>

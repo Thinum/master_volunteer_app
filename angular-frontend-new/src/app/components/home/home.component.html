@@ -1,28 +1,29 @@
 <div class="home-container">
   <!-- Header -->
-  <div class="header" *ngIf="currentUser">
+  <header class="app-overview-header home-header" *ngIf="currentUser">
     <div class="user-info">
-      <img class="profile-pic" [src]="currentUser.profilePicture || 'https://i.pravatar.cc/40?img=3'" alt="Profile Picture">
+      <app-avatar class="profile-pic" [src]="currentUser.profilePicture" [name]="currentUser.name" [size]="55" />
       <div>
-        <h3>Welcome back, {{ currentUser.name }}!</h3>
+        <p class="app-overview-header__eyebrow">Your overview</p>
+        <h1>Welcome back, {{ currentUser.name }}!</h1>
         <p class="role">Member since: {{ currentUser.joinedAt | date:'mediumDate' }}</p>
       </div>
     </div>
-    <div class="stats">
-      <div class="stat">
-        <span class="value">{{ friendsCount }}</span>
-        <span class="label">Friends</span>
+    <div class="app-overview-header__stats stats">
+      <div class="app-overview-header__stat">
+        <span class="app-overview-header__stat-value">{{ friendsCount }}</span>
+        <span class="app-overview-header__stat-label">Friends</span>
       </div>
-      <div class="stat">
-        <span class="value">{{ organisationsCount }}</span>
-        <span class="label">Organizations</span>
+      <div class="app-overview-header__stat">
+        <span class="app-overview-header__stat-value">{{ organisationsCount }}</span>
+        <span class="app-overview-header__stat-label">Organizations</span>
       </div>
-      <div class="stat">
-        <span class="value">{{ activitiesCount }}</span>
-        <span class="label">Activities</span>
+      <div class="app-overview-header__stat">
+        <span class="app-overview-header__stat-value">{{ activitiesCount }}</span>
+        <span class="app-overview-header__stat-label">Activities</span>
       </div>
     </div>
-  </div>
+  </header>
 
   <!-- Notification -->
   <div class="notification" *ngIf="requests && requests.length > 0">
@@ -78,10 +79,7 @@
       <!-- Last Friend Added -->
       <app-card size="compact" class="highlight-card" *ngIf="lastFriend">
         <div card-left>
-          <div class="friend-avatar" [attr.aria-label]="lastFriend.name">
-            <img *ngIf="lastFriend.profilePicture" [src]="lastFriend.profilePicture" [alt]="lastFriend.name"/>
-            <span *ngIf="!lastFriend.profilePicture">{{ lastFriend.name.charAt(0) }}</span>
-          </div>
+          <app-avatar class="friend-avatar" [src]="lastFriend.profilePicture" [name]="lastFriend.name" size="lg" />
         </div>
         <div card-body>
           <div class="highlight-info">
@@ -170,7 +168,7 @@
           <h5>{{ req.organisation }}</h5>
           <p class="title">{{ req.title }}</p>
           <div class="request-user">
-            <img [src]="req.user.avatar" alt="{{ req.user.name }}" class="avatar"/>
+            <app-avatar [src]="req.user.avatar" [name]="req.user.name" size="md" />
             <span>{{ req.user.name }}</span>
           </div>
         </div>

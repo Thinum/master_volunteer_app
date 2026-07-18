@@ -11,6 +11,7 @@ import { MOCK_ACTIVITIES } from '../../mock/mock-activities';
 import { MOCK_USERS } from '../../mock/mock-users';
 import { Activity } from '../../models/activity.model';
 import { User } from '../../models/user.model';
+import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 
 type StatusFilter = 'all' | 'open' | 'upcoming' | 'closed';
 type UserMetric = 'hours' | 'activities';
@@ -32,7 +33,7 @@ interface ActivityReportRow {
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [CommonModule, DatePipe, FormsModule, MatButtonModule, MatIconModule, MatSelectModule],
+  imports: [CommonModule, DatePipe, FormsModule, MatButtonModule, MatIconModule, MatSelectModule, AvatarComponent],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.css'
 })

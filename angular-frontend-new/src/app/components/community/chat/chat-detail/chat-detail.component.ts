@@ -9,11 +9,12 @@ import { ChatMessage } from '../../../../models/chat-message.model';
 import { User } from '../../../../models/user.model';
 import { ChatService } from '../../../../services/api/chat.service';
 import { VolunteerService } from '../../../../services/api/volunteer.service';
+import { AvatarComponent } from '../../../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-chat-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, MatButtonModule, MatIconModule],
+  imports: [CommonModule, FormsModule, RouterLink, MatButtonModule, MatIconModule, AvatarComponent],
   templateUrl: './chat-detail.component.html',
   styleUrl: './chat-detail.component.css'
 })

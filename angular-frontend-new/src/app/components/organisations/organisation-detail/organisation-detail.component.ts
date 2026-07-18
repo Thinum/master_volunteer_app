@@ -25,6 +25,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { EngagementLevelOverview } from '../../../models/engagement-level.model';
 import { AuthService } from '../../../services/authservice/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 
 const FALLBACK_LOCATION_LABEL = 'Location unavailable';
 const NOMINATIM_REVERSE_URL = 'https://nominatim.openstreetmap.org/reverse';
@@ -65,6 +66,7 @@ interface NominatimReverseResponse {
     MatButton,
     GoogleMapsModule,
     MatTooltipModule,
+    AvatarComponent,
   ],
   templateUrl: './organisation-detail.component.html',
   styleUrl: './organisation-detail.component.css'

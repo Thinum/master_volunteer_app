@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle } from '@angular/material/card';
-import { MatList, MatListItem } from '@angular/material/list';
+import { MatCard, MatCardContent } from '@angular/material/card';
+
 import { User } from '../../../models/user.model';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -8,19 +8,17 @@ import { VolunteerService } from '../../../services/api/volunteer.service';
 import {MatIcon} from '@angular/material/icon';
 import {MatButtonModule, MatIconButton} from '@angular/material/button';
 import {NotificationService} from '../../../services/notification.service';
-import {AppNotification, NotificationType, AppNotificationPayload} from '../../../models/notification.model';
+import {AppNotification, NotificationType} from '../../../models/notification.model';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ShareButtonComponent} from '../../../shared/components/share-button/share-button.component';
 import {MatChipsModule} from '@angular/material/chips';
+import {AvatarComponent} from '../../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-user-profile',
   templateUrl: './user-profile.component.html',
   imports: [
     MatCard,
-    MatCardSubtitle,
-    MatCardTitle,
-    MatCardHeader,
     MatCardContent,
     DatePipe,
     MatIcon,
@@ -30,6 +28,7 @@ import {MatChipsModule} from '@angular/material/chips';
     ShareButtonComponent,
     MatChipsModule,
     RouterLink,
+    AvatarComponent,
   ],
   styleUrl: './user-profile.component.css',
 })
@@ -106,12 +105,12 @@ export class UserProfileComponent implements OnInit {
   }
 
   public sendFriendRequest(){
-    let notification: AppNotification = {
+    const notification: AppNotification = {
       createdAt: new Date(),
       hasBeenRead: false,
       user: this.user,
       type: NotificationType.FRIEND_REQUEST,
-    }
+    };
     this.notificationService.createNotification(notification).subscribe({
       next: result => console.log(result),
       error: err => console.error(err)

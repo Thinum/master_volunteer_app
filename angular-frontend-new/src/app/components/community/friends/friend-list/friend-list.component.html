@@ -8,15 +8,7 @@
         routerLinkActive="active"
         ariaCurrentWhenActive="page"
       >
-        <img
-          *ngIf="friend.profilePicture"
-          [src]="friend.profilePicture"
-          [alt]="friend.name + ' avatar'"
-          class="avatar"
-        />
-        <span *ngIf="!friend.profilePicture" class="avatar-placeholder">
-          {{ friend.name.charAt(0) }}
-        </span>
+        <app-avatar [src]="friend.profilePicture" [name]="friend.name" size="md" />
         <span class="friend-name">{{ friend.name }}</span>
       </a>
     </mat-list-item>

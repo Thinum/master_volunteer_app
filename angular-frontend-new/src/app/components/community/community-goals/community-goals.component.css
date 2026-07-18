@@ -1,7 +1,7 @@
 :host {
   display: block;
   min-height: 100%;
-  background: radial-gradient(circle at 88% 0, rgba(179, 205, 254, 0.3), transparent 28rem);
+  background: var(--surface);
 }
 
 .form-page {
@@ -15,6 +15,11 @@
   align-items: flex-start;
   gap: 1rem;
   margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(175, 178, 187, 0.12);
+  border-radius: var(--radius-md);
+  background: var(--overview-accent-background);
+  box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
 }
 
 .header-icon {
@@ -226,26 +231,31 @@
 }
 
 .overview-container {
+  display: flex;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1.5rem 1.5rem 5rem;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.back-link {
+  align-self: flex-start;
+  margin-left: -0.75rem;
+  color: var(--primary);
+  font-weight: 700;
 }
 
 .overview-card {
-  background-color: #ffffff;
+  overflow: hidden;
   border-radius: 0.75rem;
+  background-color: #ffffff;
   box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
-  padding: 1.5rem;
 }
 
-.overview-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.goals-add-btn .mat-icon {
-  color: #005cbb;
+.goals-content {
+  display: block;
+  padding: 1.5rem !important;
 }
 
 .goal-item {
@@ -474,7 +484,12 @@
   }
 
   .overview-container {
-    padding: 1rem;
+    gap: 1rem;
+    padding: 0.5rem 0.25rem 4rem;
+  }
+
+  .goals-content {
+    padding: 1rem !important;
   }
 
   .goal-summary,

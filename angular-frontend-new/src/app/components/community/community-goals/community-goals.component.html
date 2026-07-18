@@ -154,21 +154,36 @@
 
 <!-- LIST -->
 <ng-template #goalsList>
-  <div class="overview-container">
-    <mat-card class="overview-card">
-      <mat-card-header class="overview-header">
-        <mat-card-title>Goals</mat-card-title>
-        <button
-          mat-icon-button
-          class="goals-add-btn"
-          (click)="goToCreateGoal()"
-          [disabled]="!canManageGoals"
-          aria-label="Add goal">
-          <mat-icon>add</mat-icon>
-        </button>
-      </mat-card-header>
+  <main class="overview-container">
+    <a
+      *ngIf="organisationId"
+      mat-button
+      class="back-link"
+      [routerLink]="['/organisations', organisationId]">
+      <mat-icon>arrow_back</mat-icon>
+      Back to organization
+    </a>
 
-      <mat-card-content>
+    <header class="app-overview-header goals-overview-header">
+      <div>
+        <p class="app-overview-header__eyebrow">Community goals</p>
+        <h1>Goals overview</h1>
+        <p>Track shared targets and the completed volunteer activities that move this organization forward.</p>
+      </div>
+      <button
+        mat-flat-button
+        color="primary"
+        class="app-overview-header__action"
+        type="button"
+        (click)="goToCreateGoal()"
+        [disabled]="!canManageGoals">
+        <mat-icon>add</mat-icon>
+        New goal
+      </button>
+    </header>
+
+    <mat-card class="overview-card">
+      <mat-card-content class="goals-content">
         <div *ngIf="loading">Loading...</div>
         <div *ngIf="errorMessage">{{ errorMessage }}</div>
 
@@ -230,13 +245,7 @@
                     [attr.href]="'/profile/' + member.id"
                     (pointerdown)="goToUserProfile($event, member.id)"
                     (click)="$event.preventDefault(); $event.stopPropagation()">
-                    <img
-                      *ngIf="member.profilePicture"
-                      [src]="member.profilePicture"
-                      [alt]="member.name + ' profile picture'">
-                    <span class="member-initial" *ngIf="!member.profilePicture">
-                      {{ member.name.charAt(0) }}
-                    </span>
+                    <app-avatar [src]="member.profilePicture" [name]="member.name" size="xs" />
                     <span>{{ member.name }}</span>
                   </a>
                 </div>
@@ -246,5 +255,5 @@
         </mat-card>
       </mat-card-content>
     </mat-card>
-  </div>
+  </main>
 </ng-template>

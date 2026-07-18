@@ -1,10 +1,10 @@
 <main class="project-page">
   <header class="page-hero">
-    <button class="back-button" mat-button type="button" (click)="cancel()">
-      <mat-icon>arrow_back</mat-icon>
-      Back
-    </button>
     <div class="hero-copy">
+      <button class="back-button" mat-button type="button" (click)="cancel()">
+        <mat-icon>arrow_back</mat-icon>
+        Back
+      </button>
       <span class="eyebrow">{{ isEditing ? 'Project settings' : 'New focused initiative' }}</span>
       <h1>{{ isEditing ? 'Shape your project' : 'Create a project' }}</h1>
       <p>Turn an important, time-bound goal into a clear home for related volunteer activities.</p>

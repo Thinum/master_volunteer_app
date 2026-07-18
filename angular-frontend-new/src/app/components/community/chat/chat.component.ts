@@ -10,11 +10,12 @@ import { User } from '../../../models/user.model';
 import { ChatService } from '../../../services/api/chat.service';
 import { VolunteerService } from '../../../services/api/volunteer.service';
 import { Router } from '@angular/router';
+import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, CardComponent, MatButtonModule, MatIconModule],
+  imports: [CommonModule, FormsModule, RouterModule, CardComponent, MatButtonModule, MatIconModule, AvatarComponent],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css'
 })

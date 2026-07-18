@@ -9,7 +9,7 @@
 
 .header-card {
   margin-bottom: 0;
-  background-color: #ffffff;
+  background: var(--overview-accent-background);
   border-radius: 0.75rem;
   box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
   padding: 2rem;
@@ -124,6 +124,27 @@
   border-radius: 0.75rem;
   box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
   overflow: hidden;
+}
+
+.list-card-header {
+  display: flex;
+  min-height: var(--control-height);
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.list-card-header mat-card-title {
+  display: flex;
+  min-height: var(--control-height);
+  margin: 0;
+  align-items: center;
+  line-height: 1.2;
+}
+
+.list-card-header .goals-add-btn {
+  flex: 0 0 var(--control-height);
+  align-self: center;
+  margin: 0;
 }
 
 .project-grid,
@@ -563,10 +584,6 @@ mat-list-item .mat-list-text {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.goals-add-btn .mat-icon {
-  color: #005cbb;         /* blaues Plus */
 }
 
 .goals-overview-link {

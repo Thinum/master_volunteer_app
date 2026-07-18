@@ -321,38 +321,9 @@ a:hover {
   gap: 1rem;
 }
 
-.btn-primary {
+.login-submit {
   width: 100%;
-  padding: 1rem;
-  background: linear-gradient(to bottom right, var(--primary), var(--primary-dim));
-  color: var(--on-primary);
-  font-size: 0.875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border: none;
-  border-radius: 9999px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-  box-shadow: 0 10px 20px rgba(70, 96, 138, 0.2);
-}
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(70, 96, 138, 0.3);
-}
-
-.btn-primary:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .divide-line {

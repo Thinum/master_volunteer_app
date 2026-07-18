@@ -1,34 +1,40 @@
-<mat-card class="profile-card">
-
-  <mat-card-header>
-    <div mat-card-avatar
-         class="profile-image"
-         [style.background-image]="'url(' + user?.profilePicture + ')'">
+<main class="profile-page">
+  <header class="app-overview-header profile-header">
+    <div class="profile-identity">
+      <app-avatar
+        class="profile-image"
+        [src]="user?.profilePicture"
+        [name]="user?.name"
+        [size]="60"
+      />
+      <div>
+        <p class="app-overview-header__eyebrow">Profile</p>
+        <h1>{{ user?.name }}</h1>
+        <p class="profile-email">{{ user?.email }}</p>
+      </div>
     </div>
-
-    <mat-card-title>{{ user?.name }}</mat-card-title>
-    <mat-card-subtitle>{{ user?.email }}</mat-card-subtitle>
 
     @if (isOwnProfile) {
     <a
       mat-raised-button
       color="primary"
-      class="edit-profile-button"
+      class="app-overview-header__action edit-profile-button"
       routerLink="/profile/edit"
       aria-label="Edit profile">
       <mat-icon>edit</mat-icon>
       <span class="edit-profile-label">Edit profile</span>
     </a>
     } @else {
-    <div class="icon-wrapper">
-      <button matIconButton type="button" (click)="sendFriendRequest()">
+    <div class="app-overview-header__action icon-wrapper">
+      <button matIconButton type="button" aria-label="Send friend request" (click)="sendFriendRequest()">
         <mat-icon>person_add</mat-icon>
       </button>
     </div>
     }
-  </mat-card-header>
+  </header>
 
-  <mat-card-content>
+  <mat-card class="profile-card">
+    <mat-card-content>
 
     <p><strong>Account Created:</strong> {{ user?.joinedAt | date }}</p>
 
@@ -65,13 +71,12 @@
     <app-card size="compact" [link]="['/profile', friend.id]">
 
       <div card-left>
-        <div class="avatar friend-avatar"
-             [style.background-image]="friend.profilePicture ? 'url(' + friend.profilePicture + ')' : null"
-             [attr.aria-label]="friend.name">
-          @if (!friend.profilePicture) {
-          <span>{{ friend.name.charAt(0) }}</span>
-          }
-        </div>
+        <app-avatar
+          class="avatar friend-avatar"
+          [src]="friend.profilePicture"
+          [name]="friend.name"
+          [size]="42"
+        />
       </div>
 
       <div card-body>
@@ -80,7 +85,6 @@
       </div>
 
     </app-card>
-    <br/>
     } @empty {
     <p>No friends yet.</p>
     }
@@ -93,8 +97,12 @@
     <app-card size="compact" [link]="['/organisations', org.id]">
 
       <div card-left>
-        <div class="avatar"
-             [style.background-image]="'url(' + org.profilePicture + ')'">
+        <div class="avatar organization-avatar"
+             [style.background-image]="org.profilePicture ? 'url(' + org.profilePicture + ')' : null"
+             [attr.aria-label]="org.orgName">
+          @if (!org.profilePicture) {
+          <span>{{ org.orgName.charAt(0) }}</span>
+          }
         </div>
       </div>
 
@@ -104,7 +112,6 @@
       </div>
 
     </app-card>
-    <br/>
     } @empty {
     <p>No organizations joined yet.</p>
     }
@@ -126,11 +133,11 @@
       </div>
 
     </app-card>
-    <br/>
     } @empty {
     <p>No activities joined yet.</p>
     }
 
-  </mat-card-content>
-</mat-card>
-<app-share-button  class="corner-button"/>
+    </mat-card-content>
+  </mat-card>
+</main>
+<app-share-button class="corner-button"/>

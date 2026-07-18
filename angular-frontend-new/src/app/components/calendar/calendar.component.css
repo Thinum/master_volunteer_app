@@ -6,42 +6,12 @@
   min-height: 100vh;
   padding: clamp(1.25rem, 3vw, 2.75rem);
   padding-bottom: calc(var(--bottom-nav-height) + 3rem);
-  background:
-    radial-gradient(circle at 8% 3%, rgba(179, 205, 254, .26), transparent 25rem),
-    radial-gradient(circle at 92% 24%, rgba(222, 204, 253, .18), transparent 21rem),
-    var(--surface);
+  background: var(--surface);
 }
 
-.page-header {
-  display: flex;
+.calendar-header {
   max-width: 1180px;
   margin: 0 auto 1.75rem;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1.5rem;
-}
-
-.page-header h1 {
-  margin: .15rem 0 .35rem;
-  color: var(--on-surface);
-  font-family: var(--font-display);
-  font-size: clamp(2.15rem, 5vw, 3.25rem);
-  letter-spacing: -.035em;
-  line-height: 1.05;
-}
-
-.page-header p:not(.eyebrow) {
-  max-width: 46rem;
-  margin: 0;
-  color: var(--on-surface-variant);
-  line-height: 1.6;
-}
-
-.page-header > button {
-  min-height: 2.9rem;
-  padding-inline: 1.15rem;
-  border-radius: var(--radius-full);
-  box-shadow: 0 8px 22px rgba(70, 96, 138, .18);
 }
 
 .eyebrow {
@@ -196,7 +166,7 @@ form {
 
 .appointment-filters button:hover {
   border-color: rgba(70, 96, 138, .35);
-  transform: translateY(-1px);
+  background: var(--surface-container-low);
 }
 
 .appointment-filters button.active {
@@ -466,15 +436,6 @@ form {
 @media (max-width: 620px) {
   .calendar-page {
     padding-inline: .85rem;
-  }
-
-  .page-header {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .page-header > button {
-    align-self: flex-start;
   }
 
   form {

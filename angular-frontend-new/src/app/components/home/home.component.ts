@@ -16,6 +16,7 @@ import { NotificationType } from '../../models/notification.model';
 import { CalendarEvent } from '../../models/calendar-event.model';
 import { CalendarDataService } from '../../services/api/calendar-data.service';
 import { CalendarMonthComponent } from '../../shared/components/calendar-month/calendar-month.component';
+import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 
 interface VerificationRequest {
   id?: number;
@@ -36,7 +37,7 @@ interface VerificationRequest {
     MatButtonModule,
     RouterLink,
     CardComponent,
-    CalendarMonthComponent
+    CalendarMonthComponent, AvatarComponent
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']

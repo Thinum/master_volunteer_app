@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
 FormBuilder,
 FormGroup,
@@ -28,6 +28,7 @@ import { CommunityGoal } from '../../../models/community-goal.model';
 import { InterestService } from '../../../services/api/interest.service';
 import { OrganisationService } from '../../../services/api/organisation.service';
 import { MOCK_SKILLS } from '../../../mock/mock-skills';
+import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 
 /* ---------------- Validators ---------------- */
 
@@ -72,7 +73,9 @@ const endAfterStartValidator: ValidatorFn = (group: AbstractControl) => {
     MatSelectModule,
     MatExpansionModule,
     MatIconModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    RouterLink,
+    AvatarComponent
   ],
   templateUrl: './community-goals.component.html',
   styleUrl: './community-goals.component.css',

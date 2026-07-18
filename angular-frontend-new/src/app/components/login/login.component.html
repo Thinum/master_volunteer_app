@@ -83,10 +83,12 @@
         <!-- Sign In Button -->
         <div class="space-y-4">
           <button
+            mat-flat-button
+            color="primary"
             type="button"
             (click)="clickLogin()"
             [disabled]="loginForm.invalid"
-            class="btn-primary">
+            class="login-submit">
             Sign In
             <mat-icon class="ml-2 text-sm">arrow_forward</mat-icon>
           </button>

@@ -1,4 +1,11 @@
 <section class="reports-page">
+  <header class="app-overview-header">
+    <div>
+      <p class="app-overview-header__eyebrow">Reports</p>
+      <h1>Volunteer impact at a glance</h1>
+      <p>Explore participation, contributed hours and activity capacity across the community.</p>
+    </div>
+  </header>
   <div class="reports-toolbar">
     <div class="segmented-control" aria-label="Report status filter">
       @for (filter of statusFilters; track filter.value) {
@@ -6,6 +13,7 @@
           type="button"
           mat-button
           [class.active]="selectedStatus === filter.value"
+          [attr.aria-pressed]="selectedStatus === filter.value"
           (click)="setStatusFilter(filter.value)">
           {{ filter.label }}
         </button>
@@ -90,7 +98,7 @@
       </div>
 
       <div class="user-summary">
-        <img [src]="selectedContribution.user.profilePicture" [alt]="selectedContribution.user.name">
+        <app-avatar [src]="selectedContribution.user.profilePicture" [name]="selectedContribution.user.name" size="lg" />
         <div>
           <strong>{{ selectedContribution.hours }}h</strong>
           <span>{{ selectedContribution.activities }} joined activities</span>
@@ -98,8 +106,8 @@
       </div>
 
       <div class="segmented-control small" aria-label="Contribution metric">
-        <button type="button" mat-button [class.active]="userMetric === 'hours'" (click)="setUserMetric('hours')">Hours</button>
-        <button type="button" mat-button [class.active]="userMetric === 'activities'" (click)="setUserMetric('activities')">Activities</button>
+        <button type="button" mat-button [class.active]="userMetric === 'hours'" [attr.aria-pressed]="userMetric === 'hours'" (click)="setUserMetric('hours')">Hours</button>
+        <button type="button" mat-button [class.active]="userMetric === 'activities'" [attr.aria-pressed]="userMetric === 'activities'" (click)="setUserMetric('activities')">Activities</button>
       </div>
 
       <div class="chart-frame contribution">

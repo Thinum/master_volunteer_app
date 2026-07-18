@@ -1,4 +1,19 @@
-<section class="notifications-list" aria-label="Notifications">
+<main class="notifications-page">
+  <header class="app-overview-header">
+    <div>
+      <p class="app-overview-header__eyebrow">Updates</p>
+      <h1>Notifications</h1>
+      <p>Review requests, community goal progress and recent organization updates.</p>
+    </div>
+    <div class="app-overview-header__stats notifications-summary" aria-label="Notification summary">
+      <div class="app-overview-header__stat">
+        <span class="app-overview-header__stat-value">{{ notificationsToDisplay.length }}</span>
+        <span class="app-overview-header__stat-label">unread</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="notifications-list" aria-label="Notifications">
   @for (notification of notificationsToDisplay; track notification.id) {
     <article class="notification-card">
       <div class="notification-icon" aria-hidden="true">
@@ -46,4 +61,5 @@
       <p>There are no new notifications.</p>
     </div>
   }
-</section>
+  </section>
+</main>

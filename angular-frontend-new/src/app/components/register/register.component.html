@@ -32,6 +32,9 @@
       <button
         mat-icon-button
         matSuffix
+        type="button"
+        [attr.aria-label]="hidePw() ? 'Show password' : 'Hide password'"
+        [attr.aria-pressed]="!hidePw()"
         (click)="toggleHidePw($event)">
         <mat-icon>{{hidePw() ? 'visibility_off' : 'visibility'}}</mat-icon>
       </button>
@@ -48,6 +51,9 @@
       <button
         mat-icon-button
         matSuffix
+        type="button"
+        [attr.aria-label]="hideConfirmPw() ? 'Show password confirmation' : 'Hide password confirmation'"
+        [attr.aria-pressed]="!hideConfirmPw()"
         (click)="toggleHideConfirmPw($event)">
         <mat-icon>{{hideConfirmPw() ? 'visibility_off' : 'visibility'}}</mat-icon>
       </button>
@@ -60,11 +66,13 @@
   </form>
 
   <div class="button-group">
-    <button mat-button (click)="goToLogin()">
+    <button mat-button type="button" (click)="goToLogin()">
       Back to Login
     </button>
 
     <button mat-raised-button color="primary"
+            type="button"
+            [disabled]="registerForm.invalid"
             (click)="clickRegister()">
       Create Account
     </button>

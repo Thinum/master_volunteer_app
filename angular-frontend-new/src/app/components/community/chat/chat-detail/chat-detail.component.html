@@ -12,10 +12,7 @@
 
   <ng-container *ngIf="conversation">
     <header class="chat-title">
-      <span class="avatar">
-        <img *ngIf="conversation.avatar" [src]="conversation.avatar" [alt]="conversation.contact" />
-        <span *ngIf="!conversation.avatar">{{ conversation.contact.charAt(0) }}</span>
-      </span>
+      <app-avatar class="avatar" [src]="conversation.avatar" [name]="conversation.contact" [size]="56" />
       <div>
         <h1>{{ conversation.contact }}</h1>
         <p>{{ conversation.isActive ? 'Online' : 'Offline' }}</p>
@@ -29,9 +26,7 @@
         [class.mine]="message.ownMessage"
       >
         <div class="message-author">
-          <span class="mini-avatar" *ngIf="message.avatar">
-            <img [src]="message.avatar" [alt]="message.authorName || message.author" />
-          </span>
+          <app-avatar class="mini-avatar" [src]="message.avatar" [name]="message.authorName || message.author" [size]="22" />
           <strong>{{ message.authorName || message.author }}</strong>
         </div>
         <p>{{ message.text }}</p>

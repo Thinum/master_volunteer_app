@@ -14,10 +14,11 @@ import { Activity, RecommendationReason } from '../../../models/activity.model';
 import { ActivityService } from '../../../services/api/activity.service';
 import { VolunteerService } from '../../../services/api/volunteer.service';
 import { catchError, forkJoin, of } from 'rxjs';
+import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-activity-overview',
-  imports: [NgFor, NgIf, NgTemplateOutlet, DatePipe, RouterLink, MatButtonModule, MatIconModule, MatFormFieldModule, MatInputModule, MatChipsModule, MatTooltipModule],
+  imports: [NgFor, NgIf, NgTemplateOutlet, DatePipe, RouterLink, MatButtonModule, MatIconModule, MatFormFieldModule, MatInputModule, MatChipsModule, MatTooltipModule, AvatarComponent],
   templateUrl: './activity-overview.component.html',
   styleUrl: './activity-overview.component.css'
 })

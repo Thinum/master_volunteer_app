@@ -9,11 +9,12 @@ import { ForumReply } from '../../../../models/forum-reply.model';
 import { User } from '../../../../models/user.model';
 import { ForumService } from '../../../../services/api/forum.service';
 import { VolunteerService } from '../../../../services/api/volunteer.service';
+import { AvatarComponent } from '../../../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-forum-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, MatButtonModule, MatIconModule],
+  imports: [CommonModule, FormsModule, RouterLink, MatButtonModule, MatIconModule, AvatarComponent],
   templateUrl: './forum-detail.component.html',
   styleUrl: './forum-detail.component.css'
 })

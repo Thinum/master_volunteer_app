@@ -13,6 +13,7 @@ import {ActivityService} from '../../../services/api/activity.service';
 import {OrganisationService} from '../../../services/api/organisation.service';
 import {ShareButtonComponent} from '../../../shared/components/share-button/share-button.component';
 import { ActivityEngagementAccess } from '../../../models/engagement-level.model';
+import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-activity-detail',
@@ -27,7 +28,8 @@ import { ActivityEngagementAccess } from '../../../models/engagement-level.model
     MatTooltipModule,
     MatSnackBarModule,
     RouterLink,
-    ShareButtonComponent
+    ShareButtonComponent,
+    AvatarComponent
   ],
   templateUrl: './activity-detail.component.html',
   styleUrl: './activity-detail.component.css'

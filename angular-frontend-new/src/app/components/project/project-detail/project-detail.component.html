@@ -64,7 +64,7 @@
         <h2>Activities</h2>
         <p>The concrete volunteer actions that move this project forward.</p>
       </div>
-      <button *ngIf="canManage" mat-stroked-button type="button" (click)="createActivity()" [disabled]="project.closed">
+      <button *ngIf="canManage" mat-stroked-button class="section-action" type="button" (click)="createActivity()" [disabled]="project.closed">
         <mat-icon>add</mat-icon>New activity
       </button>
     </div>
@@ -96,8 +96,8 @@
         <span><mat-icon>event_busy</mat-icon></span>
         <h3>No activities yet</h3>
         <p>Break this project into clear, schedulable opportunities for volunteers.</p>
-        <button *ngIf="canManage" mat-flat-button type="button" (click)="createActivity()" [disabled]="project.closed">
-          <mat-icon>add_circle</mat-icon>Create the first activity
+        <button *ngIf="canManage" mat-flat-button class="empty-action" type="button" (click)="createActivity()" [disabled]="project.closed">
+          <mat-icon>add</mat-icon>Create the first activity
         </button>
       </div>
     </ng-template>

@@ -1,3 +1,15 @@
+.notifications-page {
+  display: flex;
+  width: min(100%, 760px);
+  margin: 0 auto;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notifications-summary {
+  grid-template-columns: minmax(84px, 1fr);
+}
+
 .notifications-list {
   display: grid;
   gap: 1rem;

@@ -1,0 +1,12 @@
+<span
+  class="avatar"
+  [class.avatar--bordered]="bordered"
+  role="img"
+  [attr.aria-label]="accessibleLabel"
+>
+  @if (showImage) {
+    <img [src]="src" alt="" (error)="onImageError()" />
+  } @else {
+    <span class="avatar__initials" aria-hidden="true">{{ initials }}</span>
+  }
+</span>

@@ -30,12 +30,14 @@
   min-width: 4.75rem;
   height: 2.5rem;
   border-radius: 0.5rem;
-  color: var(--on-surface-variant);
+  color: var(--on-surface-variant) !important;
 }
 
-.segmented-control button.active {
+.segmented-control button.active,
+.segmented-control button.active:hover,
+.segmented-control button.active:focus-visible {
   background: var(--primary);
-  color: var(--on-primary);
+  color: var(--on-primary) !important;
 }
 
 .segmented-control.small {

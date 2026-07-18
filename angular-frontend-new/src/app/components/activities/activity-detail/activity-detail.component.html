@@ -99,8 +99,7 @@
           <h3>Friends joining</h3>
           <div class="friends" *ngIf="friendParticipants.length; else noFriendParticipants">
             <a *ngFor="let friend of friendParticipants" class="friend-avatar" [routerLink]="['/profile', friend.id]" matTooltip="{{ friend.name }}">
-              <img *ngIf="friend.profilePicture" [src]="friend.profilePicture" [alt]="friend.name">
-              <span *ngIf="!friend.profilePicture" class="initials">{{ friend.name.charAt(0) }}</span>
+              <app-avatar [src]="friend.profilePicture" [name]="friend.name" [size]="42" />
             </a>
           </div>
           <ng-template #noFriendParticipants><p class="empty-copy">None of your friends have joined yet.</p></ng-template>
@@ -109,8 +108,7 @@
           <h3>All participants</h3>
           <div class="friends" *ngIf="allParticipants.length; else noParticipants">
             <a *ngFor="let participant of allParticipants" class="friend-avatar" [routerLink]="['/profile', participant.id]" matTooltip="{{ participant.name }}">
-              <img *ngIf="participant.profilePicture" [src]="participant.profilePicture" [alt]="participant.name">
-              <span *ngIf="!participant.profilePicture" class="initials">{{ participant.name.charAt(0) }}</span>
+              <app-avatar [src]="participant.profilePicture" [name]="participant.name" [size]="42" />
             </a>
           </div>
           <ng-template #noParticipants><p class="empty-copy">Be the first volunteer to join.</p></ng-template>

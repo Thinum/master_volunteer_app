@@ -1,3 +1,12 @@
+.community-page {
+  display: flex;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
 ::ng-deep .mdc-tab {
   ::ng-deep .mdc-tab__text-label {
     color: #46608a;

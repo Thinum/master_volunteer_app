@@ -187,6 +187,10 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy, OnChange
   }
 
   private initWhenVisible(): void {
+    if (this.destroyed) {
+      return;
+    }
+
     if (!this.isContainerVisible()) {
       setTimeout(() => this.initWhenVisible(), 100);
       return;
@@ -521,9 +525,18 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy, OnChange
     this.nodeAnimations.clear();
     this.resizeObserver?.disconnect();
     this.activeLayout?.stop();
+    this.activeLayout = undefined;
     if (this.cy) {
-      this.cy.stop();
-      this.cy.destroy();
+      const cy = this.cy;
+      cy.stop();
+
+      // COSE may already have queued one last animation frame. That frame closes
+      // a Cytoscape batch and needs the renderer to remain alive until it finishes.
+      requestAnimationFrame(() => {
+        if (!cy.destroyed()) {
+          cy.destroy();
+        }
+      });
     }
   }
 

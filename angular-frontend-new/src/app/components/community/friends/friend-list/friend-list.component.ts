@@ -1,8 +1,9 @@
 import {Component, Input} from '@angular/core';
 import {MatList, MatListItem} from "@angular/material/list";
-import {NgForOf, NgIf} from "@angular/common";
+import {NgForOf} from "@angular/common";
 import {RouterLink, RouterLinkActive} from "@angular/router";
 import {User} from '../../../../models/user.model';
+import {AvatarComponent} from '../../../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-friend-list',
@@ -10,9 +11,9 @@ import {User} from '../../../../models/user.model';
         MatList,
         MatListItem,
         NgForOf,
-        NgIf,
         RouterLink,
-        RouterLinkActive
+        RouterLinkActive,
+        AvatarComponent
     ],
   templateUrl: './friend-list.component.html',
   styleUrl: './friend-list.component.css'

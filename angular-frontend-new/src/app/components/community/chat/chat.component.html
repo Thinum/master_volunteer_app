@@ -17,10 +17,7 @@
       class="contact-option"
       (click)="startChat(friend)"
     >
-      <span class="avatar small">
-        <img *ngIf="friend.profilePicture" [src]="friend.profilePicture" [alt]="friend.name">
-        <span *ngIf="!friend.profilePicture">{{ friend.name.charAt(0) }}</span>
-      </span>
+      <app-avatar [src]="friend.profilePicture" [name]="friend.name" size="md" />
       <span>
         <strong>{{ friend.name }}</strong>
         <small>{{ friend.username || friend.email }}</small>
@@ -41,10 +38,7 @@
       <!-- Left: Avatar and timestamp/unread -->
       <div card-left>
         <div class="contact-info">
-          <span class="avatar">
-            <img *ngIf="convo.avatar" [src]="convo.avatar" [alt]="convo.contact">
-            <span *ngIf="!convo.avatar">{{ convo.contact.charAt(0) }}</span>
-          </span>
+          <app-avatar [src]="convo.avatar" [name]="convo.contact" size="lg" />
           <div class="timestamp">
             <span class="value">{{ convo.timestamp | date: 'MMM d' }}</span>
             <span class="label time">{{ convo.timestamp | date: 'HH:mm' }}</span>

@@ -8,6 +8,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { OrganisationAdminAssignment } from '../../../models/organisation-admin-assignment.model';
 import { User } from '../../../models/user.model';
 import { OrganisationAdminAssignmentService } from '../../../services/api/organisation-admin-assignment.service';
+import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-organisation-admin-assignments',
@@ -18,7 +19,8 @@ import { OrganisationAdminAssignmentService } from '../../../services/api/organi
     MatCardModule,
     MatCheckboxModule,
     MatIconModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    AvatarComponent
   ],
   templateUrl: './organisation-admin-assignments.component.html',
   styleUrl: './organisation-admin-assignments.component.css'

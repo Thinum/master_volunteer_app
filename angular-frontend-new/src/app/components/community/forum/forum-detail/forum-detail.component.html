@@ -25,7 +25,7 @@
 
     <div class="reply-list">
       <article *ngFor="let reply of replies" class="reply">
-        <img [src]="reply.avatar" [alt]="reply.author" class="reply-avatar" />
+        <app-avatar [src]="reply.avatar" [name]="reply.author" [size]="56" class="reply-avatar" />
         <div class="reply-body">
           <div class="reply-meta">
             <strong>{{ reply.author }}</strong>

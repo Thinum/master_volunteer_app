@@ -106,7 +106,7 @@
 
   <div class="middle-row">
     <mat-card class="list-card projects-card">
-      <mat-card-header>
+      <mat-card-header class="list-card-header">
         <mat-card-title>Projects</mat-card-title>
         <button
           *ngIf="canManage"
@@ -157,7 +157,7 @@
     </mat-card>
 
     <mat-card class="list-card activities-card">
-      <mat-card-header>
+      <mat-card-header class="list-card-header">
         <mat-card-title>Activities</mat-card-title>
         <button
           [disabled]="!canManageContent"
@@ -203,8 +203,7 @@
 
               <div class="participant-row" *ngIf="activity.participants && activity.participants.length > 0">
                 <span *ngFor="let participant of activity.participants | slice:0:4" class="participant-avatar">
-                  <img *ngIf="participant.profilePicture" [src]="participant.profilePicture" [alt]="participant.name">
-                  <span *ngIf="!participant.profilePicture">{{ participant.name.charAt(0) }}</span>
+                  <app-avatar [src]="participant.profilePicture" [name]="participant.name" [size]="30" />
                 </span>
               </div>
             </div>
@@ -237,8 +236,7 @@
             [routerLink]="['/profile', admin.id]"
             matTooltip="{{ admin.name }}"
             [attr.aria-label]="admin.name">
-            <img *ngIf="admin.profilePicture" [src]="admin.profilePicture" [alt]="admin.name">
-            <span *ngIf="!admin.profilePicture">{{ (admin.name || admin.username || '?').charAt(0) }}</span>
+            <app-avatar [src]="admin.profilePicture" [name]="admin.name || admin.username" size="md" />
           </a>
         </div>
         <ng-template #noAdmins>
@@ -255,8 +253,7 @@
             [routerLink]="['/profile', friend.id]"
             matTooltip="{{ friend.name }}"
             [attr.aria-label]="friend.name">
-            <img *ngIf="friend.profilePicture" [src]="friend.profilePicture" [alt]="friend.name">
-            <span *ngIf="!friend.profilePicture">{{ friend.name.charAt(0) }}</span>
+            <app-avatar [src]="friend.profilePicture" [name]="friend.name" size="md" />
           </a>
         </div>
         <ng-template #noFriendMembers>
@@ -273,8 +270,7 @@
             [routerLink]="['/profile', member.id]"
             matTooltip="{{ member.name }}"
             [attr.aria-label]="member.name">
-            <img *ngIf="member.profilePicture" [src]="member.profilePicture" [alt]="member.name">
-            <span *ngIf="!member.profilePicture">{{ member.name.charAt(0) }}</span>
+            <app-avatar [src]="member.profilePicture" [name]="member.name" size="md" />
           </a>
         </div>
         <ng-template #noMembers>
