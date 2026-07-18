@@ -1,0 +1,49 @@
+:host {
+  display: block;
+}
+
+.loading-region {
+  position: relative;
+}
+
+.loading-content.is-loading {
+  visibility: hidden;
+}
+
+.loading-overlay {
+  position: absolute;
+  z-index: 10;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--on-surface-variant);
+  pointer-events: none;
+}
+
+.loading-indicator {
+  position: relative;
+}
+
+.loading-ring {
+  display: block;
+  border: 4px solid rgba(70, 96, 138, .2);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: loading-spinner-rotate .8s linear infinite;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.loading-label {
+  position: absolute;
+  top: calc(100% + .75rem);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+@keyframes loading-spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}

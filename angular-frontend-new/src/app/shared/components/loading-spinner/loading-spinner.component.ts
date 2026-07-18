@@ -1,11 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-loading-spinner',
+  standalone: true,
   imports: [],
   templateUrl: './loading-spinner.component.html',
   styleUrl: './loading-spinner.component.css'
 })
 export class LoadingSpinnerComponent {
-
+  @Input() loading = false;
+  @Input() label = 'Loading…';
+  @Input() diameter = 42;
 }

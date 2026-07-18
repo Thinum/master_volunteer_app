@@ -5,7 +5,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { Appointment } from '../../models/appointment.model';
@@ -13,6 +12,7 @@ import { CalendarEvent, CalendarEventType } from '../../models/calendar-event.mo
 import { AppointmentService } from '../../services/api/appointment.service';
 import { CalendarDataService } from '../../services/api/calendar-data.service';
 import { CalendarMonthComponent } from '../../shared/components/calendar-month/calendar-month.component';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-calendar',
@@ -24,9 +24,9 @@ import { CalendarMonthComponent } from '../../shared/components/calendar-month/c
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatProgressSpinnerModule,
     MatSnackBarModule,
-    CalendarMonthComponent
+    CalendarMonthComponent,
+    LoadingSpinnerComponent
   ],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'

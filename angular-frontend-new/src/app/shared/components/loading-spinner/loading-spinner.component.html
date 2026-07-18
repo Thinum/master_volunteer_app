@@ -1,1 +1,21 @@
-<p>loading-spinner works!</p>
+<div class="loading-region" [attr.aria-busy]="loading">
+  <div class="loading-content" [class.is-loading]="loading" [attr.aria-hidden]="loading">
+    <ng-content></ng-content>
+  </div>
+
+  @if (loading) {
+    <div class="loading-overlay" role="status" aria-live="polite">
+      <div class="loading-indicator">
+        <span
+          class="loading-ring"
+          [style.width.px]="diameter"
+          [style.height.px]="diameter"
+          aria-hidden="true"
+        ></span>
+        @if (label) {
+          <span class="loading-label">{{ label }}</span>
+        }
+      </div>
+    </div>
+  }
+</div>

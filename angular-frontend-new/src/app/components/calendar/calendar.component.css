@@ -120,17 +120,6 @@ form {
   gap: .5rem;
 }
 
-.loading-state {
-  display: flex;
-  max-width: 1180px;
-  min-height: 24rem;
-  margin: 0 auto;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  color: var(--on-surface-variant);
-}
-
 .personal-list {
   margin-top: 1.75rem;
   padding: clamp(1rem, 2.5vw, 1.5rem);

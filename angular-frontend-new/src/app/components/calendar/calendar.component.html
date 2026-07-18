@@ -52,8 +52,9 @@
     </form>
   </section>
 
-  <div class="loading-state" *ngIf="loading"><mat-spinner diameter="42"></mat-spinner><span>Loading calendar…</span></div>
-  <app-calendar-month *ngIf="!loading" [events]="events" (daySelected)="selectDay($event)"></app-calendar-month>
+  <app-loading-spinner [loading]="loading" label="Loading calendar…">
+    <app-calendar-month [events]="events" (daySelected)="selectDay($event)"></app-calendar-month>
+  </app-loading-spinner>
 
   <section class="personal-list" *ngIf="!loading">
     <div class="list-heading">
