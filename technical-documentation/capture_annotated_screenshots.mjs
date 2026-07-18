@@ -81,6 +81,7 @@ const screens = [
   },
   {
     file: '02-home.png',
+    splitAfterCallout: 2,
     route: '/home',
     waitFor: '.home-container',
     authenticated: true,
@@ -93,6 +94,8 @@ const screens = [
   },
   {
     file: '02b-home-alice.png',
+    splitAfterCallout: 2,
+    partAliases: ['02a-home-alice.png'],
     route: '/home',
     waitFor: '.home-container',
     authenticated: true,
@@ -125,6 +128,7 @@ const screens = [
   },
   {
     file: '03-organisations.png',
+    splitAfterCallout: 4,
     route: '/organisations',
     waitFor: '.organisations-page',
     authenticated: true,
@@ -177,9 +181,19 @@ const screens = [
   },
   {
     file: '04-organisation-detail.png',
+    splitAfterCallout: 2,
     route: '/organisations/2',
     waitFor: '.organisation-container',
     authenticated: true,
+    action: async (page) => {
+      const map = page.locator('.organisation-map google-map');
+      await map.scrollIntoViewIfNeeded();
+      await page.waitForFunction(() => (
+        [...document.querySelectorAll('.organisation-map google-map img')]
+          .some((image) => image.complete && image.naturalWidth > 100)
+      ), null, { timeout: 8000 }).catch(() => {});
+      await page.waitForTimeout(2200);
+    },
     callouts: [
       { title: 'Administrator view of organization identity and engagement controls', targets: ['.header-card'] },
       { title: 'Community goals and progress management', targets: ['.goals-card'] },
@@ -204,6 +218,7 @@ const screens = [
   },
   {
     file: '05-engagement-levels.png',
+    splitAfterCallout: 2,
     route: '/organisations/2/engagement-levels',
     waitFor: '.levels-page',
     authenticated: true,
@@ -223,6 +238,7 @@ const screens = [
   },
   {
     file: '05b-engagement-levels-alice.png',
+    splitAfterCallout: 3,
     route: '/organisations/2/engagement-levels',
     waitFor: '.levels-page',
     authenticated: true,
@@ -528,6 +544,7 @@ const screens = [
   },
   {
     file: '14-create-activity.png',
+    splitAfterCallout: 3,
     route: '/createActivity',
     waitFor: '.form-page',
     authenticated: true,
@@ -730,6 +747,7 @@ async function addAnnotations(page, callouts, viewportOnly = false) {
       );
 
       const box = document.createElement('div');
+      box.dataset.calloutIndex = String(calloutIndex);
       Object.assign(box.style, {
         position: 'absolute',
         left: `${left}px`,
@@ -897,6 +915,8 @@ async function capture(page, screen) {
     path: new URL(screen.file, outputDirectory).pathname,
     type: 'png',
   };
+  let captureTop = 0;
+  let captureBottom = null;
 
   if (screen.clipTo) {
     const target = page.locator(screen.clipTo);
@@ -922,8 +942,9 @@ async function capture(page, screen) {
     const annotatedBottom = Math.max(...foundResults.map((result) => result.bottom ?? 0));
     const pageHeight = await page.evaluate(() => Math.max(document.documentElement.scrollHeight, document.body.scrollHeight));
     const width = (screen.viewport ?? defaultViewport).width;
-    const captureTop = screen.focusAnnotations ? Math.max(0, Math.floor(annotatedTop - 40)) : 0;
+    captureTop = screen.focusAnnotations ? Math.max(0, Math.floor(annotatedTop - 40)) : 0;
     const height = Math.min(pageHeight - captureTop, Math.ceil(annotatedBottom - captureTop + 40));
+    captureBottom = captureTop + height;
     await page.setViewportSize({ width, height });
     if (captureTop) {
       await page.evaluate((top) => window.scrollTo(0, top), captureTop);
@@ -933,6 +954,72 @@ async function capture(page, screen) {
 
   await page.screenshot(screenshotOptions);
   console.log(`Captured ${screen.file}`);
+
+  if (screen.splitAfterCallout) {
+    const splitIndex = screen.splitAfterCallout;
+    const firstLast = results[splitIndex - 1];
+    const secondFirst = results[splitIndex];
+    if (!firstLast?.found || !secondFirst?.found) {
+      console.warn(`${screen.file}: could not create split variants because a boundary callout was missing`);
+      return;
+    }
+
+    const pageHeight = await page.evaluate(() => Math.max(document.documentElement.scrollHeight, document.body.scrollHeight));
+    const width = (screen.viewport ?? defaultViewport).width;
+    const annotatedBottom = Math.max(...results.filter((result) => result.found).map((result) => result.bottom ?? 0));
+    const firstPartResults = results.slice(0, splitIndex).filter((result) => result.found);
+    const secondPartResults = results.slice(splitIndex).filter((result) => result.found);
+    const firstPartBottom = Math.max(...firstPartResults.map((result) => result.bottom ?? 0));
+    const secondPartTop = Math.min(...secondPartResults.map((result) => result.top ?? 0));
+    const finalCaptureBottom = captureBottom ?? Math.min(pageHeight, Math.ceil(annotatedBottom + 40));
+    const parts = [
+      {
+        number: 1,
+        top: captureTop,
+        bottom: Math.min(finalCaptureBottom, Math.ceil(firstPartBottom + 40)),
+        firstCallout: 0,
+        lastCallout: splitIndex - 1,
+      },
+      {
+        number: 2,
+        top: Math.max(captureTop, Math.floor(secondPartTop - 40)),
+        bottom: finalCaptureBottom,
+        firstCallout: splitIndex,
+        lastCallout: results.length - 1,
+      },
+    ];
+
+    for (const part of parts) {
+      await page.evaluate(({ firstCallout, lastCallout }) => {
+        document.querySelectorAll('#documentation-annotations > div').forEach((box) => {
+          const calloutIndex = Number(box.dataset.calloutIndex);
+          box.style.display = calloutIndex >= firstCallout && calloutIndex <= lastCallout ? '' : 'none';
+        });
+      }, part);
+
+      const partFiles = [screen.file, ...(screen.partAliases ?? [])]
+        .map((file) => partFileName(file, part.number));
+      for (const partFile of partFiles) {
+        await page.screenshot({
+          path: new URL(partFile, outputDirectory).pathname,
+          type: 'png',
+          clip: {
+            x: 0,
+            y: part.top,
+            width,
+            height: Math.max(1, part.bottom - part.top),
+          },
+        });
+        console.log(`Captured ${partFile}`);
+      }
+    }
+
+    await page.evaluate(() => {
+      document.querySelectorAll('#documentation-annotations > div').forEach((box) => {
+        box.style.display = '';
+      });
+    });
+  }
 }
 
 async function login(page, username, password) {
@@ -953,6 +1040,10 @@ async function resetSession(page) {
   await page.waitForSelector('#username');
 }
 
+function partFileName(file, partNumber) {
+  return file.replace(/(\.[^.]+)$/, `-part-${partNumber}$1`);
+}
+
 function buildLegend() {
   const lines = [
     '# Current annotated screenshot legend',
@@ -969,6 +1060,22 @@ function buildLegend() {
       lines.push(`${index + 1}. ${callout.title}`);
     });
     lines.push('');
+
+    if (screen.splitAfterCallout) {
+      const splitIndex = screen.splitAfterCallout;
+      [
+        { part: 1, callouts: screen.callouts.slice(0, splitIndex), offset: 0 },
+        { part: 2, callouts: screen.callouts.slice(splitIndex), offset: splitIndex },
+      ].forEach(({ part, callouts, offset }) => {
+        [screen.file, ...(screen.partAliases ?? [])].forEach((file) => {
+          lines.push(`## ${partFileName(file, part)}`, '');
+          callouts.forEach((callout, index) => {
+            lines.push(`${index + offset + 1}. ${callout.title}`);
+          });
+          lines.push('');
+        });
+      });
+    }
   }
 
   return `${lines.join('\n')}\n`;

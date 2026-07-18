@@ -30,10 +30,40 @@ Desktop navigation is documented once in `19-navigation.png`; the responsive mob
 3. Latest member highlights
 4. Personalized activity recommendations
 
+## 02-home-part-1.png
+
+1. Member summary and totals
+2. Monthly planning calendar
+
+## 02-home-part-2.png
+
+3. Latest member highlights
+4. Personalized activity recommendations
+
 ## 02b-home-alice.png
 
 1. Alice’s member summary and totals
 2. Alice’s personal calendar
+3. Alice’s latest member highlights
+4. Recommendations based on Alice’s interests and skills
+
+## 02b-home-alice-part-1.png
+
+1. Alice’s member summary and totals
+2. Alice’s personal calendar
+
+## 02a-home-alice-part-1.png
+
+1. Alice’s member summary and totals
+2. Alice’s personal calendar
+
+## 02b-home-alice-part-2.png
+
+3. Alice’s latest member highlights
+4. Recommendations based on Alice’s interests and skills
+
+## 02a-home-alice-part-2.png
+
 3. Alice’s latest member highlights
 4. Recommendations based on Alice’s interests and skills
 
@@ -51,10 +81,32 @@ Desktop navigation is documented once in `19-navigation.png`; the responsive mob
 4. Joined organizations
 5. Recommended and complete organization lists
 
+## 03-organisations-part-1.png
+
+1. Organization overview and totals
+2. Engagement-level administration shortcuts
+3. Search and filter controls
+4. Joined organizations
+
+## 03-organisations-part-2.png
+
+5. Recommended and complete organization lists
+
 ## 04-organisation-detail.png
 
 1. Administrator view of organization identity and engagement controls
 2. Community goals and progress management
+3. New Urban Green Spaces Restoration project
+4. Organization activities and management action
+5. Administrators, friends, and members
+
+## 04-organisation-detail-part-1.png
+
+1. Administrator view of organization identity and engagement controls
+2. Community goals and progress management
+
+## 04-organisation-detail-part-2.png
+
 3. New Urban Green Spaces Restoration project
 4. Organization activities and management action
 5. Administrators, friends, and members
@@ -74,11 +126,31 @@ Desktop navigation is documented once in `19-navigation.png`; the responsive mob
 3. Administrator-editable advanced levels and requirements
 4. Administrator save controls and permissions summary
 
+## 05-engagement-levels-part-1.png
+
+1. Updated engagement overview and administrator’s current level
+2. Initial and inactive engagement levels
+
+## 05-engagement-levels-part-2.png
+
+3. Administrator-editable advanced levels and requirements
+4. Administrator save controls and permissions summary
+
 ## 05b-engagement-levels-alice.png
 
 1. Updated engagement overview and Alice’s current level
 2. Read-only organization-admin access notice
 3. Initial and inactive engagement levels
+4. Read-only advanced levels and disabled requirements
+
+## 05b-engagement-levels-alice-part-1.png
+
+1. Updated engagement overview and Alice’s current level
+2. Read-only organization-admin access notice
+3. Initial and inactive engagement levels
+
+## 05b-engagement-levels-alice-part-2.png
+
 4. Read-only advanced levels and disabled requirements
 
 ## 06-activities.png
@@ -182,6 +254,17 @@ Desktop navigation is documented once in `19-navigation.png`; the responsive mob
 1. Activity creation overview
 2. Activity basics, ownership, and schedule
 3. Map-based location selection
+4. Skills, tags, qualifications, and prerequisites
+5. Cancel and create actions
+
+## 14-create-activity-part-1.png
+
+1. Activity creation overview
+2. Activity basics, ownership, and schedule
+3. Map-based location selection
+
+## 14-create-activity-part-2.png
+
 4. Skills, tags, qualifications, and prerequisites
 5. Cancel and create actions
 
