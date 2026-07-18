@@ -1,6 +1,6 @@
-<div class="app-main min-h-screen bg-[#f9f9fe]">
+<div class="app-main">
   <app-header></app-header>
-  <div class="app-content" [class.has-bottom-nav]="showBottomNavbar()">
+  <div class="app-content" [class.has-bottom-nav]="showBottomNavbar()" [class.public-content]="!showBottomNavbar()">
     <div class="routed-content">
       <router-outlet></router-outlet>
     </div>

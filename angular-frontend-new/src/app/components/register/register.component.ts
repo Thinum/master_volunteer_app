@@ -25,7 +25,7 @@ import {LayoutingService} from '../../services/layouting.service';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnDestroy {
 
   protected registerForm: FormGroup;
   protected hidePw = signal(true);
@@ -39,6 +39,8 @@ export class RegisterComponent {
     private layoutingService: LayoutingService,
     private router: Router
   ) {
+    this.layoutingService.showBottomNavbar.set(false);
+
     this.registerForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],

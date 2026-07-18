@@ -3,7 +3,7 @@
     <div>
       <p class="app-overview-header__eyebrow">Plan your time</p>
       <h1>Calendar</h1>
-      <p>Activity dates, community goals, organisation updates and your personal appointments in one place.</p>
+      <p>Activity dates, community goals, organization updates and your personal appointments in one place.</p>
     </div>
     <button class="app-overview-header__action" mat-flat-button color="primary" type="button" (click)="openAppointmentForm()">
       <mat-icon>add</mat-icon> New appointment
@@ -72,7 +72,7 @@
         <div class="appointment-filters" aria-label="Filter by entry type">
           <button type="button" [class.active]="eventFilter === 'all'" [attr.aria-pressed]="eventFilter === 'all'" (click)="setEventFilter('all')">All entries <span>{{ events.length }}</span></button>
           <button type="button" [class.active]="eventFilter === 'personal'" [attr.aria-pressed]="eventFilter === 'personal'" (click)="setEventFilter('personal')">My appointments <span>{{ personalEventCount }}</span></button>
-          <button type="button" [class.active]="eventFilter === 'organisation'" [attr.aria-pressed]="eventFilter === 'organisation'" (click)="setEventFilter('organisation')">Organisation <span>{{ organisationEventCount }}</span></button>
+          <button type="button" [class.active]="eventFilter === 'organisation'" [attr.aria-pressed]="eventFilter === 'organisation'" (click)="setEventFilter('organisation')">Organization <span>{{ organisationEventCount }}</span></button>
         </div>
       </div>
       <div class="filter-group">

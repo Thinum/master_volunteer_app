@@ -3,7 +3,7 @@
   flex-direction: column;
   min-height: 100vh;
   min-height: 100dvh;
-  background-color: #f9f9fe;
+  background-color: var(--surface);
 }
 
 .app-content {
@@ -11,13 +11,22 @@
   box-sizing: border-box;
   width: 100%;
   padding: clamp(1rem, 2.5vw, 2rem);
-  background-color: #f9f9fe;
+  background-color: var(--surface);
 }
 
 .routed-content {
   width: min(100%, 1280px);
   margin-inline: auto;
 }
+.app-content.public-content {
+  padding: 0;
+}
+
+.app-content.public-content .routed-content {
+  width: 100%;
+  max-width: none;
+}
+
 
 @media (max-width: 600px) {
   .app-content {

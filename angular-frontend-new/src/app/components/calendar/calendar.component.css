@@ -220,23 +220,23 @@ form {
 }
 
 .appointment-item.type-personal {
-  --event-color: #526da5;
+  --event-color: var(--event-personal);
 }
 
 .appointment-item.type-activity {
-  --event-color: #39715b;
+  --event-color: var(--event-organisation);
 }
 
 .appointment-item.type-goal {
-  --event-color: #a46618;
+  --event-color: var(--event-goal);
 }
 
 .appointment-item.type-organisation {
-  --event-color: #438963;
+  --event-color: var(--event-activity);
 }
 
 .appointment-item.type-reactivation {
-  --event-color: #80558c;
+  --event-color: var(--event-project);
 }
 
 .appointment-item:hover {
@@ -246,19 +246,19 @@ form {
 }
 
 .appointment-item.status-past {
-  --status-color: #b34343;
-  --status-soft: #fde9e7;
+  --status-color: var(--error);
+  --status-soft: var(--error-container);
   background: #fffafa;
 }
 
 .appointment-item.status-today {
-  --status-color: #a46618;
-  --status-soft: #fff0d2;
+  --status-color: var(--warning);
+  --status-soft: var(--warning-container);
 }
 
 .appointment-item.status-upcoming {
-  --status-color: #39715b;
-  --status-soft: #e0f2e9;
+  --status-color: var(--success);
+  --status-soft: var(--success-container);
 }
 
 .appointment-date {
@@ -375,7 +375,7 @@ form {
 }
 
 .delete-button:hover {
-  background: #fde9e7;
+  background: var(--error-container);
   color: var(--error);
   opacity: 1;
 }

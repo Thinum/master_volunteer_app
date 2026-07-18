@@ -33,6 +33,20 @@
   --on-tertiary-container: #3d1f40;
 
   --error: #a83836;
+  --error-container: #fde9e7;
+  --success: #2f6b3a;
+  --success-container: #eef7ed;
+  --warning: #8a5a12;
+  --warning-container: #fff0d2;
+  --info: #46608a;
+  --info-container: #f0f4fa;
+
+  /* Calendar/event categories */
+  --event-personal: #526da5;
+  --event-organisation: #39715b;
+  --event-goal: #a46618;
+  --event-activity: #438963;
+  --event-project: #80558c;
 
   /* Relationship / avatar defaults */
   --relationship-friend: #4cc9f0;
@@ -68,6 +82,47 @@
   --control-radius: var(--radius-md);
   --control-padding-inline: 1.15rem;
   --control-focus-ring: 0 0 0 3px rgba(70, 96, 138, 0.22);
+
+  /* Keep Angular Material on the same palette and typography as the app. */
+  --mat-sys-primary: var(--primary);
+  --mat-sys-on-primary: var(--on-primary);
+  --mat-sys-primary-container: var(--primary-container);
+  --mat-sys-on-primary-container: var(--primary-dim);
+  --mat-sys-secondary: var(--on-surface-variant);
+  --mat-sys-secondary-container: var(--surface-container-high);
+  --mat-sys-on-secondary-container: var(--on-surface);
+  --mat-sys-tertiary: var(--tertiary);
+  --mat-sys-tertiary-container: var(--tertiary-container);
+  --mat-sys-on-tertiary-container: var(--on-tertiary-container);
+  --mat-sys-error: var(--error);
+  --mat-sys-error-container: var(--error-container);
+  --mat-sys-surface: var(--surface);
+  --mat-sys-surface-bright: var(--surface-bright);
+  --mat-sys-surface-container-lowest: var(--surface-container-lowest);
+  --mat-sys-surface-container-low: var(--surface-container-low);
+  --mat-sys-surface-container: var(--surface-container);
+  --mat-sys-surface-container-high: var(--surface-container-high);
+  --mat-sys-surface-container-highest: var(--surface-container-highest);
+  --mat-sys-on-surface: var(--on-surface);
+  --mat-sys-on-surface-variant: var(--on-surface-variant);
+  --mat-sys-outline: var(--outline-variant);
+  --mat-sys-outline-variant: var(--outline-variant);
+  --mat-sys-surface-tint: var(--primary);
+  --mat-sys-body-large-font: var(--font-body);
+  --mat-sys-body-medium-font: var(--font-body);
+  --mat-sys-body-small-font: var(--font-body);
+  --mat-sys-label-large-font: var(--font-body);
+  --mat-sys-label-medium-font: var(--font-body);
+  --mat-sys-label-small-font: var(--font-body);
+  --mat-sys-title-large-font: var(--font-display);
+  --mat-sys-title-medium-font: var(--font-body);
+  --mat-sys-title-small-font: var(--font-body);
+  --mat-sys-headline-large-font: var(--font-display);
+  --mat-sys-headline-medium-font: var(--font-display);
+  --mat-sys-headline-small-font: var(--font-display);
+  --mat-sys-display-large-font: var(--font-display);
+  --mat-sys-display-medium-font: var(--font-display);
+  --mat-sys-display-small-font: var(--font-display);
 }
 
 html, body {
@@ -80,7 +135,8 @@ html, body {
   box-sizing: border-box;
 }
 
-body {
+body,
+body.mat-typography {
   font-family: var(--font-body), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background-color: var(--surface);
   color: var(--on-surface);
@@ -99,6 +155,12 @@ button, input, textarea, select {
 
 button {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* One keyboard focus language for Material and native controls. */
+:is(button, a, [role="button"], input, textarea, select):focus-visible {
+  outline: none;
+  box-shadow: var(--control-focus-ring);
 }
 
 /* Shared Material button language: typography, proportions, colour, and motion. */

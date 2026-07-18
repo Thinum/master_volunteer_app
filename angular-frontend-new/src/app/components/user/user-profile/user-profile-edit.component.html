@@ -1,9 +1,13 @@
-<mat-card class="edit-profile-card">
-  <mat-card-header>
-    <mat-card-title>Edit Profile</mat-card-title>
-    <mat-card-subtitle>Update your contact details, picture, skills, and interests.</mat-card-subtitle>
-  </mat-card-header>
+<main class="edit-profile-page">
+  <header class="app-overview-header">
+    <div>
+      <p class="app-overview-header__eyebrow">Profile settings</p>
+      <h1>Edit profile</h1>
+      <p>Update your contact details, picture, skills, and interests.</p>
+    </div>
+  </header>
 
+  <mat-card class="edit-profile-card">
   <mat-card-content>
     <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
       <section class="picture-section">
@@ -75,3 +79,4 @@
     </form>
   </mat-card-content>
 </mat-card>
+</main>

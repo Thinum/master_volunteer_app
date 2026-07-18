@@ -302,7 +302,7 @@ h2 {
 .legend-dot.type-activity { background: #5f86bb; }
 .legend-dot.type-personal { background: #c7586a; }
 .legend-dot.type-goal { background: #8a64a8; }
-.legend-dot.type-organisation { background: #438963; }
+.legend-dot.type-organisation { background: var(--event-organisation); }
 .legend-dot.type-reactivation { background: #4b8791; }
 
 .map-view {
@@ -426,7 +426,7 @@ h2 {
 }
 
 .pin-key.organisation {
-  background: #438963;
+  background: var(--event-organisation);
 }
 
 .pin-key mat-icon {

@@ -44,7 +44,7 @@
       <h4>Your latest highlights</h4>
 
       <!-- Last Activity Joined -->
-      <app-card size="compact" class="highlight-card clickable-card" *ngIf="lastActivity" [routerLink]="['/activities', lastActivity.id]">
+      <app-card size="compact" class="highlight-card" *ngIf="lastActivity" [link]="['/activities', lastActivity.id]">
         <div card-left>
           <div class="highlight-icon green">
             <mat-icon>event_available</mat-icon>
@@ -103,7 +103,7 @@
   <div class="recommended-section" *ngIf="recommendedActivities && recommendedActivities.length > 0">
     <h4>Recommended activities for you</h4>
     <div class="recommended-grid">
-      <app-card size="compact" *ngFor="let act of recommendedActivities" class="rec-card clickable-card" [routerLink]="['/activities', act.id]">
+      <app-card size="compact" *ngFor="let act of recommendedActivities" class="rec-card" [link]="['/activities', act.id]">
         <div card-left>
           <div class="rec-badge">
             <mat-icon>explore</mat-icon>

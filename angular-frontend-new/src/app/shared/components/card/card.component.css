@@ -10,11 +10,17 @@
   border-radius: 0.75rem;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(70, 96, 138, 0.08);
-  transition: all 0.2s ease;
-  width: 100%
+  width: 100%;
+  color: inherit;
+  text-decoration: none;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-.app-card:hover {
+.app-card.is-interactive {
+  cursor: pointer;
+}
+
+.app-card.is-interactive:hover {
   box-shadow: 0 8px 16px rgba(70, 96, 138, 0.12);
   transform: translateY(-1px);
 }

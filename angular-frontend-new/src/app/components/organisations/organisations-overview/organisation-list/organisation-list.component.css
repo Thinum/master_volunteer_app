@@ -148,8 +148,8 @@
 }
 
 .tag--matched {
-  background-color: #eef7ed;
-  color: #2f6b3a;
+  background-color: var(--success-container);
+  color: var(--success);
   box-shadow: inset 0 0 0 1px rgba(47, 107, 58, 0.22);
 }
 

@@ -27,8 +27,8 @@
 
 .hero-main { position: relative; z-index: 1; max-width: 760px; }
 .hero-topline { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-.status-pill { display: inline-flex; align-items: center; gap: .45rem; padding: .35rem .7rem; border-radius: 999px; background: #e6f5ee; color: #267759; font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
-.status-pill > span { width: 7px; height: 7px; border-radius: 50%; background: #3a8a68; }
+.status-pill { display: inline-flex; align-items: center; gap: .45rem; padding: .35rem .7rem; border-radius: var(--radius-full); background: var(--success-container); color: var(--success); font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.status-pill > span { width: 7px; height: 7px; border-radius: 50%; background: var(--success); }
 .status-pill--closed { background: var(--surface-container-high); color: var(--on-surface-variant); }
 .status-pill--closed > span { background: #b8c0cd; }
 .project-type { display: inline-flex; align-items: center; gap: .35rem; color: var(--on-surface-variant); font-size: .8rem; font-weight: 700; }
@@ -72,7 +72,7 @@
 .progress-track span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#46608a,#6a86b7); }
 .progress-dates { display: flex; justify-content: space-between; margin-top: .5rem; color: #7b8799; font-size: .72rem; }
 .metric-card { display: flex; align-items: center; gap: 1rem; }
-.metric-icon--done { background: #e6f5ee; color: #2c8060; }
+.metric-icon--done { background: var(--success-container); color: var(--success); }
 .metric-card > div strong,
 .metric-card > div span { display: block; }
 .metric-card strong { font: 800 1.8rem 'Manrope',sans-serif; }

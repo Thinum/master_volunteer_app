@@ -44,9 +44,12 @@
 }
 
 .logout-button {
+  width: var(--control-height);
+  height: var(--control-height);
   background-color: transparent;
   color: #46608a;
   border: none;
+  border-radius: var(--control-radius);
   padding: 0;
   cursor: pointer;
   transition: color 0.2s ease;

@@ -9,6 +9,6 @@ import { NgClass} from '@angular/common';
   styleUrl: './card.component.css'
 })
 export class CardComponent {
-  @Input() link!: string | any[];
+  @Input() link: RouterLink['routerLink'] = null;
   @Input() size: 'default' | 'compact' = 'default';
 }
