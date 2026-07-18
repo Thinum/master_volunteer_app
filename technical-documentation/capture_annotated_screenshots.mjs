@@ -11,7 +11,7 @@ const screens = [
     route: '/',
     waitFor: '.org-item',
     callouts: [
-      { title: 'Page header and session action', targets: ['.toolbarTop'] },
+      { title: 'Page header and session action', targets: ['.toolbarTop'], badgePosition: 'top-center' },
       { title: 'Authentication form', targets: ['.login-section'] },
       { title: 'Organization search and filters', targets: ['.browse-section .search-container'] },
       { title: 'Public organization browser', targets: ['.organisations-list'] },
@@ -30,9 +30,18 @@ const screens = [
       }
     },
     callouts: [
-      { title: 'Organization search and active filter count', targets: ['.browse-section .search-container'] },
-      { title: 'Expanded category and interest filters', targets: ['#login-organisation-filters'] },
-      { title: 'Organization results updated by the selected category', targets: ['.organisations-list'] },
+      { title: 'Organization search and active filter count', targets: [
+        '.browse-section .search-container .mat-mdc-text-field-wrapper',
+        '.browse-section .app-filter-button',
+      ], padding: 4, badgePosition: 'center-left', topOffset: 48, bottomOffset: 64 },
+      { title: 'Expanded category and interest filters', targets: [
+        '#login-organisation-filters',
+        '#login-organisation-filters mat-chip-listbox:last-of-type mat-chip-option:last-child',
+      ], padding: 4, badgePosition: 'center-left', topOffset: 48, bottomOffset: 36 },
+      { title: 'Organization results updated by the selected category', targets: [
+        '.organisations-list',
+        '.organisations-list .org-item:last-child .org-panel-header',
+      ], padding: 4, badgePosition: 'center-left', topOffset: 28, bottomOffset: 36 },
     ],
   },
   {
@@ -42,15 +51,32 @@ const screens = [
     action: async (page) => {
       await page.locator('.org-item').first().locator('mat-expansion-panel-header').click();
       await page.waitForSelector('.org-item:first-child .activity-card');
+      await page.addStyleTag({
+        content: `
+          .organisations-list,
+          .organisations-list .list-content {
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+          }
+          .organisations-list .org-item:nth-child(n + 2),
+          .org-item:first-child .activities-list:nth-of-type(n + 2) {
+            display: none !important;
+          }
+        `,
+      });
+      await page.waitForTimeout(800);
     },
     callouts: [
-      { title: 'Expanded public organization', targets: ['.org-item:first-child .org-panel-header'] },
+      { title: 'Expanded public organization', targets: ['.org-item:first-child .org-panel-header'], padding: 4, badgePosition: 'center-left' },
       { title: 'First organization activity with schedule and skills', targets: [
         { selector: '.org-item:first-child .activity-card', index: 0 },
-      ] },
+        { selector: '.org-item:first-child .activity-card .activity-tags', index: 0 },
+      ], padding: 4, badgePosition: 'center-left', bottomOffset: 8 },
       { title: 'Additional organization activity', targets: [
         { selector: '.org-item:first-child .activity-card', index: 1 },
-      ] },
+        { selector: '.org-item:first-child .activity-card .activity-tags', index: 1 },
+      ], padding: 4, badgePosition: 'center-left', bottomOffset: 8 },
     ],
   },
   {
@@ -63,7 +89,6 @@ const screens = [
       { title: 'Monthly planning calendar', targets: ['.dashboard-calendar'] },
       { title: 'Latest member highlights', targets: ['.home-grid'] },
       { title: 'Personalized activity recommendations', targets: ['.recommended-section'] },
-      { title: 'Administrator navigation including platform administration', targets: ['app-nav-bar .toolbarNav'] },
     ],
   },
   {
@@ -77,7 +102,6 @@ const screens = [
       { title: 'Alice’s personal calendar', targets: ['.dashboard-calendar'] },
       { title: 'Alice’s latest member highlights', targets: ['.home-grid'] },
       { title: 'Recommendations based on Alice’s interests and skills', targets: ['.recommended-section'] },
-      { title: 'Standard member navigation without platform administration', targets: ['app-nav-bar .toolbarNav'] },
     ],
   },
   {
@@ -85,6 +109,8 @@ const screens = [
     route: '/home',
     waitFor: '.home-container',
     authenticated: true,
+    showNavigation: true,
+    preserveFixedNavigation: true,
     viewport: { width: 390, height: 844 },
     fullPage: false,
     action: async (page) => {
@@ -102,6 +128,42 @@ const screens = [
     route: '/organisations',
     waitFor: '.organisations-page',
     authenticated: true,
+    action: async (page) => {
+      await page.waitForSelector('app-organisation-list .organisation-card');
+      await page.addStyleTag({
+        content: '.engagement-admin-copy > mat-icon { flex: 0 0 24px !important; width: 24px !important; min-width: 24px !important; overflow: visible !important; }',
+      });
+      await page.evaluate(() => {
+        const lists = [...document.querySelectorAll('app-organisation-list')];
+        const joined = lists[0];
+        const recommended = lists[1];
+        const all = lists[2];
+        if (!joined || !recommended || !all) return;
+
+        const sourceGrid = all.querySelector('.organisation-grid');
+        const sourceCard = sourceGrid?.querySelector('.organisation-card:last-child');
+        if (!sourceGrid || !sourceCard) return;
+
+        const recommendationGrid = sourceGrid.cloneNode(false);
+        recommendationGrid.appendChild(sourceCard.cloneNode(true));
+        [...recommendationGrid.querySelectorAll('.tag')]
+          .slice(0, 2)
+          .forEach((tag) => tag.classList.add('tag--matched'));
+        [...sourceCard.querySelectorAll('.tag')]
+          .slice(0, 2)
+          .forEach((tag) => tag.classList.add('tag--matched'));
+        recommended.querySelector('.empty-state')?.replaceWith(recommendationGrid);
+        const recommendedCount = recommended.querySelector('.section-header p');
+        if (recommendedCount) recommendedCount.textContent = '1 organization';
+
+        const joinedCards = [...joined.querySelectorAll('.organisation-card')];
+        joinedCards.at(-1)?.remove();
+        const joinedCount = joined.querySelector('.section-header p');
+        if (joinedCount) joinedCount.textContent = `${Math.max(0, joinedCards.length - 1)} organizations`;
+        const joinedStat = document.querySelectorAll('.stat-item')[1]?.querySelector('.stat-value');
+        if (joinedStat) joinedStat.textContent = String(Math.max(0, joinedCards.length - 1));
+      });
+    },
     callouts: [
       { title: 'Organization overview and totals', targets: ['.organisations-page > .overview-header'] },
       { title: 'Engagement-level administration shortcuts', targets: ['.engagement-admin-panel'] },
@@ -184,6 +246,11 @@ const screens = [
     route: '/activities',
     waitFor: '.activities-page',
     authenticated: true,
+    action: async (page) => {
+      await page.addStyleTag({
+        content: '.activity-grid .activity-card:nth-child(n + 4) { display: none !important; }',
+      });
+    },
     callouts: [
       { title: 'Activity overview and totals', targets: ['.activities-page > .overview-header'] },
       { title: 'Activity search and filters', targets: ['.activities-page > .search-panel'] },
@@ -191,8 +258,45 @@ const screens = [
         { selector: '.activity-section', index: 0 },
         { selector: '.activity-section', index: 1 },
       ] },
-      { title: 'Complete activity catalog', targets: [{ selector: '.activity-section', index: 2 }] },
+      { title: 'Representative complete activity catalog', targets: [{ selector: '.activity-section', index: 2 }] },
       { title: 'Create activity action', targets: ['button.corner-button'] },
+    ],
+  },
+  {
+    file: '06a-activities-filter-open.png',
+    route: '/activities',
+    waitFor: '.activities-page',
+    authenticated: true,
+    action: async (page) => {
+      await page.locator('.activities-page > .search-panel .app-filter-button').click();
+      await page.waitForSelector('#activity-filters', { state: 'visible' });
+
+      const filterLists = page.locator('#activity-filters mat-chip-listbox');
+      await filterLists.nth(0).locator('mat-chip-option').filter({ hasText: 'Open' }).first().click();
+      await page.waitForTimeout(250);
+
+      const visibleTag = (await page.locator('.activity-section .activity-card .activity-tag').first().textContent())?.trim();
+      if (visibleTag) {
+        const matchingTag = filterLists.nth(1).locator('mat-chip-option').filter({ hasText: visibleTag }).first();
+        if (await matchingTag.count()) {
+          await matchingTag.click();
+          await page.waitForTimeout(250);
+        }
+      }
+
+      await page.addStyleTag({
+        content: '.activity-grid .activity-card:nth-child(n + 3) { display: none !important; }',
+      });
+      await page.evaluate(() => {
+        const sections = [...document.querySelectorAll('.activity-section')]
+          .filter((section) => section.getBoundingClientRect().height > 0);
+        sections.slice(1).forEach((section) => section.setAttribute('style', 'display: none !important'));
+      });
+    },
+    callouts: [
+      { title: 'Activity search and active filter count', targets: ['.activities-page > .search-panel'] },
+      { title: 'Expanded filters with a selected status and tag', targets: ['#activity-filters'] },
+      { title: 'Activities matching the selected filters', targets: [{ selector: '.activity-section', index: 0 }] },
     ],
   },
   {
@@ -308,14 +412,35 @@ const screens = [
     route: '/profile',
     waitFor: '.profile-card',
     authenticated: true,
+    action: async (page) => {
+      await page.waitForSelector('.profile-card mat-card-content app-card');
+      await page.evaluate(() => {
+        const content = document.querySelector('.profile-card mat-card-content');
+        if (!content) return;
+        let visibleCardsInGroup = 0;
+        [...content.children].forEach((child) => {
+          if (child.tagName === 'H3') {
+            visibleCardsInGroup = 0;
+          } else if (child.tagName === 'APP-CARD') {
+            visibleCardsInGroup += 1;
+            if (visibleCardsInGroup > 2) {
+              child.setAttribute('style', 'display: none !important');
+              if (child.nextElementSibling?.tagName === 'BR') {
+                child.nextElementSibling.setAttribute('style', 'display: none !important');
+              }
+            }
+          }
+        });
+      });
+    },
     callouts: [
       { title: 'Profile identity and edit action', targets: ['.profile-card mat-card-header'] },
       { title: 'Account details, skills, and interests', targets: [
         { selector: '.profile-card mat-card-content > p', index: 0 },
         '.profile-tags',
       ] },
-      { title: 'Friends, organizations, and activities', targets: ['.profile-card mat-card-content'] },
-      { title: 'Share profile action', targets: ['app-share-button'] },
+      { title: 'Representative friends, organizations, and activities', targets: ['.profile-card mat-card-content'] },
+      { title: 'Share profile action', targets: ['app-share-button .share-btn'] },
     ],
   },
   {
@@ -326,8 +451,6 @@ const screens = [
     callouts: [
       { title: 'Calendar introduction and appointment creation', targets: ['.calendar-page > .page-header'] },
       { title: 'Monthly calendar, view switch, and event markers', targets: ['app-calendar-month'] },
-      { title: 'Entry type and timeframe filters', targets: ['.filter-groups'] },
-      { title: 'Detailed schedule entries and actions', targets: ['.appointment-items'] },
     ],
   },
   {
@@ -347,6 +470,24 @@ const screens = [
       { title: 'Map selected in the Calendar/Map view switch', targets: ['app-calendar-month .calendar-toolbar'] },
       { title: 'Location count, activity focus control, and marker legend', targets: ['app-calendar-month .map-summary'] },
       { title: 'Interactive map of activities and joined organisations', targets: ['app-calendar-month .map-view google-map'] },
+    ],
+  },
+  {
+    file: '11c-calendar-schedule.png',
+    route: '/calendar',
+    waitFor: '.calendar-page',
+    authenticated: true,
+    focusAnnotations: true,
+    action: async (page) => {
+      await page.waitForSelector('.appointment-items .appointment-item');
+      await page.addStyleTag({
+        content: '.appointment-items .appointment-item:nth-child(n + 6) { display: none !important; }',
+      });
+    },
+    callouts: [
+      { title: 'Schedule summary and entry count', targets: ['.personal-list .list-heading'] },
+      { title: 'Entry type and timeframe filters', targets: ['.filter-groups'] },
+      { title: 'Representative detailed schedule entries and actions', targets: ['.appointment-items'] },
     ],
   },
   {
@@ -373,10 +514,15 @@ const screens = [
     route: '/admin/organisation-assignments',
     waitFor: '.assignment-page',
     authenticated: true,
+    action: async (page) => {
+      await page.addStyleTag({
+        content: '.assignment-grid .assignment-card:nth-child(n + 5) { display: none !important; }',
+      });
+    },
     callouts: [
       { title: 'Platform administration overview', targets: ['.assignment-page > .page-header'] },
       { title: 'Protected platform-admin behavior', targets: ['.notice'] },
-      { title: 'Organization assignment cards', targets: ['.assignment-grid'] },
+      { title: 'Representative organization assignment cards', targets: ['.assignment-grid'] },
       { title: 'Eligible administrators and save actions', targets: ['.admin-list', '.card-actions'] },
     ],
   },
@@ -385,6 +531,10 @@ const screens = [
     route: '/createActivity',
     waitFor: '.form-page',
     authenticated: true,
+    action: async (page) => {
+      await page.locator('google-map').scrollIntoViewIfNeeded();
+      await page.waitForTimeout(2200);
+    },
     callouts: [
       { title: 'Activity creation overview', targets: ['.form-page > .page-header'] },
       { title: 'Activity basics, ownership, and schedule', targets: [{ selector: '.form-section', index: 0 }] },
@@ -398,11 +548,110 @@ const screens = [
     route: '/projects/new',
     waitFor: '.project-page',
     authenticated: true,
+    action: async (page) => {
+      await page.addStyleTag({
+        content: '.tip-card > mat-icon { flex: 0 0 24px !important; width: 24px !important; min-width: 24px !important; overflow: visible !important; }',
+      });
+      await page.locator('google-map').scrollIntoViewIfNeeded();
+      await page.waitForTimeout(2200);
+    },
     callouts: [
       { title: 'Project creation overview', targets: ['.project-page > .page-hero'] },
       { title: 'Project identity, timeframe, and location', targets: ['.form-column'] },
       { title: 'Organization ownership and guidance', targets: ['.project-layout > .side-column'] },
       { title: 'Cancel and create actions', targets: ['.project-layout .actions'] },
+    ],
+  },
+  {
+    file: '16-goals-overview.png',
+    route: '/community-goals?organisationId=2',
+    waitFor: '.overview-container',
+    authenticated: true,
+    action: async (page) => {
+      const contributors = page.locator('.goal-contributors');
+      if (await contributors.count()) {
+        await contributors.first().locator('mat-expansion-panel-header').click();
+        await page.waitForSelector('.contribution-list');
+        await page.waitForTimeout(600);
+      }
+    },
+    callouts: [
+      { title: 'Organization goal overview and creation action', targets: ['.overview-header'], padding: 0 },
+      { title: 'Environmental goal progress, qualifying interest, and completed activities', targets: [
+        { selector: '.goal-item', index: 0 },
+      ], padding: 0, badgePosition: 'center-right' },
+      { title: 'Monthly volunteer goal progress and activity total', targets: [
+        { selector: '.goal-item', index: 1 },
+      ], padding: 0, badgePosition: 'center-right' },
+    ],
+  },
+  {
+    file: '17-create-goal.png',
+    route: '/community-goals?organisationId=2&mode=create',
+    waitFor: '.goal-form',
+    authenticated: true,
+    action: async (page) => {
+      await page.getByLabel('Goal title').fill('Restore five urban green spaces');
+      await page.getByLabel('Description').fill('Coordinate recurring volunteer activities that improve accessible green spaces across the community.');
+      await page.getByLabel('Target value').fill('5');
+      await page.getByLabel('End date').fill('12/31/2026');
+    },
+    callouts: [
+      { title: 'Community-goal creation overview', targets: ['.form-page > .page-header'] },
+      { title: 'Goal title and impact description', targets: [{ selector: '.goal-form > .form-section', index: 0 }] },
+      { title: 'Target value and qualifying activity interests', targets: [{ selector: '.goal-form > .form-section', index: 1 }] },
+      { title: 'Goal contribution timeframe', targets: [{ selector: '.goal-form > .form-section', index: 2 }] },
+      { title: 'Cancel and create-goal actions', targets: ['.goal-form > .submit-container'] },
+    ],
+  },
+  {
+    file: '18-create-organisation.png',
+    route: '/createOrganisation',
+    waitFor: '.organisation-form',
+    authenticated: true,
+    action: async (page) => {
+      await page.waitForTimeout(1800);
+    },
+    callouts: [
+      { title: 'Organization creation overview', targets: ['.form-page > .page-header'] },
+      { title: 'Organization identity and mission', targets: [{ selector: '.organisation-form > .form-section', index: 0 }] },
+      { title: 'Category, discovery tags, and custom tags', targets: [{ selector: '.organisation-form > .form-section', index: 1 }] },
+      { title: 'Map-based organization home base', targets: [{ selector: '.organisation-form > .form-section', index: 2 }] },
+      { title: 'Optional team members and role assignments', targets: [
+        { selector: '.organisation-form > .form-section', index: 3 },
+      ] },
+      { title: 'Required-field status and organization creation action', targets: [
+        '.organisation-form > .submit-container',
+      ] },
+    ],
+  },
+  {
+    file: '19-navigation.png',
+    route: '/createOrganisation',
+    waitFor: '.organisation-form',
+    authenticated: true,
+    showNavigation: true,
+    preserveFixedNavigation: true,
+    fullPage: false,
+    viewport: { width: 1440, height: 520 },
+    action: async (page) => {
+      await page.addStyleTag({
+        content: `
+          .app-main > app-header,
+          .app-main > .app-content {
+            visibility: hidden !important;
+          }
+          .app-main,
+          body {
+            background: #f9f9fe !important;
+          }
+        `,
+      });
+    },
+    clipTo: 'app-nav-bar .desktopNavigation',
+    clipMargin: 48,
+    callouts: [
+      { title: 'Primary desktop navigation and central Home action', targets: ['app-nav-bar .desktopNavigation'] },
     ],
   },
 ];
@@ -471,11 +720,14 @@ async function addAnnotations(page, callouts, viewportOnly = false) {
         return;
       }
 
-      const padding = 8;
+      const padding = definition.padding ?? 8;
       const left = Math.max(4, Math.min(...rectangles.map((rect) => rect.left)) - padding);
-      const top = Math.max(4, Math.min(...rectangles.map((rect) => rect.top)) - padding);
+      const top = Math.max(4, Math.min(...rectangles.map((rect) => rect.top)) - padding + (definition.yOffset ?? definition.topOffset ?? 0));
       const right = Math.min(annotationWidth - 4, Math.max(...rectangles.map((rect) => rect.right)) + padding);
-      const bottom = Math.min(annotationHeight - 4, Math.max(...rectangles.map((rect) => rect.bottom)) + padding);
+      const bottom = Math.min(
+        annotationHeight - 4,
+        Math.max(...rectangles.map((rect) => rect.bottom)) + padding + (definition.yOffset ?? definition.bottomOffset ?? 0),
+      );
 
       const box = document.createElement('div');
       Object.assign(box.style, {
@@ -493,10 +745,20 @@ async function addAnnotations(page, callouts, viewportOnly = false) {
 
       const badge = document.createElement('div');
       badge.textContent = String(calloutIndex + 1);
+      const badgePosition = definition.badgePosition ?? 'top-left';
+      const badgeOnRight = badgePosition === 'top-right' || badgePosition === 'center-right';
+      const badgeVerticallyCentered = badgePosition === 'center-left' || badgePosition === 'center-right';
       Object.assign(badge.style, {
         position: 'absolute',
-        left: left < 28 ? '6px' : '-18px',
-        top: top < 28 ? '6px' : '-18px',
+        left: badgePosition === 'top-center'
+          ? 'calc(50% - 19px)'
+          : (badgeOnRight ? 'auto' : (left < 28 ? '6px' : '-18px')),
+        right: badgeOnRight
+          ? (right > annotationWidth - 28 ? '6px' : '-18px')
+          : 'auto',
+        top: badgeVerticallyCentered
+          ? 'calc(50% - 19px)'
+          : (top < 28 ? '6px' : '-18px'),
         width: '38px',
         height: '38px',
         borderRadius: '999px',
@@ -511,7 +773,7 @@ async function addAnnotations(page, callouts, viewportOnly = false) {
 
       box.appendChild(badge);
       root.appendChild(box);
-      results.push({ title: definition.title, found: true });
+      results.push({ title: definition.title, found: true, top, bottom });
     });
 
     document.body.appendChild(root);
@@ -527,7 +789,24 @@ async function addAnnotations(page, callouts, viewportOnly = false) {
   });
 }
 
-async function preparePage(page) {
+async function preparePage(page, screen) {
+  const navigationStyles = screen.showNavigation
+    ? (screen.preserveFixedNavigation
+      ? `app-nav-bar { display: block !important; }`
+      : `
+        app-nav-bar {
+          display: block !important;
+          position: relative !important;
+        }
+        app-nav-bar .toolbarNav {
+          position: static !important;
+          inset: auto !important;
+          transform: none !important;
+          margin: 32px auto 24px !important;
+        }
+      `)
+    : `app-nav-bar { display: none !important; }`;
+
   await page.addStyleTag({
     content: `
       *, *::before, *::after {
@@ -547,16 +826,13 @@ async function preparePage(page) {
       .mat-mdc-snack-bar-container {
         display: none !important;
       }
-      app-nav-bar {
-        display: block !important;
-        position: relative !important;
+      .mat-ripple-element,
+      .mat-mdc-button-ripple,
+      .mat-mdc-button-persistent-ripple::before {
+        display: none !important;
+        opacity: 0 !important;
       }
-      app-nav-bar .toolbarNav {
-        position: static !important;
-        inset: auto !important;
-        transform: none !important;
-        margin: 32px auto 24px !important;
-      }
+      ${navigationStyles}
       .save-bar,
       .submit-container {
         position: static !important;
@@ -609,7 +885,7 @@ async function capture(page, screen) {
   if (screen.action) {
     await screen.action(page);
   }
-  await preparePage(page);
+  await preparePage(page, screen);
 
   const results = await addAnnotations(page, screen.callouts, screen.fullPage === false);
   const missing = results.filter((result) => !result.found);
@@ -617,11 +893,45 @@ async function capture(page, screen) {
     console.warn(`${screen.file}: missing callouts: ${missing.map((entry) => entry.title).join(', ')}`);
   }
 
-  await page.screenshot({
+  const screenshotOptions = {
     path: new URL(screen.file, outputDirectory).pathname,
-    fullPage: screen.fullPage !== false,
     type: 'png',
-  });
+  };
+
+  if (screen.clipTo) {
+    const target = page.locator(screen.clipTo);
+    const box = await target.boundingBox();
+    if (!box) {
+      throw new Error(`${screen.file}: clip target not found: ${screen.clipTo}`);
+    }
+    const margin = screen.clipMargin ?? 32;
+    const viewport = screen.viewport ?? defaultViewport;
+    const x = Math.max(0, box.x - margin);
+    const y = Math.max(0, box.y - margin);
+    screenshotOptions.clip = {
+      x,
+      y,
+      width: Math.min(viewport.width - x, box.width + margin * 2),
+      height: Math.min(viewport.height - y, box.height + margin * 2),
+    };
+  } else if (screen.fullPage === false) {
+    screenshotOptions.fullPage = false;
+  } else {
+    const foundResults = results.filter((result) => result.found);
+    const annotatedTop = Math.min(...foundResults.map((result) => result.top ?? 0));
+    const annotatedBottom = Math.max(...foundResults.map((result) => result.bottom ?? 0));
+    const pageHeight = await page.evaluate(() => Math.max(document.documentElement.scrollHeight, document.body.scrollHeight));
+    const width = (screen.viewport ?? defaultViewport).width;
+    const captureTop = screen.focusAnnotations ? Math.max(0, Math.floor(annotatedTop - 40)) : 0;
+    const height = Math.min(pageHeight - captureTop, Math.ceil(annotatedBottom - captureTop + 40));
+    await page.setViewportSize({ width, height });
+    if (captureTop) {
+      await page.evaluate((top) => window.scrollTo(0, top), captureTop);
+    }
+    screenshotOptions.fullPage = false;
+  }
+
+  await page.screenshot(screenshotOptions);
   console.log(`Captured ${screen.file}`);
 }
 
@@ -648,6 +958,8 @@ function buildLegend() {
     '# Current annotated screenshot legend',
     '',
     'Red numbered boxes identify the main UI regions referenced by the technical documentation.',
+    'Long catalog and administration pages use representative entries so the figures remain legible in academic layouts.',
+    'Desktop navigation is documented once in `19-navigation.png`; the responsive mobile menu is documented in `02c-home-mobile-menu.png`.',
     '',
   ];
 

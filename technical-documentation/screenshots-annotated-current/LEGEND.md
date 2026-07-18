@@ -1,6 +1,8 @@
 # Current annotated screenshot legend
 
 Red numbered boxes identify the main UI regions referenced by the technical documentation.
+Long catalog and administration pages use representative entries so the figures remain legible in academic layouts.
+Desktop navigation is documented once in `19-navigation.png`; the responsive mobile menu is documented in `02c-home-mobile-menu.png`.
 
 ## 01-login.png
 
@@ -27,7 +29,6 @@ Red numbered boxes identify the main UI regions referenced by the technical docu
 2. Monthly planning calendar
 3. Latest member highlights
 4. Personalized activity recommendations
-5. Administrator navigation including platform administration
 
 ## 02b-home-alice.png
 
@@ -35,7 +36,6 @@ Red numbered boxes identify the main UI regions referenced by the technical docu
 2. Alice’s personal calendar
 3. Alice’s latest member highlights
 4. Recommendations based on Alice’s interests and skills
-5. Standard member navigation without platform administration
 
 ## 02c-home-mobile-menu.png
 
@@ -86,8 +86,14 @@ Red numbered boxes identify the main UI regions referenced by the technical docu
 1. Activity overview and totals
 2. Activity search and filters
 3. Joined and recommended activities
-4. Complete activity catalog
+4. Representative complete activity catalog
 5. Create activity action
+
+## 06a-activities-filter-open.png
+
+1. Activity search and active filter count
+2. Expanded filters with a selected status and tag
+3. Activities matching the selected filters
 
 ## 07-activity-detail.png
 
@@ -135,15 +141,13 @@ Red numbered boxes identify the main UI regions referenced by the technical docu
 
 1. Profile identity and edit action
 2. Account details, skills, and interests
-3. Friends, organizations, and activities
+3. Representative friends, organizations, and activities
 4. Share profile action
 
 ## 11-calendar.png
 
 1. Calendar introduction and appointment creation
 2. Monthly calendar, view switch, and event markers
-3. Entry type and timeframe filters
-4. Detailed schedule entries and actions
 
 ## 11b-calendar-map.png
 
@@ -151,6 +155,12 @@ Red numbered boxes identify the main UI regions referenced by the technical docu
 2. Map selected in the Calendar/Map view switch
 3. Location count, activity focus control, and marker legend
 4. Interactive map of activities and joined organisations
+
+## 11c-calendar-schedule.png
+
+1. Schedule summary and entry count
+2. Entry type and timeframe filters
+3. Representative detailed schedule entries and actions
 
 ## 12-reports.png
 
@@ -164,7 +174,7 @@ Red numbered boxes identify the main UI regions referenced by the technical docu
 
 1. Platform administration overview
 2. Protected platform-admin behavior
-3. Organization assignment cards
+3. Representative organization assignment cards
 4. Eligible administrators and save actions
 
 ## 14-create-activity.png
@@ -181,4 +191,31 @@ Red numbered boxes identify the main UI regions referenced by the technical docu
 2. Project identity, timeframe, and location
 3. Organization ownership and guidance
 4. Cancel and create actions
+
+## 16-goals-overview.png
+
+1. Organization goal overview and creation action
+2. Environmental goal progress, qualifying interest, and completed activities
+3. Monthly volunteer goal progress and activity total
+
+## 17-create-goal.png
+
+1. Community-goal creation overview
+2. Goal title and impact description
+3. Target value and qualifying activity interests
+4. Goal contribution timeframe
+5. Cancel and create-goal actions
+
+## 18-create-organisation.png
+
+1. Organization creation overview
+2. Organization identity and mission
+3. Category, discovery tags, and custom tags
+4. Map-based organization home base
+5. Optional team members and role assignments
+6. Required-field status and organization creation action
+
+## 19-navigation.png
+
+1. Primary desktop navigation and central Home action
 
