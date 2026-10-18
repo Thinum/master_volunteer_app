@@ -281,11 +281,21 @@ public class DataLoader {
                     List.of(
                             skill("Teaching", SkillProficiency.ADVANCED),
                             skill("Mathematics", SkillProficiency.ADVANCED),
-                            skill("Mentoring", SkillProficiency.INTERMEDIATE)
+                            skill("Mentoring", SkillProficiency.INTERMEDIATE),
+                            skill("Physical Fitness", SkillProficiency.INTERMEDIATE),
+                            skill("Environmental Work", SkillProficiency.INTERMEDIATE),
+                            skill("Event Support", SkillProficiency.INTERMEDIATE),
+                            skill("Responsibility", SkillProficiency.INTERMEDIATE)
                     ),
                     List.of(
                             InterestCategory.EDUCATION_AND_TUTORING,
-                            InterestCategory.CHILDREN_AND_YOUTH
+                            InterestCategory.CHILDREN_AND_YOUTH,
+                            InterestCategory.EMERGENCY_AND_RESCUE_SERVICES,
+                            InterestCategory.MUSIC,
+                            InterestCategory.TECHNOLOGY,
+                            InterestCategory.ACCESSIBILITY_AND_INCLUSION,
+                            InterestCategory.HUMANITARIAN_AID,
+                            InterestCategory.SPORTS_AND_FITNESS
                     )
             );
             mia.setActive(true);
@@ -419,6 +429,7 @@ public class DataLoader {
             relationshipRepository.save(new UserRelationship(null, alice, bob, RelationshipType.FRIEND, 85));
             relationshipRepository.save(new UserRelationship(null, tom, sandra, RelationshipType.FRIEND, 75));
             relationshipRepository.save(new UserRelationship(null, tom, bella, RelationshipType.FRIEND, 80));
+            relationshipRepository.save(new UserRelationship(null, tom, mia, RelationshipType.FRIEND, 80));
             relationshipRepository.save(new UserRelationship(null, sandra, mia, RelationshipType.FRIEND, 70));
             relationshipRepository.save(new UserRelationship(null, lukas, tom, RelationshipType.FRIEND, 65));
             relationshipRepository.save(new UserRelationship(null, emma, bella, RelationshipType.FRIEND, 88));
