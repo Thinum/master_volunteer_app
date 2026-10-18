@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {NotificationService} from '../../../services/notification.service';
 import {AppNotification, NotificationType} from '../../../models/notification.model';
 import {MatIcon} from '@angular/material/icon';
@@ -13,13 +14,18 @@ import {MatButtonModule} from '@angular/material/button';
   templateUrl: './notifications-list.component.html',
   styleUrl: './notifications-list.component.css'
 })
-export class NotificationsListComponent {
+export class NotificationsListComponent implements OnInit {
+    private readonly notificationService = inject(NotificationService);
     protected readonly NotificationType = NotificationType;
     public notificationsToDisplay: AppNotification[] = [];
-    constructor(private notificationService: NotificationService) {
-      notificationService.getNotifications().subscribe(notifications => {
+    constructor() {
+      this.notificationService.getNotifications().pipe(takeUntilDestroyed()).subscribe(notifications => {
         this.notificationsToDisplay = notifications ?? [];
       })
+    }
+
+    ngOnInit(): void {
+      this.notificationService.refreshNotifications();
     }
 
     public onNotificationClick(notification: AppNotification) {

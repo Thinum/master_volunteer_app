@@ -1,48 +1,50 @@
-import { Injectable } from '@angular/core';
+import { DestroyRef, inject, Injectable } from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MOCK_NOTIFICATIONS} from '../mock/mock-notification';
 import {AppNotification} from '../models/notification.model';
 import {environment} from '../../environments/environment';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, catchError, finalize, map, Observable, of, tap} from 'rxjs';
+import {BehaviorSubject, catchError, EMPTY, exhaustMap, map, merge, Observable, of, Subject, switchMap, tap, timer} from 'rxjs';
+import {AuthService} from './authservice/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationService {
+  private readonly http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/notifications`;
   private mockNotifications = MOCK_NOTIFICATIONS.map(notification => ({...notification}));
   private notificationsSubject = new BehaviorSubject<AppNotification[]>([]);
-  private hasLoaded = false;
-  private isLoading = false;
+  private readonly refreshSubject = new Subject<void>();
 
-  constructor(private http: HttpClient) {}
+  constructor() {
+    const authService = inject(AuthService);
+    const destroyRef = inject(DestroyRef);
+    authService.sessionToken$.pipe(
+      switchMap(token => {
+        // Switching sessions cancels the previous account's pending request and polling.
+        this.notificationsSubject.next([]);
+        this.mockNotifications = MOCK_NOTIFICATIONS.map(notification => ({...notification}));
+        if (!token) return EMPTY;
+
+        return merge(of(undefined), timer(30_000, 30_000), this.refreshSubject).pipe(
+          exhaustMap(() => this.http.get<AppNotification[]>(`${this.apiUrl}/notifications`).pipe(
+            map(notifications => [...(notifications ?? []), ...this.mockNotifications]),
+            // Keep the last successful result and allow the next refresh to retry.
+            catchError(() => EMPTY)
+          ))
+        );
+      }),
+      takeUntilDestroyed(destroyRef)
+    ).subscribe(notifications => this.notificationsSubject.next(notifications));
+  }
 
   getNotifications(): Observable<AppNotification[]> {
-    if (!this.hasLoaded && !this.isLoading) {
-      this.loadNotifications();
-    }
     return this.notificationsSubject.asObservable();
   }
 
   refreshNotifications(): void {
-    this.hasLoaded = false;
-    this.loadNotifications();
-  }
-
-  private loadNotifications(): void {
-    if (this.isLoading) return;
-    this.isLoading = true;
-
-    this.http.get<AppNotification[]>(`${this.apiUrl}/notifications`)
-      .pipe(
-        map(notifications => [...(notifications ?? []), ...this.mockNotifications]),
-        catchError(() => of([...this.mockNotifications])),
-        finalize(() => this.isLoading = false)
-      )
-      .subscribe(notifications => {
-        this.hasLoaded = true;
-        this.notificationsSubject.next(notifications);
-      });
+    this.refreshSubject.next();
   }
 
   createNotification(notification: AppNotification){

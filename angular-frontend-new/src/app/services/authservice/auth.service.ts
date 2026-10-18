@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthUserDTOModel } from '../../models/contract/AuthUserDTO.model';
 import { AuthToken } from '../../models/contract/AuthToken.model';
@@ -11,6 +11,7 @@ export const AUTH_TOKEN_STRING = 'authToken';
 
 let runtimeAuthToken: string | null = null;
 let runtimeExpiry: string | null = null;
+const authSessionSubject = new BehaviorSubject<string | null>(getStoredAuthToken());
 
 function readLocalStorage(key: string): string | null {
   try {
@@ -53,6 +54,7 @@ export function setStoredAuthSession(token: string, expiry: string | null): void
   } else {
     removeLocalStorage(EXPIRY_DATE_STRING);
   }
+  authSessionSubject.next(token);
 }
 
 export function clearStoredAuthSession(expectedToken?: string | null): boolean {
@@ -63,6 +65,7 @@ export function clearStoredAuthSession(expectedToken?: string | null): boolean {
   runtimeExpiry = null;
   removeLocalStorage(AUTH_TOKEN_STRING);
   removeLocalStorage(EXPIRY_DATE_STRING);
+  authSessionSubject.next(null);
   return true;
 }
 
@@ -97,16 +100,20 @@ export function getAuthTokenExpiryTime(token: string | null, serializedExpiry: s
   providedIn: 'root'
 })
 export class AuthService {
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
   private loggedInSubject = new BehaviorSubject<boolean>(this.hasValidToken());
   public loggedIn$ = this.loggedInSubject.asObservable();
-  private tokenCheckInterval: any;
+  public readonly sessionToken$ = authSessionSubject.pipe(distinctUntilChanged());
+  private tokenCheckInterval?: ReturnType<typeof setInterval>;
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor() {
     if (this.isLoggedIn()) {
       this.startTokenCheck();
     } else {
       this.logout();
     }
+    authSessionSubject.next(getStoredAuthToken());
   }
 
   public login(username: string, password: string): Observable<AuthToken> {

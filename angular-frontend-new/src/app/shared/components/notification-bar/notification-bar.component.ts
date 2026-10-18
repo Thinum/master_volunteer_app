@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {RouterLink, RouterLinkActive} from '@angular/router';
@@ -18,9 +19,10 @@ import {NotificationService} from '../../../services/notification.service';
   styleUrl: './notification-bar.component.css'
 })
 export class NotificationBarComponent {
-  protected notificationCount: number = 0;
-  constructor(private notificationService: NotificationService) {
-    notificationService.getNotifications().subscribe(notifications => {
+  protected notificationCount = 0;
+  constructor() {
+    const notificationService = inject(NotificationService);
+    notificationService.getNotifications().pipe(takeUntilDestroyed()).subscribe(notifications => {
       this.notificationCount = notifications.length;
     })
   }

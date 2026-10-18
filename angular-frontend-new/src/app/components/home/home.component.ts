@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -61,6 +62,7 @@ export class HomeComponent implements OnInit {
   private readonly activityService = inject(ActivityService);
   private readonly calendarDataService = inject(CalendarDataService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     this.loadUserData();
@@ -147,7 +149,7 @@ export class HomeComponent implements OnInit {
   }
 
   private loadNotifications(): void {
-    this.notificationService.getNotifications().subscribe({
+    this.notificationService.getNotifications().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (notifications) => {
         this.requests = (notifications || [])
           .filter(notif => notif.type === NotificationType.FRIEND_REQUEST)

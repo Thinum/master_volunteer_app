@@ -6,6 +6,7 @@ import { ActivityService } from '../../services/api/activity.service';
 import { of } from 'rxjs';
 import { CalendarDataService } from '../../services/api/calendar-data.service';
 import { Activity } from '../../models/activity.model';
+import { provideRouter } from '@angular/router';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -28,6 +29,7 @@ describe('HomeComponent', () => {
     };
 
     mockActivityService = {
+      getRecommendedActivities: jasmine.createSpy('getRecommendedActivities').and.returnValue(of([])),
       getAllActivities: jasmine.createSpy('getAllActivities').and.returnValue(of([])),
       joinActivity: jasmine.createSpy('joinActivity').and.returnValue(of(true))
     };
@@ -38,6 +40,7 @@ describe('HomeComponent', () => {
     await TestBed.configureTestingModule({
       imports: [HomeComponent],
       providers: [
+        provideRouter([]),
         { provide: VolunteerService, useValue: mockVolunteerService },
         { provide: NotificationService, useValue: mockNotificationService },
         { provide: ActivityService, useValue: mockActivityService },
