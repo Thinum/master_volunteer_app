@@ -26,7 +26,14 @@ public class UserRelationship {
     private RelationshipType type;
 
     @Column(name = "like_score")
-    private Integer likeScore;
+    private Integer likeScore = 80;
+
+    @PrePersist
+    private void applyDefaultLikeScore() {
+        if (likeScore == null) {
+            likeScore = 80;
+        }
+    }
 
     public UserRelationship(Long id, User fromUser, User toUser, RelationshipType type) {
         this.id = id;

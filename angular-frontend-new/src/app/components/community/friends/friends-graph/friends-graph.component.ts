@@ -450,7 +450,7 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy, OnChange
         }
       }));
 
-    const pairMap = new Map<string, { scores: number[], types: string[] }>();
+    const pairMap = new Map<string, { score: number; type: string }[]>();
 
     for (const rel of this.loadedRelationships) {
       if (!includedUserIds.has(rel.fromUserId) || !includedUserIds.has(rel.toUserId)) {
@@ -462,20 +462,26 @@ export class FriendsGraphComponent implements AfterViewInit, OnDestroy, OnChange
       const key = `${a}-${b}`;
 
       if (!pairMap.has(key)) {
-        pairMap.set(key, { scores: [], types: [] });
+        pairMap.set(key, []);
       }
 
-      pairMap.get(key)!.scores.push(rel.likeScore);
-      pairMap.get(key)!.types.push(rel.type);
+      const score = typeof rel.likeScore === 'number' && Number.isFinite(rel.likeScore)
+        ? rel.likeScore
+        : 80;
+      const type = typeof rel.type === 'string' && rel.type.trim()
+        ? rel.type.trim().toUpperCase()
+        : 'FRIEND';
+      pairMap.get(key)!.push({ score, type });
     }
 
     const edges = Array.from(pairMap.entries()).map(([key, data]) => {
       const [a, b] = key.split('-').map(Number);
 
-      const avgScore = data.scores.reduce((s, v) => s + v, 0) / data.scores.length;
-
-      const strongestIndex = data.scores.indexOf(Math.max(...data.scores));
-      const dominantType = data.types[strongestIndex].toUpperCase();
+      const avgScore = data.reduce((sum, relationship) => sum + relationship.score, 0) / data.length;
+      const strongestRelationship = data.reduce((strongest, relationship) =>
+        relationship.score > strongest.score ? relationship : strongest
+      );
+      const dominantType = strongestRelationship.type;
 
       const relationshipColorsNormalized: Record<string, string> = {};
       for (const [k, v] of Object.entries(RELATIONSHIP_COLORS)) {
